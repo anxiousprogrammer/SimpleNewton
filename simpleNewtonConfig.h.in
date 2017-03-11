@@ -1,0 +1,3 @@
+// The configured options and settings for Tutorial
+#define simpleNewton_VERSION_MAJOR @simpleNewton_VERSION_MAJOR@
+#define simpleNewton_VERSION_MINOR @simpleNewton_VERSION_MINOR@

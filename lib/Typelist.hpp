@@ -34,7 +34,13 @@ struct typeNodes_concatenate;
 // Remove type from typelist
 template< class REM_T, class... TYPES >
 struct typeNodes_remove;
+
+// Remove type from typelist
+template< class... TYPES >
+struct typeNodes_removeDuplicates;
 /* End: operations on typelists */
+
+
 
 // The do-all, no-instance wrapper
 // Definition of the typelist
@@ -54,10 +60,10 @@ struct SN_CT_TYPELIST {
    /* Remove type from typelist */
    template< class REM_T >
    using removeFromList = typename typeNodes_remove< REM_T, TYPES... >::list;
+   /* Remove duplicates from typelist */
+   using removeDuplicates = typename typeNodes_removeDuplicates< TYPES... >::list;
    
-private:   // To prevent client to create instances of a typelist
-   SN_CT_TYPELIST() = default;
-   SN_CT_TYPELIST( const SN_CT_TYPELIST & ) = default;
+   virtual void NoInstance() = 0;   // To prevent client to create instances of a typelist
 };
 
 }   // namespace simpleNewton

@@ -51,6 +51,7 @@ template< int pseudoSize > void declareAssertFailed() {}
 #define SN_ASSERT_NEGATIVE    ( VALUE )
 #define SN_ASSERT_MSG         ( expression, MSG )
 
+#define SN_ASSERT_SIZE_SAME              ( VAR, REF )
 #define SN_ASSERT_SIZE_LESS_THAN         ( VAR, REF )
 #define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( VAR, REF )
 #define SN_ASSERT_INDEX_WITHIN_SIZE      ( IND, REF )
@@ -158,14 +159,20 @@ template< int pseudoSize > void declareAssertFailed() {}
 
 
 /* Run-time constraints related to container sizes */
-#define SN_ASSERT_SIZE_LESS_THAN( VAR, REF ) \
-   do { if( !static_cast< bool >( static_cast<unsigned int>(VAR) > 0 && static_cast<unsigned int>(VAR) <= static_cast<unsigned int>(REF) ) ) { \
+#define SN_ASSERT_SIZE_SAME( SIZE, REF ) \
+   do { if( !static_cast< bool >( static_cast<unsigned int>(SIZE) == static_cast<unsigned int>(REF) ) ) { \
            simpleNewton::asserts::errorMessage( "Size-less-than assertion failed - ", __FILE__, __LINE__ ); \
            std::abort(); \
    } } while(false)
 
-#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( VAR, REF ) \
-   do { if( !static_cast< bool >( VAR > 0 && VAR < REF ) ) { \
+#define SN_ASSERT_SIZE_LESS_THAN( SIZE, REF ) \
+   do { if( !static_cast< bool >( static_cast<unsigned int>(SIZE) > 0 && static_cast<unsigned int>(SIZE) <= static_cast<unsigned int>(REF) ) ) { \
+           simpleNewton::asserts::errorMessage( "Size-less-than assertion failed - ", __FILE__, __LINE__ ); \
+           std::abort(); \
+   } } while(false)
+
+#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
+   do { if( !static_cast< bool >( SIZE > 0 && SIZE < REF ) ) { \
            simpleNewton::asserts::errorMessage( "Size-strictly-less-than assertion failed - ", __FILE__, __LINE__ ); \
            std::abort(); \
    } } while(false)

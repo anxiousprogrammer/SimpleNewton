@@ -57,10 +57,15 @@ struct typeNodes_append {
 
 //+****************************************************************************************************************************************
 /* Concatenate typelist operation */
-// Full definition
+// Work-around partial specialization: we pass typelist as argument but extract the template arguments by compiler-deducing them.
 template< class... NEW_TYPES, class... TYPES >
 struct typeNodes_concatenate< SN_CT_TYPELIST<NEW_TYPES...>, TYPES... > {
    using list = SN_CT_TYPELIST< TYPES..., NEW_TYPES... >;
+};
+// Partial specilization for empty typelist: sometimes we WANT empty typelists, especially when operating on other typelists.
+template< class... TYPES >
+struct typeNodes_concatenate< SN_CT_TYPELIST<NullType>, TYPES... > {
+   using list = SN_CT_TYPELIST< TYPES... >;
 };
 /* End: Append typelist operation */
 //+****************************************************************************************************************************************
@@ -68,20 +73,52 @@ struct typeNodes_concatenate< SN_CT_TYPELIST<NEW_TYPES...>, TYPES... > {
 
 //+****************************************************************************************************************************************
 /* Remove a type from typelist operation */
-// Full definition
+// 'Acting' specialization
 template< class REM_T, class... TAIL >
 struct typeNodes_remove< REM_T, REM_T, TAIL... > {
-   using list = SN_CT_TYPELIST< TAIL... >;
+   using list = typename typeNodes_remove< REM_T, TAIL... >::list;
 };
 
+// Terminator specialization(s)
 template< class REM_T, class END >
 struct typeNodes_remove< REM_T, END > {
    using list = SN_CT_TYPELIST< END >;
 };
+template< class REM_T >
+struct typeNodes_remove< REM_T, REM_T > {
+   using list = SN_CT_TYPELIST< NullType >;
+};
 
+// Recursive specialization
 template< class REM_T, class HEAD, class... TAIL >
 struct typeNodes_remove< REM_T, HEAD, TAIL... > {
    using list = typename SN_CT_TYPELIST< HEAD >::template concatenateList< typename typeNodes_remove< REM_T, TAIL... >::list >;
+};
+/* End: Append typelist operation */
+//+****************************************************************************************************************************************
+
+
+//+****************************************************************************************************************************************
+/* Remove duplicates from typelist operation */
+// Empty specialization
+template<> struct typeNodes_removeDuplicates< NullType > {
+   using list = SN_CT_TYPELIST< NullType >;
+};
+
+// Terminator specialization
+template< class END > 
+struct typeNodes_removeDuplicates< END > {
+   using list = SN_CT_TYPELIST< END >;
+};
+
+// Recursive specialization
+template< class HEAD, class... TAIL >
+struct typeNodes_removeDuplicates< HEAD, TAIL... > {
+private:
+   using R1 = typename typeNodes_removeDuplicates< TAIL... >::list;
+   using R2 = typename R1::template removeFromList< HEAD >;
+public:
+   using list = typename SN_CT_TYPELIST< HEAD >::template concatenateList< R2 >;
 };
 /* End: Append typelist operation */
 //+****************************************************************************************************************************************

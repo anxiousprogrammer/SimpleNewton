@@ -51,6 +51,8 @@ struct SN_CT_TYPELIST {
    // 'Function style' operations associated with typelist
    /* Calculate length */
    enum { getSize = typeNodes_length< list >::result };
+   /* Is type in typelist */
+   template< class TYPE > bool isInList< TYPE, TYPES... >();
    /* Append typelist */
    template< class... MORE_TYPES >
    using appendList = typename typeNodes_append< TYPES..., MORE_TYPES... >::list;

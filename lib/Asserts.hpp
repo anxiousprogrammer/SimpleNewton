@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
-#include "GlobalConstants.hpp"
+#include <GlobalConstants.hpp>
 
 namespace simpleNewton {
 namespace asserts {
@@ -28,33 +28,33 @@ template< int pseudoSize > void declareAssertFailed() {}
 
 #ifdef NDEBUG
 
-#define SN_CT_ASSERT             ( expression )
-#define SN_CT_ASSERT_EQUAL       ( VALUE, REFERENCE )
-#define SN_CT_ASSERT_INEQUAL     ( VALUE, REFERENCE )
-#define SN_CT_ASSERT_LESS_THAN   ( VALUE, REFERENCE )
-#define SN_CT_ASSERT_LEQ         ( VALUE, REFERENCE )
+#define SN_CT_ASSERT( expression )
+#define SN_CT_ASSERT_EQUAL( VALUE, REFERENCE )
+#define SN_CT_ASSERT_INEQUAL( VALUE, REFERENCE )
+#define SN_CT_ASSERT_LESS_THAN( VALUE, REFERENCE )
+#define SN_CT_ASSERT_LEQ( VALUE, REFERENCE )
 #define SN_CT_ASSERT_GREATER_THAN( VALUE, REFERENCE )
-#define SN_CT_ASSERT_GREQ        ( VALUE, REFERENCE )
-#define SN_CT_ASSERT_ZERO        ( VALUE )
-#define SN_CT_ASSERT_POSITIVE    ( VALUE )
-#define SN_CT_ASSERT_NEGATIVE    ( VALUE )
+#define SN_CT_ASSERT_GREQ( VALUE, REFERENCE )
+#define SN_CT_ASSERT_ZERO( VALUE )
+#define SN_CT_ASSERT_POSITIVE( VALUE )
+#define SN_CT_ASSERT_NEGATIVE( VALUE )
 
-#define SN_ASSERT             ( expression )
-#define SN_ASSERT_EQUAL       ( VALUE, REFERENCE )
-#define SN_ASSERT_INEQUAL     ( VALUE, REFERENCE )
-#define SN_ASSERT_LESS_THAN   ( VALUE, REFERENCE )
-#define SN_ASSERT_LEQ         ( VALUE, REFERENCE )
+#define SN_ASSERT( expression )
+#define SN_ASSERT_EQUAL( VALUE, REFERENCE )
+#define SN_ASSERT_INEQUAL( VALUE, REFERENCE )
+#define SN_ASSERT_LESS_THAN( VALUE, REFERENCE )
+#define SN_ASSERT_LEQ( VALUE, REFERENCE )
 #define SN_ASSERT_GREATER_THAN( VALUE, REFERENCE )
-#define SN_ASSERT_GREQ        ( VALUE, REFERENCE )
-#define SN_ASSERT_ZERO        ( VALUE )
-#define SN_ASSERT_POSITIVE    ( VALUE )
-#define SN_ASSERT_NEGATIVE    ( VALUE )
-#define SN_ASSERT_MSG         ( expression, MSG )
+#define SN_ASSERT_GREQ( VALUE, REFERENCE )
+#define SN_ASSERT_ZERO( VALUE )
+#define SN_ASSERT_POSITIVE( VALUE )
+#define SN_ASSERT_NEGATIVE( VALUE )
+#define SN_ASSERT_MSG( expression, MSG )
 
-#define SN_ASSERT_SIZE_SAME              ( VAR, REF )
-#define SN_ASSERT_SIZE_LESS_THAN         ( VAR, REF )
+#define SN_ASSERT_SIZE_SAME( VAR, REF )
+#define SN_ASSERT_SIZE_LESS_THAN( VAR, REF )
 #define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( VAR, REF )
-#define SN_ASSERT_INDEX_WITHIN_SIZE      ( IND, REF )
+#define SN_ASSERT_INDEX_WITHIN_SIZE( IND, REF )
 
 #else
 

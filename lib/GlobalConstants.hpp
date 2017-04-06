@@ -2,7 +2,7 @@
 #define GLOBALCONSTANTS_HPP
 
 #include <limits>
-#include "Types.hpp"
+#include <Types.hpp>
 
 namespace simpleNewton {
 namespace globalConstants {

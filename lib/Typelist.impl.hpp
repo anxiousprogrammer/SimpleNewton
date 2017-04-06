@@ -23,7 +23,9 @@ struct typeNodes<H, TYPES...> : typeNodes<TYPES...> {
 
 /*****************************************************************************************************************************************|
 *
-*   Operations on the above typelist: calc. length, find at index, add item, erase item.
+*   Operations on the above typelist: calc. length, is type available, append list, concatenate list, remove from list and remove
+*
+*   duplicates.
 *
 |*****************************************************************************************************************************************/
 
@@ -40,6 +42,19 @@ template< class H, class... TYPES >
 struct typeNodes_length< typeNodes< H, TYPES... > > {
    enum { result = 1 + typeNodes_length< typeNodes<TYPES...> >::result };
 };
+/* End: Calculate length operation */
+//+****************************************************************************************************************************************
+
+
+//+****************************************************************************************************************************************
+/* Is type available */
+// Terminator full specialization
+template< class TYPE > bool isInList< TYPE, TYPES... >() {
+   return true;
+}
+
+// Recursive specialization
+
 /* End: Calculate length operation */
 //+****************************************************************************************************************************************
 

@@ -6,24 +6,30 @@
 #include <string>
 #include <memory>
 
+#include <Functor.hpp>
+
 namespace simpleNewton {
 
 // Floating point types
-using real_t = double;
-using single_t = float;
-using ConstReal_t = const double;
-using ConstSingle_t = const float;
+using real_t         = double;
+using single_t       = float;
+using const_real_t   = const double;
+using const_single_t = const float;
 
 // Integer types
-using std::size_t;
-using long_t = unsigned long;
-using large_t = unsigned long long;
-using ConstLong_t = const unsigned long;
-using ConstLarge_t = const unsigned long long;
+using byte_t        = char;
+using small_t       = unsigned int;
+using large_t       = unsigned long;
+using id_t          = unsigned long;
+using const_byte_t  = const unsigned int;
+using const_small_t = const unsigned int;
+using const_large_t = const unsigned long;
+using const_id_t    = unsigned long;
 
 // Other
-using std::string;
-using flag_t = bool;
+using string_t       = std::string;
+using const_string_t = const std::string;
+using flag_t         = bool;
 
 // Inheritance casts
 template< class CLS1, class CLS2 >

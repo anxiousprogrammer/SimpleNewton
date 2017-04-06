@@ -1,12 +1,33 @@
 #include <iostream>
 #include "simpleNewtonConfig.h"
 #include <Asserts.hpp>
-#include <TypeTraits.hpp>
+#include <Typelist.hpp>
+#include <TypeConstraints.hpp>
 
-class B {};
+// operator checking
+class B {
+public:
+   bool operator==( const B & ) const { return true; }
+   bool operator==( const int & ) const { return true; }
+   bool operator<( const B & ) const { return true; }
+   bool operator>( const B & ) const { return true; }
+   bool operator<=( const B & ) const { return true; }
+   bool operator>=( const B & ) const { return true; }
+};
+
+// Inheritance
 class D : public B {};
-class C {};
+class C { 
+public:
+   float operator()( int, int ) const volatile { std::cout << "Dings" << std::endl; return 0.0; }
+};
 class E : public D, public C {};
+
+template< class T >
+constexpr bool f1( T ) {
+   //std::cout << "Here, got into the function, y'all" << std::endl;
+   return true;
+}
 
 int main() {
 
@@ -14,8 +35,6 @@ int main() {
   
    // Asserts
    const int value = 10;
-   //int test = 0;
-   const float ding = 10.0;
    
    SN_CT_ASSERT( value == 10 );
    SN_CT_ASSERT_EQUAL( value, 10 );
@@ -42,11 +61,17 @@ int main() {
    SN_ASSERT_INDEX_WITHIN_SIZE( 1, 2 );
    
    // TypeTraits
+   /*SN_CT_ASSERT_INT( *pint );
    SN_CT_ASSERT_TYPE( ding, ConstSingle_t );
-   SN_CT_ASSERT_STRICTLY_DERIVED_FROM( D, B );
+   SN_CT_ASSERT_STRICTLY_DERIVED_FROM( D, B );*/
+   int j = 0;
+   volatile const int k = 0;
+   SN_CT_ASSERT_INT( j );
+   SN_CT_ASSERT_CALLABLE( E() );
+   SN_CT_ASSERT_COMPARABLE( B(), B() );
+   SN_CT_ASSERT_SAME_TYPE( j, k );
+   SN_CT_ASSERT_RVALUE( 2 );
+   SN_CT_ASSERT_DERIVED_FROM<D, B>();
    
-   std::shared_ptr<C> sp( new C );
-   SN_CT_ASSERT_SHARED_PTR( sp );
-
    return 0;
 }

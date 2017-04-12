@@ -5,6 +5,8 @@
 |***************************************************************************************************************************************///+
 
 namespace simpleNewton {
+namespace typelist {
+namespace impl {
 
 // Specialization -> tail-end of the typelist.
 template< class TAIL >
@@ -49,13 +51,23 @@ struct typeNodes_length< typeNodes< H, TYPES... > > {
 //+****************************************************************************************************************************************
 /* Is type available */
 // Terminator full specialization
-template< class TYPE > bool isInList< TYPE, TYPES... >() {
-   return true;
-}
+template< class TYPE, class END > 
+struct is_in_list< TYPE, END > {
+   enum : bool { result = false };
+};
 
-// Recursive specialization
+// 'Acting' full specialization
+template< class TYPE, class... TAIL >
+struct is_in_list< TYPE, TYPE, TAIL... > {
+   enum : bool { result = true };
+};
 
-/* End: Calculate length operation */
+// Recursive full specialization
+template< class TYPE, class HEAD, class... TAIL >
+struct is_in_list< TYPE, HEAD, TAIL...> {
+   enum : bool { result = is_in_list< TYPE, TAIL... >::result || false };
+};
+/* End: is type in typelist check */
 //+****************************************************************************************************************************************
 
 
@@ -72,7 +84,7 @@ struct typeNodes_append {
 
 //+****************************************************************************************************************************************
 /* Concatenate typelist operation */
-// Work-around partial specialization: we pass typelist as argument but extract the template arguments by compiler-deducing them.
+// Work-around full specialization: we pass typelist as argument but extract the template arguments by compiler-deducing them.
 template< class... NEW_TYPES, class... TYPES >
 struct typeNodes_concatenate< SN_CT_TYPELIST<NEW_TYPES...>, TYPES... > {
    using list = SN_CT_TYPELIST< TYPES..., NEW_TYPES... >;
@@ -138,4 +150,6 @@ public:
 /* End: Append typelist operation */
 //+****************************************************************************************************************************************
 
+}   // namespace impl
+}   // namespace typelist
 }   // namespace simpleNewton

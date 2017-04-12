@@ -10,6 +10,9 @@
 
 namespace simpleNewton {
 
+// The empty class/typename
+struct NullType {};
+
 // Floating point types
 using real_t         = double;
 using single_t       = float;
@@ -20,11 +23,11 @@ using const_single_t = const float;
 using byte_t        = char;
 using small_t       = unsigned int;
 using large_t       = unsigned long;
-using id_t          = unsigned long;
+using ID_t          = unsigned long;
 using const_byte_t  = const unsigned int;
 using const_small_t = const unsigned int;
 using const_large_t = const unsigned long;
-using const_id_t    = unsigned long;
+using const_ID_t    = const unsigned long;
 
 // Other
 using string_t       = std::string;

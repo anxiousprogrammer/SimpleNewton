@@ -6,4 +6,8 @@
 *
 |***************************************************************************************************************************************///+
 
+namespace simpleNewton {
+
 template struct BasicTypeTraits_CPPHackClass<int>;
+
+}   // namespace simpleNewton

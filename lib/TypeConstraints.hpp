@@ -1,12 +1,17 @@
 #ifndef TYPECONSTRAINTS_HPP
 #define TYPECONSTRAINTS_HPP
 
+#include <Asserts.hpp>
 #include <BasicTypeTraits.hpp>
-/**||***************************************************************************************************************************************
+#include <Typelist.hpp>
+
+/**||**************************************************************************************************************************************
 *
 *   Description: Compile-time Asserts based on BasicTypeTraits.hpp
 *
-|***************************************************************************************************************************************///+
+|**************************************************************************************************************************************///+
+
+namespace simpleNewton {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///   HACK: TEMPLATE/INLINE OR NO, WE WANT CPP!
@@ -20,182 +25,213 @@ struct TypeConstraints_CPPHackClass {};
 ///   RELEASE mode 
 //////////////////
 
+template< bool constexpr_expr >
+inline void SN_CT_ASSERT() {}
+
+template< int NUM, class... PARAM >
+inline void SN_CT_ASSERT_NUM_TEMPLATE_ARG() {}
+
 template< class TYPE >
 inline void SN_CT_ASSERT_VOID_TYPE() {}
 
 template< class TYPE >
 inline void SN_CT_ASSERT_INT_TYPE() {}
-#define SN_CT_ASSERT_INT( VAR )
+template< class TYPE >
+#define SN_CT_ASSERT_INT( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_NOT_INT_TYPE() {}
-#define SN_CT_ASSERT_NOT_INT( VAR )
+#define SN_CT_ASSERT_NOT_INT( ... )
 
 template< class TYPE >
-inline void SN_CT_ASSERT_FLOAT_TYPE() {}
-#define SN_CT_ASSERT_FLOAT( VAR )
+inline void SN_CT_ASSERT_FP_TYPE() {}
+#define SN_CT_ASSERT_FP( ... )
 
 template< class TYPE >
-inline void SN_CT_ASSERT_NOT_FLOAT_TYPE() {}
-#define SN_CT_ASSERT_NOT_FLOAT( VAR )
+inline void SN_CT_ASSERT_NOT_FP_TYPE() {}
+#define SN_CT_ASSERT_NOT_FP( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_SMALL_TYPE() {}
-#define SN_CT_ASSERT_SMALL( VAR )
+#define SN_CT_ASSERT_SMALL( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_LARGE_TYPE() {}
-#define SN_CT_ASSERT_LARGE( VAR )
+#define SN_CT_ASSERT_LARGE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_ID_TYPE() {}
-#define SN_CT_ASSERT_ID( VAR )
+#define SN_CT_ASSERT_ID( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_STRING_TYPE() {}
-#define SN_CT_ASSERT_STRING( VAR )
+#define SN_CT_ASSERT_STRING( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_BOOL_TYPE() {}
-#define SN_CT_ASSERT_BOOL( VAR )
+#define SN_CT_ASSERT_BOOL( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_ARRAY_TYPE() {}
-#define SN_CT_ASSERT_ARRAY( VAR )
+#define SN_CT_ASSERT_ARRAY( ... )
 
-template< class TYPE >
-inline void SN_CT_ASSERT_FUNCTION_TYPE() {}
-#define SN_CT_ASSERT_FUNCTION( VAR )
+#define SN_CT_ASSERT_FUNCTION( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_CLASS_TYPE() {}
-#define SN_CT_ASSERT_CLASS( VAR )
+#define SN_CT_ASSERT_OBJECT( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_PTR_TYPE() {}
-#define SN_CT_ASSERT_PTR( VAR )
+#define SN_CT_ASSERT_PTR( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_PTR_TO_CONST_TYPE() {}
-#define SN_CT_ASSERT_PTR_TO_CONST( VAR )
+#define SN_CT_ASSERT_PTR_TO_CONST( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_FUNCTION_PTR_TYPE() {}
-#define SN_CT_ASSERT_FUNCTION_PTR( VAR )
+#define SN_CT_ASSERT_FUNCTION_PTR( ... )
+
+template< class TYPE >
+inline void SN_CT_ASSERT_MEMBER_FUNCTION_PTR_TYPE() {}
+#define SN_CT_ASSERT_MEMBER_FUNCTION_PTR( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_REFERENCE_TYPE() {}
-#define SN_CT_ASSERT_REFERENCE( VAR )
+#define SN_CT_ASSERT_REFERENCE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_CONST_REFERENCE_TYPE() {}
-#define SN_CT_ASSERT_CONST_REFERENCE( VAR )
+#define SN_CT_ASSERT_CONST_REFERENCE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_RVALUE_REFERENCE_TYPE() {}
-#define SN_CT_ASSERT_RVALUE_REFERENCE( VAR )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_NOT_RVALUE_REFERENCE_TYPE() {}
-#define SN_CT_ASSERT_NOT_RVALUE_REFERENCE( VAR )
+#define SN_CT_ASSERT_NOT_RVALUE_REFERENCE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_CONST_TYPE() {}
-#define SN_CT_ASSERT_CONST( VAR )
+#define SN_CT_ASSERT_CONST( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_NOT_CONST_TYPE() {}
-#define SN_CT_ASSERT_NOT_CONST( VAR )
+#define SN_CT_ASSERT_NOT_CONST( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_VOLATILE_TYPE() {}
-#define SN_CT_ASSERT_VOLATILE( VAR )
+#define SN_CT_ASSERT_VOLATILE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_NOT_VOLATILE_TYPE() {}
-#define SN_CT_ASSERT_NOT_VOLATILE( VAR )
+#define SN_CT_ASSERT_NOT_VOLATILE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_UNSIGNED_TYPE() {}
-#define SN_CT_ASSERT_UNSIGNED( VAR )
+#define SN_CT_ASSERT_UNSIGNED( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_SIGNED_TYPE() {}
-#define SN_CT_ASSERT_SIGNED( VAR )
+#define SN_CT_ASSERT_SIGNED( ... )
 
-template< class TYPE >
-inline void SN_CT_ASSERT_RVALUE( TYPE && INST ) {}
+#define SN_CT_ASSERT_RVALUE( ... )
+#define SN_CT_ASSERT_LVALUE( ... )
 
-template< class TYPE >
-inline void SN_CT_ASSERT_LVALUE( TYPE && INST ) {}
-
-template< class TYPE >
+template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_SAME_TYPENAME() {}
+template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_STRICTLY_SAME_TYPENAME() {}
-#define SN_CT_ASSERT_SAME_TYPE( INST )
-#define SN_CT_ASSERT_STRICTLY_SAME_TYPE( INST )
-#define SN_CT_ASSERT_TYPE( INST, TYPE )
-#define SN_CT_ASSERT_STRICTLY_TYPE( INST, TYPE )
 
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_SAME_TYPE( const TYPE1 &, const TYPE2 & ) {}
+#define SN_CT_ASSERT_STRICTLY_SAME_TYPE( INST1, INST2 )
+
+template< class TYPE, class GTYPE >
+inline void SN_CT_ASSERT_TYPE( const GTYPE & ) {}
+#define SN_CT_ASSERT_STRICTLY_TYPE( INST, ... )
+
+template< class TYPE, class TYPELIST >
+inline void SN_CT_ASSERT_TYPE_IN_TYPELIST() {}
 
 
 template< class DER, class BASE >
 inline void SN_CT_ASSERT_DERIVED_FROM() {}
-#define SN_CT_ASSERT_INSTANCE_DERIVED_FROM( DER, BASE )
-
 template< class DER, class BASE >
-inline void SN_CT_ASSERT_STRICTLY_DERIVED_FROM() {}
-#define SN_CT_ASSERT_INSTANCE_STRICTLY_DERIVED_FROM( DER, BASE )
+inline void SN_CT_ASSERT_INSTANCE_DERIVED_FROM( const DER &, const BASE & ) {}
 
 template< class DER, class BASE >
 inline void SN_CT_ASSERT_NOT_DERIVED_FROM() {}
-#define SN_CT_ASSERT_INSTANCE_NOT_DERIVED_FROM( DER, BASE )
-
 template< class DER, class BASE >
-inline void SN_CT_ASSERT_STRICTLY_NOT_DERIVED_FROM() {}
-#define SN_CT_ASSERT_INSTANCE_STRICTLY_NOT_DERIVED_FROM( DER, BASE )
+inline void SN_CT_ASSERT_INSTANCE_NOT_DERIVED_FROM( const DER &, const BASE & ) {}
 
 template< class TYPE >
 inline void SN_CT_ASSERT_CALLABLE_TYPE() {}
-#define SN_CT_ASSERT_CALLABLE( INST )
+template< class TYPE >
+#define SN_CT_ASSERT_CALLABLE( ... )
 
 template< class TYPE >
 inline void SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE() {}
+
+template< class TYPE >
+inline void SN_CT_ASSERT_COPY_CONSTRUCTIBLE_TYPE() {}
+
+template< class TYPE >
+inline void SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE() {}
 
 template< class TYPE >
 inline void SN_CT_ASSERT_CONSTRUCTIBLE_TYPE() {}
 
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE() {}
-#define SN_CT_ASSERT_STRICTLY_COMPARABLE( INST1, INST2 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_STRICTLY_COMPARABLE( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_COMPARABLE_TYPE() {}
-#define SN_CT_ASSERT_COMPARABLE( INST1, INST2 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_COMPARABLE( const TYPE1 &, const TYPE2 & ) {}
+
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_COPY_ASSIGNABLE_TYPE() {}
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_COPY_ASSIGNABLE( const TYPE1 &, const TYPE2 & ) {}
+
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_MOVE_ASSIGNABLE_TYPE() {}
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_MOVE_ASSIGNABLE( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_ASSIGNABLE_TYPE() {}
-#define SN_CT_ASSERT_STRICTLY_ASSIGNABLE( INST1, INST2 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_ASSIGNABLE( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_CAN_ADD_TYPE() {}
-#define SN_CT_ASSERT_CAN_ADD( INST1, INST2 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_CAN_ADD( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE2, class TYPE1 >
 inline void SN_CT_ASSERT_CAN_SUBTRACT_TYPE() {}
-#define SN_CT_ASSERT_CAN_SUBTRACT( INST2, INST1 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_CAN_SUBTRACT( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_CAN_MULTIPLY_TYPE() {}
-#define SN_CT_ASSERT_CAN_MULTIPLY( INST1, INST2 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_CAN_MULTIPLY( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE2, class TYPE1 >
 inline void SN_CT_ASSERT_CAN_DIVIDE_TYPE() {}
-#define SN_CT_ASSERT_CAN_DIVIDE( INST2, INST1 )
+template< class TYPE1, class TYPE2 >
+inline void SN_CT_ASSERT_CAN_DIVIDE( const TYPE1 &, const TYPE2 & ) {}
 
 template< class TYPE >
 inline void SN_CT_ASSERT_ARITHMETIC_TYPE() {}
-#define SN_CT_ASSERT_ARITHMETIC( INST )
+template< class TYPE >
+inline void SN_CT_ASSERT_ARITHMETIC( const TYPE & ) {}
 
 #else
 
@@ -204,7 +240,6 @@ inline void SN_CT_ASSERT_ARITHMETIC_TYPE() {}
 //////////////////
 
 
-namespace simpleNewton {
 namespace typetraits {
 namespace impl {
 // Error signal function
@@ -213,14 +248,29 @@ template<> struct CT_ASSERT_ERROR<true>  { enum { ASSERT_FAILED = false }; };
 template<> struct CT_ASSERT_ERROR<false> {};
 }   // namespace impl
 }   // namespace typetraits
-}   // namespace simpleNewton
 
 
 
-/* Constraint - instance/type must be void type */
+/* Constraint - Compile time assert */
+template< bool constexpr_expr >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< static_cast<bool>( constexpr_expr ) >::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - number of template arguments must be determinate */
+template< int NUM, class... ARG >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NUM_TEMPLATE_ARG() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< (NUM == typetraits::argument_count<ARG...>::value) >::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - type must be void type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_VOID_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_void< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_void< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -228,258 +278,346 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_VOID_TYPE() {
 /* Constraint - instance/type must be integer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_INT_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_integer< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_INT( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_integer< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
-
+#define SN_CT_ASSERT_INT( ... ) \
+   do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_integer< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+   } while(false)
 
 
 /* Constraint - instance/type must NOT be integer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_INT_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_integer< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_NOT_INT( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_integer< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_NOT_INT( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_integer< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must be float type */
+/* Constraint - instance/type must be floating point type */
 template< class TYPE >
-inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FLOAT_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_floating_point< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FP_TYPE() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_FLOAT( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_floating_point< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_FP( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_floating_point< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must NOT be float type */
+/* Constraint - instance/type must NOT be floating point type */
 template< class TYPE >
-inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_FLOAT_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_floating_point< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_FP_TYPE() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_NOT_FLOAT( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_floating_point< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) return; } while(false)
+#define SN_CT_ASSERT_NOT_FP( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_floating_point< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be small type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SMALL_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_small_t< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_small_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_SMALL( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_small_t< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_SMALL( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_small_t< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be large type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_LARGE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_large_t< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_large_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_LARGE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_large_t< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_LARGE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_large_t< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be ID type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ID_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_id_t< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_ID_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_ID( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_id_t< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_ID( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_ID_t< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be string type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRING_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_string_t< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_string_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_STRING( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_string_t< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_STRING( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_string_t< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be bool type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_BOOL_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_bool< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_bool< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_BOOL( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_bool< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_BOOL( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_bool< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be array type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ARRAY_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_array< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_array< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_ARRAY( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_array< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_ARRAY( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_array< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must be function type */
-template< class TYPE >
-inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FUNCTION_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_function< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
-}
-#define SN_CT_ASSERT_FUNCTION( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_function< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+/* Constraint - must be function type */
+#define SN_CT_ASSERT_FUNCTION( FUNC_NAME ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_function< decltype(FUNC_NAME) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be class type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CLASS_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_class< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CLASS( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_class< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_OBJECT( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be pointer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_PTR_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_pointer< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_PTR( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_pointer< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_PTR( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be pointer to const type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_PTR_TO_CONST_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_pointer_to_const< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer_to_const< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_PTR_TO_CONST( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_pointer_to_const< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_PTR_TO_CONST( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer_to_const< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be function pointer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FUNCTION_PTR_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_function_pointer< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_function_pointer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_FUNCTION_PTR( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_function_pointer< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_FUNCTION_PTR( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_function_pointer< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
+
+
+
+/* Constraint - instance/type must be member function pointer type */
+template< class TYPE >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MEMBER_FUNCTION_PTR_TYPE() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_member_function_pointer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+}
+#define SN_CT_ASSERT_MEMBER_FUNCTION_PTR( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_member_function_pointer< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_REFERENCE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_reference< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_REFERENCE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_REFERENCE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_reference< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be const reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CONST_REFERENCE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_const_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_const_reference< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CONST_REFERENCE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_const_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_CONST_REFERENCE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_const_reference< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must be rvalue reference type */
+/* Constraint - type must be rvalue reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_RVALUE_REFERENCE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_rvalue_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_RVALUE_REFERENCE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_rvalue_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
 
 
 
 /* Constraint - instance/type must NOT be rvalue reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_RVALUE_REFERENCE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_rvalue_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_NOT_RVALUE_REFERENCE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_rvalue_reference< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_NOT_RVALUE_REFERENCE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_rvalue_reference< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be const qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CONST_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_const< TYPE >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_const< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CONST( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_const< decltype(VAR) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_CONST( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_const< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be NOT be const qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_CONST_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_const< TYPE >::ASSERT_FAILED >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_const< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_NOT_CONST( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_const< decltype(VAR) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_NOT_CONST( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_const< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be volatile qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_VOLATILE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_volatile< TYPE >::ASSERT_FAILED >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_volatile< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_VOLATILE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_volatile< decltype(VAR) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_VOLATILE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_volatile< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must NOT be volatile qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_VOLATILE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_volatile< TYPE >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_volatile< TYPE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_NOT_VOLATILE( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_volatile< decltype(VAR) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_NOT_VOLATILE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_volatile< decltype(__VA_ARGS__) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be unsigned qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_UNSIGNED_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_unsigned< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_unsigned< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_UNSIGNED( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_unsigned< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_UNSIGNED( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_unsigned< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
 /* Constraint - instance/type must be signed qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SIGNED_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_signed< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_signed< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_SIGNED( VAR ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_signed< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(VAR)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_SIGNED( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_signed< \
+   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must be rvalue/lvalue */
-#define SN_CT_ASSERT_RVALUE( INST ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_rvalue(INST) >::ASSERT_FAILED ) break; } while(false)
-#define SN_CT_ASSERT_LVALUE( INST ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_lvalue(INST) >::ASSERT_FAILED ) break; } while(false)
+/* Constraint - instance must be rvalue/lvalue */
+#define SN_CT_ASSERT_RVALUE( ... ) \
+   do { if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_rvalue(__VA_ARGS__) >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_LVALUE( ... ) \
+   do { if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue(__VA_ARGS__) >::ASSERT_FAILED ) break; } while(false)
 
 
 
@@ -490,26 +628,51 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SIGNED_TYPE() {
 /* IMPORTANT, GENERAL Constraint - typetraits must be the same */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SAME_TYPENAME() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type, typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< typename typetraits::impl::NoCVQ_R<TYPE1>::type, typename typetraits::impl::NoCVQ_R<TYPE2>::type >::value >::ASSERT_FAILED ) return;
 }
+
+
 
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_SAME_TYPENAME() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< TYPE1, TYPE2 >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< TYPE1, TYPE2 >::value >::ASSERT_FAILED ) return;
 }
 
-#define SN_CT_ASSERT_SAME_TYPE( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type, typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >::value >::ASSERT_FAILED ) break; } while(false)
+
+
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SAME_TYPE( const TYPE1 &, const TYPE2 & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< TYPE1, TYPE2 >::value >::ASSERT_FAILED ) return;
+}
+
+
 
 #define SN_CT_ASSERT_STRICTLY_SAME_TYPE( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< decltype(INST1), decltype(INST2) >::value >::ASSERT_FAILED ) break; } while(false)
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::are_type_similar< decltype(INST1), decltype(INST2) >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
-#define SN_CT_ASSERT_TYPE( INST, TYPE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST)>::type, typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) break; } while(false)
 
-#define SN_CT_ASSERT_STRICTLY_TYPE( INST, TYPE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_type_similar< decltype(INST), TYPE >::value >::ASSERT_FAILED ) break; } while(false)
 
+template< class TYPE, class GTYPE >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_TYPE( const GTYPE & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< typename typetraits::impl::NoCVQ_R<GTYPE>::type, typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+}
+
+
+
+#define SN_CT_ASSERT_STRICTLY_TYPE( INST, ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< decltype(INST), __VA_ARGS__ >::value >::ASSERT_FAILED ) break; \
+} while(false)
+
+
+
+template< class TYPE, class TYPELIST >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_TYPE_IN_TYPELIST() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< TYPELIST:: template isInList<TYPE>() >::ASSERT_FAILED ) return;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,65 +682,100 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_SAME_TYPENAM
 /* Constraint - instance/type DER must be derived from BASE */
 template< class DER, class BASE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_DERIVED_FROM() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<DER>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<BASE>::type >(nullptr) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_DER = typename typetraits::impl::NoCVQ_R<DER>::type;
+   using STRIPPED_BASE = typename typetraits::impl::NoCVQ_R<BASE>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_DER >::value && 
+                                           typetraits::is_class< STRIPPED_BASE >::value && 
+                                           typetraits::is_derived_from< STRIPPED_DER, STRIPPED_BASE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_INSTANCE_DERIVED_FROM( DER, BASE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(DER)>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(BASE)>::type >(nullptr) ) >::value >::ASSERT_FAILED ) break; } while(false)
-
-
-
-/* Constraint - instance/type DER must be strictly derived from BASE */
 template< class DER, class BASE >
-inline void SN_CT_ASSERT_STRICTLY_DERIVED_FROM() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_strictly_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<DER>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<BASE>::type >(nullptr) ) >::value >::ASSERT_FAILED ) return;
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_INSTANCE_DERIVED_FROM( const DER &, const BASE & ) {
+   using STRIPPED_DER = typename typetraits::impl::NoCVQ_R<DER>::type;
+   using STRIPPED_BASE = typename typetraits::impl::NoCVQ_R<BASE>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_DER >::value && 
+                                           typetraits::is_class< STRIPPED_BASE >::value && 
+                                           typetraits::is_derived_from< STRIPPED_DER, STRIPPED_BASE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_INSTANCE_STRICTLY_DERIVED_FROM( DER, BASE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_strictly_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(DER)>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(BASE)>::type >(nullptr) ) >::value >::ASSERT_FAILED ) break; } while(false)
 
 
 
 /* Constraint - instance/type DER must NOT be derived from BASE */
 template< class DER, class BASE >
 inline void SN_CT_ASSERT_NOT_DERIVED_FROM() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<DER>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<BASE>::type >(nullptr) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_DER = typename typetraits::impl::NoCVQ_R<DER>::type;
+   using STRIPPED_BASE = typename typetraits::impl::NoCVQ_R<BASE>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_DER >::value && 
+                                           typetraits::is_class< STRIPPED_BASE >::value && 
+                                           typetraits::not_derived_from< STRIPPED_DER, STRIPPED_BASE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_INSTANCE_NOT_DERIVED_FROM( DER, BASE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(DER)>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(BASE)>::type >(nullptr) ) >::value >::ASSERT_FAILED ) break; } while(false)
-
-
-
-/* Constraint - instance/type DER must be strictly NOT derived from BASE */
 template< class DER, class BASE >
-inline void SN_CT_ASSERT_STRICTLY_NOT_DERIVED_FROM() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_strictly_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<DER>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<BASE>::type >(nullptr) ) >::value >::ASSERT_FAILED ) return;
+inline void SN_CT_ASSERT_INSTANCE_NOT_DERIVED_FROM( const DER &, const BASE & ) {
+   using STRIPPED_DER = typename typetraits::impl::NoCVQ_R<DER>::type;
+   using STRIPPED_BASE = typename typetraits::impl::NoCVQ_R<BASE>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_DER >::value && 
+                                           typetraits::is_class< STRIPPED_BASE >::value && 
+                                           typetraits::not_derived_from< STRIPPED_DER, STRIPPED_BASE >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_INSTANCE_STRICTLY_NOT_DERIVED_FROM( DER, BASE ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::not_strictly_derived_from< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(DER)>::type >(nullptr) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(BASE)>::type >(nullptr) ) >::value >::ASSERT_FAILED ) return; } while(false)
 
 
 
 /* Constraint - instance/type must be callable */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CALLABLE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_callable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_callable< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CALLABLE( INST ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_callable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+#define SN_CT_ASSERT_CALLABLE( ... ) \
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_callable< \
+   decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >( nullptr ) ) \
+   >::value >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 
-/* Constraint - instance/type must be trivially constructible */
+/* Constraint - type must be trivially constructible */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_trivially_constructible< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_TYPE >::value && 
+                                           typetraits::is_trivially_constructible< STRIPPED_TYPE >::value >::ASSERT_FAILED ) return;
 }
 
 
 
-/* Constraint - instance/type must be constructible */
-template< class TYPE, class... PARAM >
+/* Constraint - type must be copy constructible */
+template< class TYPE >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COPY_CONSTRUCTIBLE() {
+   using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_TYPE >::value && 
+                                           typetraits::is_copy_constructible< STRIPPED_TYPE >::value >::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - type must be move constructible */
+template< class TYPE >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_CONSTRUCTIBLE() {
+   using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_TYPE >::value && 
+                                           typetraits::is_move_constructible< STRIPPED_TYPE >::value >::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - type must be constructible */
+template< class TYPE, class PARAM_TYPELIST >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CONSTRUCTIBLE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_constructible< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ), PARAM... >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_TYPE >::value && 
+                                           typetraits::is_constructible< STRIPPED_TYPE, PARAM_TYPELIST >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -585,83 +783,219 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CONSTRUCTIBLE() {
 /* Constraint - instance/type must be strictly comparable with another specific instance/type */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_strictly_comparable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ) >::value>::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_strictly_comparable< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value>::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_STRICTLY_COMPARABLE( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_strictly_comparable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_COMPARABLE( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_strictly_comparable< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value>::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - instance/type must be comparable with another specific instance/type */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COMPARABLE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_comparable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_comparable< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value>::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_COMPARABLE( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::are_comparable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COMPARABLE( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_comparable< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value>::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - a specific instance/type must be COPY assignable to instance/type */
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COPY_ASSIGNABLE_TYPE() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue( TYPE1() ) && typetraits::is_copy_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COPY_ASSIGNABLE( const TYPE1 &, const TYPE2 & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue( TYPE1() ) && typetraits::is_copy_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
+
+
+
+/* Constraint - a specific instance/type must be MOVE assignable to instance/type */
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_ASSIGNABLE_TYPE() {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_move_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_ASSIGNABLE( const TYPE1 & INST1, const TYPE2 & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue( INST1 ) && typetraits::is_move_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - a specific instance/type must be assignable to instance/type */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ASSIGNABLE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_assignable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue( TYPE1() ) && typetraits::is_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_ASSIGNABLE( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_assignable< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ASSIGNABLE( const TYPE1 &, const TYPE2 & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_lvalue( TYPE1() ) && typetraits::is_assignable< 
+   decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - instance/type must be addable with a specific instance/type */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_ADD_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_add< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_add< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CAN_ADD( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_add< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_ADD( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_add< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - a specific instance/type must be subtractible from instance/type */
-template< class TYPE2, class TYPE1 >
+template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_SUBTRACT_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_subtract< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_subtract< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CAN_SUBTRACT( INST2, INST1 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_subtract< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_SUBTRACT( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_subtract< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - instance/type must be multipliable with a specific instance/type */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_MULTIPLY_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_multiply< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_multiply< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CAN_MULTIPLY( INST1, INST2 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_multiply< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_MULTIPLY( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_multiply< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - a specific instance/type must be able to divide instance/type */
-template< class TYPE2, class TYPE1 >
+template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_DIVIDE_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_divide< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE2>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE1>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_divide< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_CAN_DIVIDE( INST2, INST1 ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_divide< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST2)>::type >( nullptr ) ), decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST1)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE1, class TYPE2 >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_DIVIDE( const TYPE1 &, const TYPE2 & ) {
+   using STRIPPED_TYPE1 = typename typetraits::impl::NoCVQ_R<TYPE1>::type;
+   using STRIPPED_TYPE2 = typename typetraits::impl::NoCVQ_R<TYPE2>::type;
+   
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_divide< 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
+   decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 /* Constraint - instance/type must be arithmetic (with itself) */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_IS_ARITHMETIC_TYPE() {
-   if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::is_arithmetic< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_arithmetic< 
+   decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
 }
-#define SN_CT_ASSERT_IS_ARITHMETIC( INST ) \
-   do { if( !simpleNewton::typetraits::impl::CT_ASSERT_ERROR< simpleNewton::typetraits::can_multiply< decltype( simpleNewton::typetraits::impl::Class_Type_Return< typename simpleNewton::typetraits::impl::NoCVQ_R<decltype(INST)>::type >( nullptr ) ) >::value >::ASSERT_FAILED ) break; } while(false)
+template< class TYPE >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_IS_ARITHMETIC( const TYPE & ) {
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_arithmetic< 
+   decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) 
+   >::value >::ASSERT_FAILED ) return;
+}
 
 
 
 #endif   // NDEBUG
+
+}   // namespace simpleNewton
 
 #endif

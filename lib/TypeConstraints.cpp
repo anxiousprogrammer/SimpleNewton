@@ -6,4 +6,8 @@
 *
 |***************************************************************************************************************************************///+
 
+namespace simpleNewton {
+
 template struct TypeConstraints_CPPHackClass<int>;
+
+}   // namespace simpleNewton

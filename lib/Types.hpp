@@ -21,6 +21,7 @@ using const_single_t = const float;
 
 // Integer types
 using byte_t        = char;
+using uint_t        = unsigned int;
 using small_t       = unsigned int;
 using large_t       = unsigned long;
 using ID_t          = unsigned long;

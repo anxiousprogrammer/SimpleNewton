@@ -22,10 +22,12 @@ include_directories( "${PROJECT_BINARY_DIR}" )
 # Now the libraries
 include_directories( "${PROJECT_SOURCE_DIR}/lib" )
 add_subdirectory( lib )
-set( ALL_LIBRARIES ASSERTS BASICTYPETRAITS TYPECONSTRAINTS )
+set( ALL_LIBRARIES ASSERTS BASICTYPETRAITS TYPECONSTRAINTS LOGGER )
 
 # add the executable - assert tester
 add_executable( AssertTest ${PROJECT_SOURCE_DIR}/prog/AssertTest.cpp )
+add_executable( LoggerTest ${PROJECT_SOURCE_DIR}/prog/LoggerTest.cpp )
 #add_executable( TypelistTest ${PROJECT_SOURCE_DIR}/prog/TypelistTest.cpp )
 target_link_libraries( AssertTest ${ALL_LIBRARIES} )
+target_link_libraries( LoggerTest ${ALL_LIBRARIES} )
 #target_link_libraries( TypelistTest ${ALL_LIBRARIES} )

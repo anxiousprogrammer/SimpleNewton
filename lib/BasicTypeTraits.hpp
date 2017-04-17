@@ -2,12 +2,9 @@
 #define BASICTYPETRAITS_HPP
 
 #include <Types.hpp>
+#include <Typelist.hpp>
 
 namespace simpleNewton {
-
-// The 'opposite' of decltype - pseudo-instantiation
-template< class T > T&& declval();
-template< class T > T declinst();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///   HACK: TEMPLATE/INLINE OR NO, WE WANT CPP!
@@ -15,6 +12,29 @@ template< class T > T declinst();
 template< class T > struct BasicTypeTraits_CPPHackClass {};
 
 namespace typetraits {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Type altering actions
+/////////////////////////
+
+// The 'opposite' of decltype - pseudo-instantiation
+template< class T > T&& declval();
+template< class T > T declinst();
+
+// Add, remove reference
+template< class T > struct add_reference { using type = T &; };
+template< class T > struct remove_reference { using type = T; };
+template< class T > struct remove_reference<T &> { using type = T; };
+
+// Add, remove const
+template< class T > struct add_const { using type = const T; };
+template< class T > struct remove_const { using type = T; };
+template< class T > struct remove_const< const T > { using type = T; };
+
+// Add, remove volatile
+template< class T > struct add_volatile { using type = volatile T; };
+template< class T > struct remove_volatile { using type = T; };
+template< class T > struct remove_volatile< volatile T > { using type = T; };
 
 /**||***************************************************************************************************************************************
 *
@@ -67,6 +87,7 @@ template< class TYPE > struct is_bool;
 template< class TYPE > struct is_array;
 template< class TYPE > struct is_function;
 template< class TYPE > struct is_class;
+template< class TL > struct is_typelist;
 
 // Declarations -> pointer and reference types
 template< class TYPE > struct is_pointer;
@@ -99,6 +120,7 @@ template< class TYPE > constexpr bool is_lvalue( TYPE && INST );
 
 // OOP CT control - Inheritance, rule of five check, overloaded operator existence check! All using parameter validation.
 template< class DERIVED, class BASE, typename > struct is_derived_from;
+template< class CLS, class TL > struct is_derived_from_list_member; 
 template< class NOT_DERIVED, class NOT_BASE, typename > struct not_derived_from;
 template< class TYPE, typename > struct is_callable;
 template< class TYPE, typename > struct is_trivially_constructible;
@@ -202,7 +224,7 @@ template<> struct is_bool<bool> : public impl::true_type        {};
 template< class TYPE > struct is_array : public impl::false_type                        {};
 template< class TYPE, int SIZE > struct is_array< TYPE[SIZE] > : public impl::true_type {};
 
-// Specialization -> function, pointer to member function and class
+// Specialization -> function, class and typelist
 template< class TYPE > struct is_function : public impl::false_type                                                {};
 template< class RET_TYPE, class... PARAM > struct is_function< RET_TYPE( PARAM... ) > : public impl::true_type     {};
 template< class RET_TYPE, class... PARAM > struct is_function< RET_TYPE( PARAM...,... ) > : public impl::true_type {}; // printf
@@ -210,6 +232,9 @@ template< class RET_TYPE, class... PARAM > struct is_function< RET_TYPE( PARAM..
 template< class TYPE > struct is_class {
    enum : bool { value = is_member_function_pointer< decltype( impl::Class_Type_Return<TYPE>( nullptr ) ) >::value };
 };
+
+template< class TL > struct is_typelist : public impl::false_type {};
+template< class... PARAM > struct is_typelist< SN_CT_TYPELIST< PARAM... > > : public impl::true_type {};
 
 // Specialization -> pointer and reference
 template< class TYPE > struct is_pointer : public impl::false_type                         {};
@@ -296,6 +321,29 @@ struct is_derived_from : public impl::false_type {};
 template< class DERIVED, class BASE >
 struct is_derived_from< DERIVED, BASE, 
                         impl::a_void< decltype( impl::ptr_accept<BASE>( impl::ptr_return<DERIVED>() ) ) > > : public impl::true_type {};
+
+
+
+// Template parameter CLS must be derived from at least one class in the typelist
+// Implementation struct
+/* Declaration */
+template< class CLS, class... PARAM > struct is_derived_from_list_member_impl;
+/* Terminator specialization */
+template< class CLS, class END > struct is_derived_from_list_member_impl< CLS, END > {
+   enum : bool { value = is_derived_from< CLS, END >::value };
+};
+/* Acting specialization */
+template< class CLS, class HEAD, class... TAIL > 
+struct is_derived_from_list_member_impl< CLS, HEAD, TAIL... > {
+   enum : bool { value = is_derived_from< CLS, HEAD >::value || is_derived_from_list_member_impl< CLS, TAIL... >::value };
+};
+
+/* Full definition, failing case: not typelist */
+template< class CLS, class TL >
+struct is_derived_from_list_member : public impl::false_type {};
+/* Partial specialization */
+template< class CLS, template<class...> class TL, class... PARAM >
+struct is_derived_from_list_member< CLS, TL<PARAM...> > : public is_derived_from_list_member_impl< CLS, PARAM... > {};
 
 
 

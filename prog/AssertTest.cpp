@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "simpleNewtonConfig.h"
 #include <Asserts.hpp>
 #include <TypeConstraints.hpp>
@@ -17,6 +18,8 @@ public:
    ArithType<T> operator-( const ArithType<T> & ) const;
    ArithType<T> operator*( const T & ) const;
    ArithType<T> operator*( const ArithType<T> & ) const;
+   ArithType<T> operator/( const T & ) const;
+   ArithType<T> operator/( const ArithType<T> & ) const;
    ArithType<T>&& operator=( const T & );
    ArithType<T>&& operator=( const ArithType<T> & );
 };
@@ -31,6 +34,7 @@ public:
    bool operator>( const CompType<T> & ) const { return true; }
    bool operator<=( const CompType<T> & ) const { return true; }
    bool operator>=( const CompType<T> & ) const { return true; }
+   CompType<T> operator=( const CompType<T> & );
 };
 
 // Inheritance compile-time asserts test cases
@@ -64,6 +68,8 @@ template bool f1<int>( int );
 
 // (Trivially) constructible
 class tc {
+   tc( const tc & ) = default;
+   tc( tc&& ) = default;
 public:
    tc() = default;
 };
@@ -81,6 +87,8 @@ public:
 
 // (move) constructible
 class mc {
+   mc() = default;
+   mc( const mc & ) = default;
 public:
    mc( mc && ) = default;
 };
@@ -103,7 +111,7 @@ int main() {
    /* Asserts */
    const int value = 10;
    
-   SN_ASSERT< value == 10 >();
+   SN_ASSERT( value == 10 );
    SN_ASSERT_EQUAL( value, 10 );
    SN_ASSERT_INEQUAL( value, 100 );
    SN_ASSERT_LESS_THAN( value, 11 );
@@ -112,7 +120,7 @@ int main() {
    SN_ASSERT_GREQ( value, 10 );
    SN_ASSERT_ZERO( 1E-16 );
    
-   SN_ASSERT_MSG< value == 10 >( "Here" );
+   SN_ASSERT_MSG( value == 10, "Here" );
    
    SN_ASSERT_SIZE_STRICTLY_LESS_THAN( 1, 2 );
    SN_ASSERT_SIZE_LESS_THAN( 1, 2 );
@@ -244,10 +252,16 @@ int main() {
    //SN_CT_ASSERT_STRICTLY_TYPE( j, int );
    
    SN_CT_ASSERT_TYPE_IN_TYPELIST< int, SN_CT_TYPELIST<int, float, double, long> >();
+   //SN_CT_ASSERT_TYPE_IN_TYPELIST< unsigned long, SN_CT_TYPELIST<int, float, double, long> >();
    
-   
+   SN_CT_ASSERT_TYPELIST< SN_CT_TYPELIST< int, float, long, double > >();
+   //SN_CT_ASSERT_TYPELIST< double >();
+   SN_CT_ASSERT_DERIVED_FROM_LIST_MEMBER< ED, SN_CT_TYPELIST< int, float, B<int>, double > >();
+   SN_CT_ASSERT_DERIVED_FROM_LIST_MEMBER< ED, SN_CT_TYPELIST< int, float, ED, double > >();
+   //SN_CT_ASSERT_DERIVED_FROM_LIST_MEMBER< ND, SN_CT_TYPELIST< int, float, B<int>, double > >();
    
    SN_CT_ASSERT_DERIVED_FROM< D<int>, B<int> >();
+   SN_CT_ASSERT_DERIVED_FROM< D<int>, D<int> >();
    //SN_CT_ASSERT_DERIVED_FROM< D<int>, int >();
    SN_CT_ASSERT_DERIVED_FROM< B<int>, B<int> >();
    //SN_CT_ASSERT_DERIVED_FROM< ND, B<int> >();
@@ -266,20 +280,19 @@ int main() {
    SN_CT_ASSERT_CALLABLE( &f1<int> );
    //SN_CT_ASSERT_CALLABLE( int() );
    
-   SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE< tc >();
-   //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE< SN_CT_TYPELIST<int> >();
-   //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE< ntc >();
-   //SN_CT_ASSERT_CONSTRUCTIBLE< constr, int, float >();
+   SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< tc >();
+   //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< SN_CT_TYPELIST<int> >();
+   //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< ntc >();
    
-   SN_CT_ASSERT_COPY_CONSTRUCTIBLE< cc >();
-   //SN_CT_ASSERT_COPY_CONSTRUCTIBLE< tc >();
+   SN_CT_ASSERT_COPY_CONSTRUCTIBLE_TYPE< cc >();
+   //SN_CT_ASSERT_COPY_CONSTRUCTIBLE_TYPE< tc >();
    
-   SN_CT_ASSERT_MOVE_CONSTRUCTIBLE< mc >();
-   //SN_CT_ASSERT_MOVE_CONSTRUCTIBLE< ntc >();
+   SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE< mc >();
+   //SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE< ntc >();
    
-   SN_CT_ASSERT_CONSTRUCTIBLE< constr, SN_CT_TYPELIST< int, float > >();
-   SN_CT_ASSERT_CONSTRUCTIBLE< constr, SN_CT_TYPELIST< float, float > >();   // Cast!
-   //SN_CT_ASSERT_CONSTRUCTIBLE< constr, SN_CT_TYPELIST< int, float, float > >();
+   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< int, float > >();
+   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< float, float > >();   // Cast!
+   //SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< int, float, float > >();
    
    SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE< CompType<int>, CompType<int> >();
    SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE< CompType<int>, int >();
@@ -294,6 +307,31 @@ int main() {
    ArithType<int> inst;
    SN_CT_ASSERT_MOVE_ASSIGNABLE( inst, ArithType<int>() );
    SN_CT_ASSERT_MOVE_ASSIGNABLE_TYPE< ArithType<int>, ArithType<int> >();
+   SN_CT_ASSERT_MOVE_ASSIGNABLE_TYPE< ArithType<int>, ArithType<int> >();
+   
+   CompType<int> a_inst1, a_inst2;
+   SN_CT_ASSERT_COPY_ASSIGNABLE_TYPE< CompType<int>, CompType<int> >();
+   SN_CT_ASSERT_COPY_ASSIGNABLE( a_inst1, a_inst2 );
+   
+   SN_CT_ASSERT_CAN_ADD_TYPE< ArithType<float>, float >();
+   SN_CT_ASSERT_CAN_ADD( inst, ArithType<int>() );
+   //SN_CT_ASSERT_CAN_ADD_TYPE< ArithType<float>, int >();
+   
+   SN_CT_ASSERT_CAN_SUBTRACT_TYPE< ArithType<float>, float >();
+   SN_CT_ASSERT_CAN_SUBTRACT( inst, ArithType<int>() );
+   //SN_CT_ASSERT_CAN_SUBTRACT_TYPE< ArithType<float>, int >();
+   
+   SN_CT_ASSERT_CAN_MULTIPLY_TYPE< ArithType<float>, float >();
+   SN_CT_ASSERT_CAN_MULTIPLY( inst, ArithType<int>() );
+   //SN_CT_ASSERT_CAN_MULTIPLY_TYPE< ArithType<float>, int >();
+   
+   SN_CT_ASSERT_CAN_DIVIDE_TYPE< ArithType<float>, float >();
+   SN_CT_ASSERT_CAN_DIVIDE( inst, ArithType<int>() );
+   //SN_CT_ASSERT_CAN_DIVIDE_TYPE< ArithType<float>, int >();
+   
+   SN_CT_ASSERT_ARITHMETIC_TYPE< ArithType<float> >();
+   SN_CT_ASSERT_ARITHMETIC( inst );
+   //SN_CT_ASSERT_ARITHMETIC_TYPE< CompType<float> >();
    
    return 0;
 }

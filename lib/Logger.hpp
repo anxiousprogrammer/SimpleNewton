@@ -7,6 +7,7 @@
 #include <fstream>
 #include <mutex>
 #include <memory>
+#include <ctime>
 
 #include <Types.hpp>
 
@@ -23,15 +24,17 @@ namespace simpleNewton {
 #define __SN_LOGLEVEL_EVENT__      2
 #define __SN_LOGLEVEL_WATCH__      3
 
-#ifndef __SN_LOGLEVEL__
- #define __SN_LOGLEVEL__ 1
+#ifdef NDEBUG
+ #define __SN_LOGLEVEL__ 0
+#else
+ #define __SN_LOGLEVEL__ 3
 #endif
 
 // Typelist of logger streams
 using __SN_LIST_OF_LOGGER_STREAMS__ = SN_CT_TYPELIST< std::fstream, std::ofstream >;   // Flexibility of output (writing)
 
 // Some enumerators
-enum class LogEvent { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPIRecv, MPIBCast };
+enum class LogEventType { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPIRecv, MPIBCast };
 
 /**||***************************************************************************************************************************************
 *
@@ -47,18 +50,28 @@ public:
    //////////////////////////////////
    
    /* instance */
-   static Logger & getInstance();
+   static inline Logger & getInstance() {
+      static Logger single;
+      return single;
+   }
    
    /* indicate the level of output */
    static inline uint_t writeLevel()  { return Logger::getInstance().writeLevel_; }
    
    /* Provide the output stream */
    template< class STREAM_T >
-   static void writeSettings( const uint_t _writeLevel = __SN_LOGLEVEL_ERROR__ ) {
+   static void writeSettings( int argc, char ** argv, const uint_t _writeLevel = __SN_LOGLEVEL_ERROR__  ) {
       SN_CT_REQUIRE< typetraits::is_derived_from_list_member< STREAM_T, __SN_LIST_OF_LOGGER_STREAMS__ >::value >();
       Logger::getInstance().file_ = std::unique_ptr< STREAM_T >( new STREAM_T() );
       Logger::getInstance().writeLevel_ = _writeLevel;
       Logger::getInstance().streamSet_ = true;
+      
+      SN_REQUIRE_GREQ( argc, 1 );
+      std::string exec( argv[0] );
+      time_t _now( time(nullptr) );
+      std::cout << "========================================================================================================>" << std::endl;
+      std::cout << "********************************************************************************************************" << std::endl
+                << ">>>   Simple Newton framework running \'" << exec << "\' with start time: " << ctime( &_now ) << std::endl;
    }
    
    
@@ -81,6 +94,7 @@ public:
    /* Buffering operator */
    template< typename INP_T >
    friend inline Logger & operator<<( Logger & lg, const INP_T & input ) {
+      //SN_CT_REQUIRE<  >();
       lg.buffer_ << input;
       return lg;
    }
@@ -120,9 +134,10 @@ private:   // MEMBERS
 
 
 // Forward declarations of the implemented functions
+void print_message( const char * msg );
 void report_error( const char * msg, const char * const file, int line );
-void report_event( LogEvent event, const char * const file, int line, 
-                   const char * ptr_name, const char * res_type, const char * array_size );
+void report_warning( const char * msg, const char * const file, int line );
+void report_event( LogEventType event, const char * const file, int line, const char * info = " " );
 
 template< class HEAD_PARAM, class... TAIL_PARAM >
 void watch_impl( const HEAD_PARAM & head, const TAIL_PARAM &... tail ) {
@@ -134,66 +149,65 @@ void watch_variables( const char * const msg, const char * const file, int line,
    Logger::getInstance() << "[LOGGER__>][VARIABLE WATCH ]:   " << "<Description>   " << msg << Logger::nl
                          << Logger::nl;
    watch_impl( arg... );
-   Logger::getInstance() << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl
-                         << "==============================================================================================>" << Logger::nl;
-
+   Logger::getInstance() << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
    if( Logger::writeLevel() >= __SN_LOGLEVEL_WATCH__ )
       Logger::getInstance() << Logger::b_write;
    else
       Logger::getInstance() << Logger::b_end;
 }
 
-void report_warning( const char * msg, const char * const file, int line );
+#define SN_LOG_MESSAGE( MSG ) \
+do { print_message( MSG ); } while(false)
 
 #if __SN_LOGLEVEL__ == __SN_LOGLEVEL_INACTIVE__
 
  #define SN_LOG_REPORT_ERROR( MSG )
- #define SN_LOG_REPORT_EVENT( EV, PTR_NAME, TYPE, SIZE )
- #define SN_LOG_WATCH_VARIABLES( MSG, ... )
  #define SN_LOG_REPORT_WARNING( MSG )
+ #define SN_LOG_REPORT_EVENT( EV, INFO )
+ #define SN_LOG_WATCH_VARIABLES( MSG, ... )
 
 #endif
 #if __SN_LOGLEVEL__ == __SN_LOGLEVEL_ERROR__
 
  #define SN_LOG_REPORT_ERROR( MSG ) \
  do { report_error( MSG, __FILE__, __LINE__ ); } while(false)
- #define SN_LOG_REPORT_EVENT( EV, PTR_NAME, TYPE, SIZE )
- #define SN_LOG_WATCH_VARIABLE( MSG, ... )
  #define SN_LOG_REPORT_WARNING( MSG )
+ #define SN_LOG_REPORT_EVENT( EV, INFO )
+ #define SN_LOG_WATCH_VARIABLES( MSG, ... )
 
 #endif
 #if __SN_LOGLEVEL__ == __SN_LOGLEVEL_WARNING__
 
  #define SN_LOG_REPORT_ERROR( MSG ) \
  do { report_error( MSG, __FILE__, __LINE__ ); } while(false)
- #define SN_LOG_REPORT_EVENT( EV, PTR_NAME, TYPE, SIZE ) \
- do { report_event( EV, __FILE__, __LINE__, PTR_NAME, TYPE, SIZE ); } while(false)
- #define SN_LOG_WATCH_VARIABLE( MSG, ... ) \
- do { watch_variables( MSG, __FILE__, __LINE__, __VA_ARGS__ ); } while(false)
  #define SN_LOG_REPORT_WARNING( MSG ) \
  do { report_warning( MSG, __FILE__, __LINE__ ); } while(false)
+ #define SN_LOG_REPORT_EVENT( EV, INFO )
+ #define SN_LOG_WATCH_VARIABLES( MSG, ... )
 
 #endif
 #if __SN_LOGLEVEL__ == __SN_LOGLEVEL_EVENT__
 
  #define SN_LOG_REPORT_ERROR( MSG ) \
  do { report_error( MSG, __FILE__, __LINE__ ); } while(false)
- #define SN_LOG_REPORT_EVENT( EV, PTR_NAME, TYPE, SIZE ) \
- do { report_event( EV, __FILE__, __LINE__, PTR_NAME, TYPE, SIZE ); } while(false)
- #define SN_LOG_WATCH_VARIABLE( MSG, ... )
- #define SN_LOG_REPORT_WARNING( MSG )
+ #define SN_LOG_REPORT_WARNING( MSG ) \
+ do { report_warning( MSG, __FILE__, __LINE__ ); } while(false)
+ #define SN_LOG_REPORT_EVENT( EV, INFO ) \
+ do { report_event( EV, __FILE__, __LINE__, INFO ); } while(false)
+ #define SN_LOG_WATCH_VARIABLES( MSG, ... )
 
 #endif
 #if __SN_LOGLEVEL__ == __SN_LOGLEVEL_WATCH__
 
  #define SN_LOG_REPORT_ERROR( MSG ) \
  do { report_error( MSG, __FILE__, __LINE__ ); } while(false)
- #define SN_LOG_REPORT_EVENT( EV, PTR_NAME, TYPE, SIZE ) \
- do { report_event( EV, __FILE__, __LINE__, PTR_NAME, TYPE, SIZE ); } while(false)
- #define SN_LOG_WATCH_VARIABLE( MSG, ... ) \
+ #define SN_LOG_REPORT_WARNING( MSG ) \
+ do { report_warning( MSG, __FILE__, __LINE__ ); } while(false)
+ #define SN_LOG_REPORT_EVENT( EV, INFO ) \
+ do { report_event( EV, __FILE__, __LINE__, INFO ); } while(false)
+ #define SN_LOG_WATCH_VARIABLES( MSG, ... ) \
  do { watch_variables( MSG, __FILE__, __LINE__, __VA_ARGS__ ); } while(false)
- #define SN_LOG_REPORT_WARNING( MSG )
-
+ 
 #endif
 
 }   // namespace simpleNewton

@@ -56,7 +56,7 @@ template< typename T1, typename T2 >
 class C { 
 public:
    float operator()( T1, T2 ) const volatile { std::cout << "Dings" << std::endl; return 0.0; }
-   void MemberFunction( const T1 & ) {}
+   void MemberFunction( const T1 & ) volatile {}
 };
 
 /* function template for callable type */
@@ -198,6 +198,7 @@ int main() {
    bool (*fp)(int) = &f1<int>;
    SN_CT_ASSERT_FUNCTION_PTR_TYPE< int(*)(int, int) >();
    SN_CT_ASSERT_FUNCTION_PTR( fp );
+   SN_CT_ASSERT_MEMBER_FUNCTION_PTR( &CompType<int>::operator< );
    
    const int & rf = value;
    SN_CT_ASSERT_REFERENCE_TYPE< const int & >();
@@ -280,6 +281,12 @@ int main() {
    SN_CT_ASSERT_CALLABLE( &f1<int> );
    //SN_CT_ASSERT_CALLABLE( int() );
    
+   SN_CT_ASSERT_FUNCTOR_CAN_CALL< C<int, float>, int, float >();
+   SN_CT_ASSERT_CAN_CALL< int >( &f1<int> );
+   SN_CT_ASSERT_CAN_CALL< int >( &C<int, float>::MemberFunction );
+   SN_CT_ASSERT_CAN_CALL< int, float >( &C<int, float>::operator() );
+   //SN_CT_ASSERT_CAN_CALL< int >( int() );
+   
    SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< tc >();
    //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< SN_CT_TYPELIST<int> >();
    //SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE< ntc >();
@@ -290,9 +297,9 @@ int main() {
    SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE< mc >();
    //SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE< ntc >();
    
-   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< int, float > >();
-   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< float, float > >();   // Cast!
-   //SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, SN_CT_TYPELIST< int, float, float > >();
+   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, int, float >();
+   SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, float, float >();   // Cast!
+   //SN_CT_ASSERT_CONSTRUCTIBLE_TYPE< constr, int, float, float >();
    
    SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE< CompType<int>, CompType<int> >();
    SN_CT_ASSERT_STRICTLY_COMPARABLE_TYPE< CompType<int>, int >();

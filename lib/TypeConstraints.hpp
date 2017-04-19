@@ -205,6 +205,11 @@ template< class TYPE >
 inline void SN_CT_ASSERT_CALLABLE_TYPE() {}
 #define SN_CT_ASSERT_CALLABLE( ... )
 
+template< class CAL, class... PARAM >
+inline void SN_CT_ASSERT_FUNCTOR_CAN_CALL() {}
+template< class... PARAM, class CAL >
+inline void SN_CT_ASSERT_CAN_CALL( const CAL ) {}
+
 template< class TYPE >
 inline void SN_CT_ASSERT_TRIVIALLY_CONSTRUCTIBLE_TYPE() {}
 
@@ -262,9 +267,6 @@ inline void SN_CT_ASSERT_CAN_DIVIDE_TYPE() {}
 template< class TYPE1, class TYPE2 >
 inline void SN_CT_ASSERT_CAN_DIVIDE( const TYPE1 &, const TYPE2 & ) {}
 
-template< class CLS, class MEMB_FUNC >
-inline void SN_CT_ASSERT_HAS_MEMBER_FUNCTION() {}
-
 template< class TYPE >
 inline void SN_CT_ASSERT_ARITHMETIC_TYPE() {}
 template< class TYPE >
@@ -297,7 +299,8 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NUM_TEMPLATE_ARG() {
 /* Constraint - type must be void type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_VOID_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_void< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_void< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) 
+      return;
 }
 
 
@@ -305,25 +308,34 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_VOID_TYPE() {
 /* Constraint - instance/type must be integer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_INT_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_INT( ... ) \
-   do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_integer< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
-   } while(false)
+do { \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+                                           typetraits::is_integer< \
+                                                                   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                 >::value \
+                                         >::ASSERT_FAILED ) break; \
+} while(false)
 
 
 /* Constraint - instance/type must NOT be integer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_INT_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::not_integer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_NOT_INT( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_integer< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+                                           typetraits::not_integer< \
+                                                                    typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                  >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -331,13 +343,17 @@ do { \
 /* Constraint - instance/type must be floating point type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FP_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_FP( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_floating_point< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+                                           typetraits::is_floating_point< \
+                                                                          typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                        >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -345,13 +361,16 @@ do { \
 /* Constraint - instance/type must NOT be floating point type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_FP_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::not_floating_point< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_NOT_FP( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_floating_point< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                          typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                         >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -359,13 +378,16 @@ do { \
 /* Constraint - instance/type must be small type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SMALL_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_small_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_small_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_SMALL( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_small_t< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                 >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -373,13 +395,16 @@ do { \
 /* Constraint - instance/type must be large type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_LARGE_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_large_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_large_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_LARGE( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_large_t< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                 >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -387,13 +412,16 @@ do { \
 /* Constraint - instance/type must be ID type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ID_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_ID_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_ID_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_ID( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_ID_t< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                              >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -401,13 +429,16 @@ do { \
 /* Constraint - instance/type must be string type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRING_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_string_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_string_t< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_STRING( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_string_t< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                    typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                  >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -415,13 +446,16 @@ do { \
 /* Constraint - instance/type must be bool type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_BOOL_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_bool< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_bool< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_BOOL( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_bool< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                              >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -429,13 +463,16 @@ do { \
 /* Constraint - instance/type must be array type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ARRAY_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_array< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_array< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_ARRAY( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_array< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                 typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                               >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -451,13 +488,16 @@ do { \
 /* Constraint - instance/type must be class type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CLASS_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_class< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_OBJECT( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                 typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                               >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -472,13 +512,16 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_TYPELIST() {
 /* Constraint - instance/type must be pointer type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_PTR_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_pointer< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_PTR( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
+                                                                 >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -486,13 +529,15 @@ do { \
 /* Constraint - instance/type must be pointer to const type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_PTR_TO_CONST_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer_to_const< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_pointer_to_const< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_PTR_TO_CONST( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_pointer_to_const< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::is_pointer_to_const< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -504,9 +549,9 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FUNCTION_PTR_TYPE() {
 }
 #define SN_CT_ASSERT_FUNCTION_PTR( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_function_pointer< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::is_function_pointer< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -518,9 +563,9 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MEMBER_FUNCTION_PTR_T
 }
 #define SN_CT_ASSERT_MEMBER_FUNCTION_PTR( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_member_function_pointer< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::is_member_function_pointer< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -552,7 +597,9 @@ do { \
 /* Constraint - type must be rvalue reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_RVALUE_REFERENCE_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 
 
@@ -560,13 +607,15 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_RVALUE_REFERENCE_TYPE
 /* Constraint - instance/type must NOT be rvalue reference type */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_NOT_RVALUE_REFERENCE_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::not_rvalue_reference< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_NOT_RVALUE_REFERENCE( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::not_rvalue_reference< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::not_rvalue_reference< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -622,13 +671,15 @@ do { \
 /* Constraint - instance/type must be unsigned qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_UNSIGNED_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_unsigned< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_unsigned< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_UNSIGNED( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_unsigned< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::is_unsigned< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -636,13 +687,15 @@ do { \
 /* Constraint - instance/type must be signed qualified */
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SIGNED_TYPE() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_signed< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+   typetraits::is_signed< typename typetraits::impl::NoCVQ_R<TYPE>::type >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_SIGNED( ... ) \
 do { \
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_signed< \
-   typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type \
-   >::value >::ASSERT_FAILED ) break; \
+   if( !typetraits::impl::CT_ASSERT_ERROR< \
+   typetraits::is_signed< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >::value \
+                                         >::ASSERT_FAILED ) break; \
 } while(false)
 
 
@@ -662,7 +715,11 @@ do { \
 /* IMPORTANT, GENERAL Constraint - typetraits must be the same */
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_SAME_TYPENAME() {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< typename typetraits::impl::NoCVQ_R<TYPE1>::type, typename typetraits::impl::NoCVQ_R<TYPE2>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+   typetraits::are_type_similar< 
+                                 typename typetraits::impl::NoCVQ_R<TYPE1>::type, 
+                                 typename typetraits::impl::NoCVQ_R<TYPE2>::type 
+                               >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -691,7 +748,11 @@ do { \
 
 template< class TYPE, class GTYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_TYPE( const GTYPE & ) {
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_type_similar< typename typetraits::impl::NoCVQ_R<GTYPE>::type, typename typetraits::impl::NoCVQ_R<TYPE>::type >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+   typetraits::are_type_similar< 
+                                 typename typetraits::impl::NoCVQ_R<GTYPE>::type, 
+                                 typename typetraits::impl::NoCVQ_R<TYPE>::type 
+                               >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -783,14 +844,29 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CALLABLE_TYPE() {
    using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_callable< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                  >::value >::ASSERT_FAILED ) return;
 }
 #define SN_CT_ASSERT_CALLABLE( ... ) \
 do { \
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_callable< \
    decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<decltype(__VA_ARGS__)>::type >( nullptr ) ) \
-   >::value >::ASSERT_FAILED ) break; \
+                                                                  >::value >::ASSERT_FAILED ) break; \
 } while(false)
+
+
+
+/* Constraint - instance/type must be callable with specified parameters */
+template< class CAL, class... PARAM >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_FUNCTOR_CAN_CALL() {
+   using STRIPPED_CAL = typename typetraits::impl::NoCVQ_R<CAL>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_CAL >::value &&
+                                           typetraits::can_call< STRIPPED_CAL, SN_CT_TYPELIST<PARAM...> >::value >::ASSERT_FAILED ) return;
+}
+template< class... PARAM, class CAL >
+inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_CALL( const CAL ) {
+   using STRIPPED_CAL = typename typetraits::impl::NoCVQ_R<CAL>::type;
+   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_call< STRIPPED_CAL, SN_CT_TYPELIST<PARAM...> >::value >::ASSERT_FAILED ) return;
+}
 
 
 
@@ -825,11 +901,13 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TY
 
 
 /* Constraint - type must be constructible */
-template< class TYPE, class PARAM_TYPELIST >
+template< class TYPE, class... PARAM >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CONSTRUCTIBLE_TYPE() {
    using STRIPPED_TYPE = typename typetraits::impl::NoCVQ_R<TYPE>::type;
-   if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_class< STRIPPED_TYPE >::value && 
-                                           typetraits::is_constructible< STRIPPED_TYPE, PARAM_TYPELIST >::value >::ASSERT_FAILED ) return;
+   if( !typetraits::impl::CT_ASSERT_ERROR< 
+                                           typetraits::is_class< STRIPPED_TYPE >::value && 
+                                           typetraits::is_constructible< STRIPPED_TYPE, SN_CT_TYPELIST<PARAM...> >::value 
+                                         >::ASSERT_FAILED ) return;
 }
 
 
@@ -843,7 +921,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_COMPARABLE_T
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_strictly_comparable< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value>::ASSERT_FAILED ) return;
+                                                                              >::value>::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_COMPARABLE( const TYPE1 &, const TYPE2 & ) {
@@ -853,7 +931,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_STRICTLY_COMPARABLE( 
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_strictly_comparable< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value>::ASSERT_FAILED ) return;
+                                                                              >::value>::ASSERT_FAILED ) return;
 }
 
 
@@ -867,7 +945,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COMPARABLE_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_comparable< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value>::ASSERT_FAILED ) return;
+                                                                     >::value>::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COMPARABLE( const TYPE1 &, const TYPE2 & ) {
@@ -877,7 +955,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COMPARABLE( const TYP
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::are_comparable< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value>::ASSERT_FAILED ) return;
+                                                                     >::value>::ASSERT_FAILED ) return;
 }
 
 
@@ -888,7 +966,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COPY_ASSIGNABLE_TYPE(
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_copy_assignable< 
    decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                         >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_COPY_ASSIGNABLE( const TYPE1 & INST, const TYPE2 & ) {
@@ -906,7 +984,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_ASSIGNABLE_TYPE(
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_move_assignable< 
    decltype( typetraits::impl::Class_Type_Return< TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                         >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_MOVE_ASSIGNABLE( const TYPE1 & INST1, const TYPE2 & ) {
@@ -945,7 +1023,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_ADD_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_add< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                              >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_ADD( const TYPE1 &, const TYPE2 & ) {
@@ -955,7 +1033,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_ADD( const TYPE1 
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_add< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                              >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -969,7 +1047,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_SUBTRACT_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_subtract< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                   >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_SUBTRACT( const TYPE1 &, const TYPE2 & ) {
@@ -979,7 +1057,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_SUBTRACT( const T
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_subtract< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                   >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -993,7 +1071,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_MULTIPLY_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_multiply< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                   >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_MULTIPLY( const TYPE1 &, const TYPE2 & ) {
@@ -1003,7 +1081,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_MULTIPLY( const T
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_multiply< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                   >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -1017,7 +1095,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_DIVIDE_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_divide< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                 >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE1, class TYPE2 >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_DIVIDE( const TYPE1 &, const TYPE2 & ) {
@@ -1027,7 +1105,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_CAN_DIVIDE( const TYP
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::can_divide< 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE1 >( nullptr ) ), 
    decltype( typetraits::impl::Class_Type_Return< STRIPPED_TYPE2 >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                 >::value >::ASSERT_FAILED ) return;
 }
 
 
@@ -1037,13 +1115,13 @@ template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ARITHMETIC_TYPE() {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_arithmetic< 
    decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                    >::value >::ASSERT_FAILED ) return;
 }
 template< class TYPE >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_ARITHMETIC( const TYPE & ) {
    if( !typetraits::impl::CT_ASSERT_ERROR< typetraits::is_arithmetic< 
    decltype( typetraits::impl::Class_Type_Return< typename typetraits::impl::NoCVQ_R<TYPE>::type >( nullptr ) ) 
-   >::value >::ASSERT_FAILED ) return;
+                                                                    >::value >::ASSERT_FAILED ) return;
 }
 
 

@@ -235,9 +235,71 @@ inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, con
 }   // namespace impl
 }   // namespace asserts
 
-#ifdef NDEBUG
 
-/* RT asserts*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// RELEASE mode assert
+///////////////////////
+
+#define SN_REQUIRE( EXPR ) \
+do { asserts::impl::assert< EXPR >( __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_EQUAL( VAL, REF ) \
+do { asserts::impl::assert_equal( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_FP_EQUAL( VAL, REF ) \
+do { asserts::impl::assert_fp_equal( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_INEQUAL( VAL, REF ) \
+do { asserts::impl::assert_inequal( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_FP_INEQUAL( VAL, REF ) \
+do { asserts::impl::assert_fp_inequal( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_LESS_THAN( VAL, REF ) \
+do { asserts::impl::assert_less_than( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_LEQ( VAL, REF ) \
+do { asserts::impl::assert_leq( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_GREATER_THAN( VAL, REF ) \
+do { asserts::impl::assert_greater_than( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_GREQ( VAL, REF ) \
+do { asserts::impl::assert_greq( VAL, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_ZERO( VAL ) \
+do { asserts::impl::assert_zero( VAL, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_POSITIVE( VAL ) \
+do { asserts::impl::assert_positive( VAL, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_NEGATIVE( VAL ) \
+do { asserts::impl::assert_negative( VAL, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_MSG( EXPR, MSG ) \
+do { asserts::impl::assert_msg< EXPR >( MSG, __FILE__, __LINE__ ); } while(false)
+
+
+/* Run-time constraints related to container sizes */
+#define SN_REQUIRE_SIZE_SAME( SIZE, REF ) \
+do { asserts::impl::assert_size_same( SIZE, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_SIZE_LESS_THAN( SIZE, REF ) \
+do { asserts::impl::assert_size_less_than( SIZE, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
+do { asserts::impl::assert_size_strictly_less_than( SIZE, REF, __FILE__, __LINE__ ); } while(false)
+
+#define SN_REQUIRE_INDEX_WITHIN_SIZE( IND, REF ) \
+do { asserts::impl::assert_index_within_size( IND, REF, __FILE__, __LINE__ ); } while(false)
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///   DEBUG mode run time asserts
+/////////////////////////////////
+
+#ifdef NDEBUG
 
 template< bool constexpr_expr > 
 inline void SN_ASSERT() {}
@@ -293,11 +355,6 @@ inline void SN_ASSERT_INDEX_WITHIN_SIZE( const U_INT &, const U_INT & ) {}
 
 #else
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Run-time like that!
-/////////////////////////
 
 
 #define SN_ASSERT( EXPR ) \

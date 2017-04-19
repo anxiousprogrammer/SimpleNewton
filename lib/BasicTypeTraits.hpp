@@ -17,12 +17,9 @@ namespace typetraits {
 /// Type altering actions
 /////////////////////////
 
-// The 'opposite' of decltype - pseudo-instantiation
-template< class T > T&& declval();
-template< class T > T declinst();
-
 // Add, remove reference
 template< class T > struct add_reference { using type = T &; };
+template< class T > struct add_rvalue_reference { using type = T &&; };
 template< class T > struct remove_reference { using type = T; };
 template< class T > struct remove_reference<T &> { using type = T; };
 
@@ -35,6 +32,15 @@ template< class T > struct remove_const< const T > { using type = T; };
 template< class T > struct add_volatile { using type = volatile T; };
 template< class T > struct remove_volatile { using type = T; };
 template< class T > struct remove_volatile< volatile T > { using type = T; };
+
+// No CVQ_R
+template< class T > using essential_type = typename remove_const< typename remove_volatile< typename remove_reference<T>::type >::type 
+                                                                >::type;
+
+// The 'opposite' of decltype - pseudo-instantiation
+template< class T > T&& declval();
+template< class T > T declinst();
+//template< class T > using declval = add_rvalue_reference<T>::type;
 
 /**||***************************************************************************************************************************************
 *
@@ -123,6 +129,7 @@ template< class DERIVED, class BASE, typename > struct is_derived_from;
 template< class CLS, class TL > struct is_derived_from_list_member; 
 template< class NOT_DERIVED, class NOT_BASE, typename > struct not_derived_from;
 template< class TYPE, typename > struct is_callable;
+template< class CAL, class TL, typename > struct can_call;
 template< class TYPE, typename > struct is_trivially_constructible;
 template< class TYPE, typename > struct is_copy_constructible;
 template< class TYPE, typename > struct is_move_constructible;
@@ -236,7 +243,7 @@ template< class TYPE > struct is_class {
 template< class TL > struct is_typelist : public impl::false_type {};
 template< class... PARAM > struct is_typelist< SN_CT_TYPELIST< PARAM... > > : public impl::true_type {};
 
-// Specialization -> pointer and reference
+// Specialization -> ptr, ptr to const, func ptr, member func ptr and reference and a couple others.
 template< class TYPE > struct is_pointer : public impl::false_type                         {};
 template< class TYPE > struct is_pointer< TYPE* > : public impl::true_type                 {};
 template< class TYPE > struct is_pointer< std::unique_ptr<TYPE> > : public impl::true_type {};
@@ -252,8 +259,8 @@ template< class TYPE > struct is_pointer_to_const< std::weak_ptr< const TYPE > >
 template< class TYPE > struct is_function_pointer : public impl::false_type                                             {};
 template< class RET_TYPE, class... PARAM > struct is_function_pointer< RET_TYPE(*)(PARAM...) > : public impl::true_type {};
 
-template< class TYPE > struct is_member_function_pointer : public impl::false_type                                      {};
-template< class MEMB_TYPE, class TYPE > struct is_member_function_pointer< MEMB_TYPE TYPE::* > : public impl::true_type {};
+template< class TYPE > struct is_member_function_pointer : public impl::false_type                                       {};
+template< class RET_TYPE, class TYPE > struct is_member_function_pointer< RET_TYPE(TYPE::*) > : public impl::true_type   {};
 
 template< class TYPE > struct is_reference : public impl::false_type          {};
 template< class TYPE > struct is_reference< TYPE & > : public impl::true_type {};
@@ -317,7 +324,7 @@ template< class TYPE > constexpr bool is_lvalue( TYPE && INST )  { return  are_t
 /* Full definition, failing case */
 template< class NOT_DERIVED, class NOT_BASE, typename=void >
 struct is_derived_from : public impl::false_type {};
-/* Full specialization, true case */
+/* Partial specialization, true case */
 template< class DERIVED, class BASE >
 struct is_derived_from< DERIVED, BASE, 
                         impl::a_void< decltype( impl::ptr_accept<BASE>( impl::ptr_return<DERIVED>() ) ) > > : public impl::true_type {};
@@ -351,7 +358,7 @@ struct is_derived_from_list_member< CLS, TL<PARAM...> > : public is_derived_from
 /* Full specialization, true case */
 template< class TYPE1, class TYPE2, typename=void >
 struct not_derived_from : public impl::true_type {};
-/* Full specialization, failing case */
+/* Partial specialization, failing case */
 template< class DERIVED, class BASE >
 struct not_derived_from< DERIVED, BASE, 
                          impl::a_void< decltype( impl::ptr_accept<BASE>( impl::ptr_return<DERIVED>() ) ) > > : public impl::false_type {};
@@ -367,11 +374,47 @@ template< class RET_TYPE, class... PARAM >
 struct is_callable< RET_TYPE( PARAM... ), void > : public impl::true_type    {};
 template< class RET_TYPE, class... PARAM >
 struct is_callable< RET_TYPE(*)( PARAM... ), void > : public impl::true_type {};
+/* Pointer to member function can be type qualified */
 template< class RET_TYPE, class CLS, class... PARAM >
 struct is_callable< RET_TYPE(CLS::*)( PARAM... ), void > : public impl::true_type {};
+template< class RET_TYPE, class CLS, class... PARAM >
+struct is_callable< RET_TYPE(CLS::*)( PARAM... ) const, void > : public impl::true_type {};
+template< class RET_TYPE, class CLS, class... PARAM >
+struct is_callable< RET_TYPE(CLS::*)( PARAM... ) volatile, void > : public impl::true_type {};
+template< class RET_TYPE, class CLS, class... PARAM >
+struct is_callable< RET_TYPE(CLS::*)( PARAM... ) const volatile, void > : public impl::true_type {};
 /* Function object type */
 template< class CAL >
 struct is_callable< int CAL::*, impl::a_void< decltype(&CAL::operator()) > > : public impl::true_type {};
+
+
+
+// Check for callability: functor, pointer to function
+/* Full definition, failing case */
+template< class CAL, class TL, typename=void > struct can_call : public impl::false_type {};
+/* Partial specialization, true case */
+template< class CAL, template<class...> class TL, class... PARAM > 
+struct can_call< CAL, TL<PARAM...>, impl::a_void< decltype( declval<CAL>()( declval< PARAM >()... ) ) > > : public impl::true_type {};
+/* Partial specialization, pointer to member function */
+template< class R_TYPE, class CLS, template<class...> class TL, class... PROV_PARAM, class... REQ_PARAM > 
+struct can_call< R_TYPE(CLS::*)(REQ_PARAM...), TL<PROV_PARAM...>, 
+                 impl::a_void< decltype( (declval<CLS>().*declinst<R_TYPE(CLS::*)(REQ_PARAM...)>())( declval< PROV_PARAM >()... ) ) > >
+                 : public impl::true_type {};
+/* Partial specialization, pointer to member function (with const) */
+template< class R_TYPE, class CLS, template<class...> class TL, class... PROV_PARAM, class... REQ_PARAM > 
+struct can_call< R_TYPE(CLS::*)(REQ_PARAM...) const, TL<PROV_PARAM...>, 
+                 impl::a_void< decltype( (declval<const CLS>().*declinst<R_TYPE(CLS::*)(REQ_PARAM...) const>())
+                                          ( declval< PROV_PARAM >()... ) ) > > : public impl::true_type {};
+/* Partial specialization, pointer to member function (with volatile) */
+template< class R_TYPE, class CLS, template<class...> class TL, class... PROV_PARAM, class... REQ_PARAM > 
+struct can_call< R_TYPE(CLS::*)(REQ_PARAM...) volatile, TL<PROV_PARAM...>, 
+                 impl::a_void< decltype( (declval<CLS>().*declinst<R_TYPE(CLS::*)(REQ_PARAM...) volatile>())
+                                          ( declval< PROV_PARAM >()... ) ) > > : public impl::true_type {};
+/* Partial specialization, pointer to member function (with const volatile) */
+template< class R_TYPE, class CLS, template<class...> class TL, class... PROV_PARAM, class... REQ_PARAM > 
+struct can_call< R_TYPE(CLS::*)(REQ_PARAM...) const volatile, TL<PROV_PARAM...>, 
+                 impl::a_void< decltype( (declval<const CLS>().*declinst<R_TYPE(CLS::*)(REQ_PARAM...) const volatile>())
+                                          ( declval< PROV_PARAM >()... ) ) > > : public impl::true_type {};
 
 
 
@@ -379,7 +422,7 @@ struct is_callable< int CAL::*, impl::a_void< decltype(&CAL::operator()) > > : p
 /* Full definition, failing case */
 template< class TYPE, typename=void >
 struct is_trivially_constructible : public impl::false_type {};
-/* Full specialization: class type */
+/* Partial specialization: class type */
 template< class TYPE >
 struct is_trivially_constructible< TYPE, impl::a_void< decltype( TYPE() ) > > : public impl::true_type {};
 
@@ -389,7 +432,7 @@ struct is_trivially_constructible< TYPE, impl::a_void< decltype( TYPE() ) > > : 
 /* Full definition, failing case */
 template< class TYPE, typename=void >
 struct is_copy_constructible : public impl::false_type {};
-/* Full specialization: class type */
+/* Partial specialization: class type */
 template< class TYPE >
 struct is_copy_constructible< TYPE, impl::a_void< decltype( TYPE( declinst<TYPE>() ) ) > > : public impl::true_type {};
 
@@ -399,7 +442,7 @@ struct is_copy_constructible< TYPE, impl::a_void< decltype( TYPE( declinst<TYPE>
 /* Full definition, failing case */
 template< class TYPE, typename=void >
 struct is_move_constructible : public impl::false_type {};
-/* Full specialization: class type */
+/* Partial specialization: class type */
 template< class TYPE >
 struct is_move_constructible< TYPE, impl::a_void< decltype( TYPE( declval<TYPE>() ) ) > > : public impl::true_type {};
 
@@ -409,7 +452,7 @@ struct is_move_constructible< TYPE, impl::a_void< decltype( TYPE( declval<TYPE>(
 /* Full definition, failing case */
 template< class TYPE, class TL, typename=void >
 struct is_constructible : public impl::false_type {};
-/* Full specialization: class type */
+/* Partial specialization: class type */
 template< class TYPE, template< class... > class TL, class... PARAM >
 struct is_constructible< TYPE, TL<PARAM...>, impl::a_void< decltype( TYPE( declval<PARAM>()... ) ) > > : public impl::true_type {};
 

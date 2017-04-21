@@ -1,7 +1,7 @@
 #include <iostream>
-#include <Asserts.hpp>
-#include <TypeTraits.hpp>
-#include <Typelist.hpp>
+
+#include <asserts/Asserts.hpp>
+#include <asserts/TypeConstraints.hpp>
 
 // Test classes
 template< typename T >

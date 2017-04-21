@@ -17,7 +17,10 @@ void Logger::flushBuffer( flag_t _write ) {
 
 void Logger::writeLog() {
    if( ! Logger::getInstance().streamSet_ ) {
-      std::cout << "[LOGGER__>][ERROR ]:   Logger attempted to write to no destination. Please set write settings first." << std::endl;
+      auto timep = std::chrono::high_resolution_clock::now();
+      real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+      std::cout << "["<< point 
+                << "][LOGGER__>][ERROR ]:   Logger attempted to write to no destination. Please set write settings first." << std::endl;
       std::abort();
    }
    
@@ -26,17 +29,23 @@ void Logger::writeLog() {
    }
    
    Logger::getInstance().file_guard_.lock();
-   static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).open( "log.txt", std::ios_base::app );
+   static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).open( "log_" + Logger::getInstance().exec_.substr(2), 
+                                                                                                          std::ios_base::app );
    if( ! static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).is_open() ) {
-      std::cout << "[LOGGER__>][ERROR ]:   Could not open the log file for logger.";
+      auto timep = std::chrono::high_resolution_clock::now();
+      real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+      std::cout << "[" << point << "][LOGGER__>][ERROR ]:   Could not open the log file for logger.";
       std::abort();
    }
    
+   time_t _now = time(nullptr);
    try {
-   (*Logger::getInstance().file_) << Logger::getInstance().buffer_.str() << std::endl;
+   (*Logger::getInstance().file_) << ctime( &_now) << Logger::getInstance().buffer_.str() << std::endl << std::endl;
    } 
    catch( std::exception & ex ) {
-      std::cout << "[LOGGER__>][EXCEPTION ]: A standard exception was caught during the writing of the log file. " 
+      auto timep = std::chrono::high_resolution_clock::now();
+      real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+      std::cout << "[" << point << "][LOGGER__>][EXCEPTION ]: A standard exception was caught during the writing of the log file. " 
                 << ex.what() << std::endl;
    }
    static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).close();
@@ -60,14 +69,19 @@ Logger::~Logger() {
 ///   Implementation of the macros
 //////////////////////////////////
 
-
+namespace logger {
+namespace impl {
 
 void print_message( const char * msg ) {
-   Logger::getInstance() << "[LOGGER__>][MESSAGE ]:   " << msg << Logger::nl << Logger::b_end;
+   auto timep = std::chrono::high_resolution_clock::now();
+   real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+   Logger::getInstance() << "[" << point << "][LOGGER__>][MESSAGE ]:   " << msg << Logger::nl << Logger::b_end;
 }
 
 void report_error( const char * msg, const char * const file, int line ) {
-   Logger::getInstance() << "[LOGGER__>][ERROR ]:   " << "<Description>   " << msg
+   auto timep = std::chrono::high_resolution_clock::now();
+   real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+   Logger::getInstance() << "[" << point << "][LOGGER__>][ERROR ]:   " << "<Description>   " << msg
                          << Logger::nl
                          << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
    Logger::getInstance() << Logger::b_write;
@@ -76,7 +90,9 @@ void report_error( const char * msg, const char * const file, int line ) {
 
 
 void report_warning( const char * msg, const char * const file, int line ) {
-   Logger::getInstance() << "[LOGGER__>][WARNING ]:    " << msg
+   auto timep = std::chrono::high_resolution_clock::now();
+   real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+   Logger::getInstance() << "[" << point << "][LOGGER__>][WARNING ]:    " << msg
                          << Logger::nl
                          << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
    if( Logger::writeLevel() >= __SN_LOGLEVEL_WARNING__ )
@@ -101,7 +117,10 @@ void report_event( LogEventType event, const char * const file, int line, const 
    break;
    default: event_tag = "UNKNOWN EVENT"; descr = "An unspecified event has ocurred"; break;
    };
-   Logger::getInstance() << "[LOGGER__>][EVENT - " << event_tag << " ]:   " << descr
+   
+   auto timep = std::chrono::high_resolution_clock::now();
+   real_t point = std::chrono::duration_cast< std::chrono::microseconds >(timep - Logger::getStartTime()).count() * 0.001f;
+   Logger::getInstance() << "[" << point << "][LOGGER__>][EVENT - " << event_tag << " ]:   " << descr
                          << Logger::nl << "   " << info << Logger::nl
                          << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
    if( Logger::writeLevel() >= __SN_LOGLEVEL_EVENT__ )
@@ -109,5 +128,12 @@ void report_event( LogEventType event, const char * const file, int line, const 
    else
       Logger::getInstance() << Logger::b_end;
 }
+
+
+
+void watch_impl() {}
+
+}   // namespace impl
+}   // namespace logger
 
 }   // namespace simpleNewton

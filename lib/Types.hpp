@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 
-#include <Functor.hpp>
+#include <types/Functor.hpp>
 
 namespace simpleNewton {
 

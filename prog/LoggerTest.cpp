@@ -1,6 +1,6 @@
 #include <vector>
-#include <Logger.hpp>
-#include <Asserts.hpp>
+
+#include <logger/Logger.hpp>
 
 using namespace simpleNewton;
 

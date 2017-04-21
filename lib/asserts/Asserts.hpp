@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
+
 #include <GlobalConstants.hpp>
 
 namespace simpleNewton {

@@ -1,13 +1,7 @@
-#include <TypeConstraints.hpp>
-
 /**||***************************************************************************************************************************************
 *
-*   Description: cpp for linking TYPECONSTRAINTS library (pure template/inline header)
+*   Description: Implementation of the base class of all mathematical datatypes
 *
 |***************************************************************************************************************************************///+
 
-namespace simpleNewton {
 
-template struct TypeConstraints_CPPHackClass<int>;
-
-}   // namespace simpleNewton

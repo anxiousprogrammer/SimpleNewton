@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include "simpleNewtonConfig.h"
-#include <Asserts.hpp>
-#include <TypeConstraints.hpp>
+
+#include <asserts/Asserts.hpp>
+#include <asserts/TypeConstraints.hpp>
 
 
 // Operator checking compile-time asserts test cases

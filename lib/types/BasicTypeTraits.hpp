@@ -2,7 +2,7 @@
 #define BASICTYPETRAITS_HPP
 
 #include <Types.hpp>
-#include <Typelist.hpp>
+#include "Typelist.hpp"
 
 namespace simpleNewton {
 

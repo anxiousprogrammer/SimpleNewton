@@ -1,13 +1,13 @@
-#include "Container.hpp"
-
-namespace simpleNewton {
+#include "Matrix3.hpp"
 
 /**||***************************************************************************************************************************************
 *
-*   Description: cpp for ease of compilation
+*   Description: cpp for linking Matrix3.hpp (pure template/inline header)
 *
 |***************************************************************************************************************************************///+
 
-template class Container< real_t, 1000000 >;
+namespace simpleNewton {
+
+template struct Matrix3< real_t >;
 
 }   // namespace simpleNewton

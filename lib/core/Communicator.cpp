@@ -1,13 +1,14 @@
-#include "Container.hpp"
+#include "Communicator.hpp"
 
 namespace simpleNewton {
 
 /**||***************************************************************************************************************************************
 *
-*   Description: cpp for ease of compilation
+*   Description: purely for compilation purposes
 *
 |***************************************************************************************************************************************///+
 
-template class Container< real_t, 1000000 >;
+template struct Communicator_CPPHackClass<int>;
 
 }   // namespace simpleNewton
+

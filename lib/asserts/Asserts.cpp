@@ -4,18 +4,12 @@
 
 /**||****************************************************************************************************************************************
 *
-*   Description: 
+*   Description: cpp for compilation
 *
 |****************************************************************************************************************************************///+
 
 namespace simpleNewton {
-namespace asserts {
-namespace impl {
 
-void errorMessage( const char * const msg, const char * const file, int line ) {
-   std::cerr << msg << " => From here: " << file << ":" << line << ":\n" << std::endl;
-}
+template struct Asserts_CPPHackClass<int>;
 
-}   // namespace impl
-}   // namespace asserts
 }   // namespace simpleNewton

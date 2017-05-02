@@ -21,8 +21,9 @@ public:
    ArithType<T> operator*( const ArithType<T> & ) const;
    ArithType<T> operator/( const T & ) const;
    ArithType<T> operator/( const ArithType<T> & ) const;
-   ArithType<T>&& operator=( const T & );
-   ArithType<T>&& operator=( const ArithType<T> & );
+   ArithType<T> & operator=( const T & );
+   ArithType<T> & operator=( const ArithType<T> & );
+   ArithType<T> & operator=( ArithType<T> && );
 };
 
 template< typename T >
@@ -35,7 +36,7 @@ public:
    bool operator>( const CompType<T> & ) const { return true; }
    bool operator<=( const CompType<T> & ) const { return true; }
    bool operator>=( const CompType<T> & ) const { return true; }
-   CompType<T> operator=( const CompType<T> & );
+   CompType<T> & operator=( const CompType<T> & );
 };
 
 // Inheritance compile-time asserts test cases

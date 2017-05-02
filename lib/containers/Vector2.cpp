@@ -1,13 +1,14 @@
-#include "Container.hpp"
-
-namespace simpleNewton {
+#include "Vector2.hpp"
 
 /**||***************************************************************************************************************************************
 *
-*   Description: cpp for ease of compilation
+*   Description: cpp for linking Vector2.hpp (pure template/inline header)
 *
 |***************************************************************************************************************************************///+
 
-template class Container< real_t, 1000000 >;
+namespace simpleNewton {
+
+template struct Vector2< real_t >;
+template struct Vector2_t< real_t >;
 
 }   // namespace simpleNewton

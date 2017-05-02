@@ -218,7 +218,7 @@ inline void SN_CT_ASSERT_COPY_CONSTRUCTIBLE_TYPE() {}
 template< class TYPE >
 inline void SN_CT_ASSERT_MOVE_CONSTRUCTIBLE_TYPE() {}
 
-template< class TYPE, class TL >
+template< class TYPE, class... PARAM >
 inline void SN_CT_ASSERT_CONSTRUCTIBLE_TYPE() {}
 
 template< class TYPE1, class TYPE2 >

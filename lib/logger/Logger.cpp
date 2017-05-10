@@ -1,4 +1,10 @@
+
 #include "Logger.hpp"
+
+#include <ctime>
+#include <iostream>
+#include <fstream>
+#include <mutex>
 
 namespace simpleNewton {
 
@@ -8,70 +14,57 @@ namespace simpleNewton {
 *
 |***************************************************************************************************************************************///+
 
-
 void Logger::flushBuffer( flag_t _write ) {
 
+   if( _write && ! buffer_.str().empty() )
+      writeLog( (*this) );
+   
+   static std::mutex proc_cout_mutex;
+   std::lock_guard< std::mutex > cout_lock( proc_cout_mutex );   // std::cout is also a shared, external 'resource'.
    std::cout << buffer_.str() << std::endl;
-   if( _write )
-      writeLog();
    buffer_.str( std::string() );
 }
 
 
 
-void Logger::writeLog() {
-
-   if( ! Logger::getInstance().streamSet_ ) {
+// This is process local. Threads must stand in line to get at this resource.
+void Logger::writeLog( const Logger & lg ) {
    
-      auto timep = getCurrentTime();
-      real_t point = millisecondDuration( getStartTime(), timep );
-      std::cout << "["<< point << " ms][LOGGER__>][P" << MPIManager::getCommRank() 
-                << "][ERROR ]:   Logger attempted to write using no proper stream. Please set write settings first." << std::endl;
-      
-      /////////////////
-      ///   EXIT POINT!
-      SN_EXIT();
-      /////////////////
-   }
+   static std::mutex proc_file_mutex;   // Looks like lazy initialization;
+   static std::ofstream file;           // owned by process, not threads.
    
-   if( Logger::getInstance().buffer_.str().empty() ) {
-      return;
-   }
+   std::lock_guard< std::mutex > file_lock( proc_file_mutex );   // Thread safety
    
-   Logger::getInstance().file_guard_.lock();   // Thread safety
-   static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).open( Logger::getInstance().exec_.substr(2) + "log_on_proc" + 
-                                                                          std::to_string( SN_MPI_RANK() ), std::ios_base::app );
-   if( ! static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).is_open() ) {
+   file.open( ProcSingleton::getExecName() + "log_on_proc" + std::to_string( SN_MPI_RANK() ), std::ios_base::app );
+   if( ! file.is_open() ) {
    
-      auto timep = getCurrentTime();
-      real_t point = millisecondDuration( getStartTime(), timep );
-      std::cout << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() 
+      real_t time_point = ProcSingleton::getDurationFromStart();
+      std::cout << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
                 << "][ERROR ]:   Could not open the log file for logger.";
 
       /////////////////
       ///   EXIT POINT!
-      SN_EXIT();
+      ProcSingleton::ExitProgram();
       /////////////////
    }
    
    time_t _now = time(nullptr);
    try {
-   (*Logger::getInstance().file_) << ctime( &_now) << Logger::getInstance().buffer_.str() << std::endl << std::endl;
+      file << ctime( &_now) << lg.buffer_.str() << std::endl << std::endl;
    } 
    catch( std::exception & ex ) {
-   
-      auto timep = getCurrentTime();
-      real_t point = millisecondDuration( getStartTime(), timep );
-      std::cout << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() 
+
+      real_t time_point = ProcSingleton::getDurationFromStart();
+      std::cout << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
                 << "][EXCEPTION CAUGHT ]: A standard exception was caught during the writing of the log file. " 
                 << ex.what() << std::endl;
    }
-   static_cast< std::ofstream & >( (*Logger::getInstance().file_) ).close();
-   Logger::getInstance().file_guard_.unlock();
+   file.close();
 }
 
 
 
+// Bomb has been planted!
 Logger::~Logger() {
 
    flushBuffer( true );
@@ -80,72 +73,72 @@ Logger::~Logger() {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Implementation of the macros
-//////////////////////////////////
+///   MACRO function implementation
+///////////////////////////////////
 
 namespace logger {
 namespace impl {
 
+bool eventWatchRegionSwitch_ = false;   // Here's a global!
 
 
 void print_message( const std::string & msg ) {
 
-   auto timep = Logger::getCurrentTime();
-   real_t point = Logger::millisecondDuration( Logger::getStartTime(), timep );
-   Logger::getInstance() << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() << "][MESSAGE ]:   " << msg 
-                         << Logger::nl << Logger::b_print;
+   Logger lg( Logger::createInstance() );
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][MESSAGE ]:   " << msg << '\n';
+   lg.flushBuffer( false );
 }
 
 
 
 void report_error( const std::string & msg, const std::string & file, int line ) {
 
-   auto timep = Logger::getCurrentTime();
-   real_t point = Logger::millisecondDuration( Logger::getStartTime(), timep );
-   Logger::getInstance() << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() << "][ERROR ]:   " << msg
-                         << Logger::nl
-                         << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
-   Logger::getInstance() << Logger::b_write;
+   Logger lg( Logger::createInstance() );
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][ERROR ]:   " << msg << '\n' 
+      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+   lg.flushBuffer( true );
 }
 
 
 
 void catch_exception( std::exception & exc, const std::string & file, int line ) {
 
-   auto timep = Logger::getCurrentTime();
-   real_t point = Logger::millisecondDuration( Logger::getStartTime(), timep );
-   Logger::getInstance() << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() << "][EXCEPTION CAUGHT ]:   " << exc.what()
-                         << Logger::nl
-                         << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
-   Logger::getInstance() << Logger::b_write;
+   Logger lg( Logger::createInstance() );
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][EXCEPTION CAUGHT ]:   " << exc.what() << '\n'
+      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+   lg.flushBuffer( true );
 }
 
 
 
 void report_warning( const std::string & msg, const std::string & file, int line ) {
 
-   auto timep = Logger::getCurrentTime();
-   real_t point = Logger::millisecondDuration( Logger::getStartTime(), timep );
-   Logger::getInstance() << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() << "][WARNING ]:    " << msg
-                         << Logger::nl
-                         << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
+   Logger lg( Logger::createInstance() );
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][WARNING ]:    " << msg << '\n'
+      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      
    #ifdef __SN_LOGLEVEL_WRITE_WARNINGS__
-      Logger::getInstance() << Logger::b_write;
+      lg.flushBuffer( true );
    #else
-      Logger::getInstance() << Logger::b_print;
+      lg.flushBuffer( false );
    #endif
 }
 
 
 
 void markEventHorizon() {
-   Logger::getInstance().eventWatchRegionSwitch_ = ! Logger::getInstance().eventWatchRegionSwitch_;
+   eventWatchRegionSwitch_ = ! eventWatchRegionSwitch_;
 }
 void report_event( LogEventType event, const std::string & file, int line, const std::string & info ) {
    
-   if( ! Logger::getInstance().eventWatchRegionSwitch_ )
+   if( ! eventWatchRegionSwitch_ )
       return;
    
+   Logger lg( Logger::createInstance() );
    std::string event_tag;
    std::string descr;
    switch( event ) {
@@ -153,30 +146,33 @@ void report_event( LogEventType event, const std::string & file, int line, const
    case LogEventType::ResDealloc: event_tag = "RESOURCE DEALLOCATED"; descr = "Pointer, Type, Size (in that order): "; break;
    case LogEventType::OMPFork: event_tag = "OMP PARALLEL REGION ENTERED"; descr = "OpenMP fork occurred. "; break;
    case LogEventType::OMPJoin: event_tag = "OMP PARALLEL REGION EXITED";  descr = "OpenMP operation synchronized. "; break;
-   case LogEventType::MPISend: event_tag = "MPI COMMUNICATION (SEND)"; descr = "An MPI_Send operation was completed successfully. "; break;
-   case LogEventType::MPIRecv: event_tag = "MPI COMMUNICATION (RECV)"; descr = "An MPI_Recv operation was completed successfully. "; break;
-   case LogEventType::MPIBCast: event_tag = "MPI COMMUNICATION (BCAST)"; descr = "An MPI_BCast operation was completed successfully. ";
-   break;
+   case LogEventType::MPISend: event_tag = "MPI COMMUNICATION (SEND)"; descr = "Package, source, target (in that order): "; break;
+   case LogEventType::MPISsend: event_tag = "MPI COMMUNICATION (SYNC. SEND)"; descr = "Package, source, target (in that order): "; break;
+   case LogEventType::MPIIsend: event_tag = "MPI COMMUNICATION (ISEND)"; descr = "Package, source, target (in that order): "; break;
+   case LogEventType::MPIRecv: event_tag = "MPI COMMUNICATION (RECV)"; descr = "Package, source, target (in that order): "; break;
+   case LogEventType::MPIIrecv: event_tag = "MPI COMMUNICATION (IRECV)"; descr = "Package, source, target (in that order): "; break;
+   case LogEventType::MPIBCast: event_tag = "MPI COMMUNICATION (BCAST)"; descr = "Package, source (in that order): "; break;
+   case LogEventType::MPIWait: event_tag = "MPI COMMUNICATION (WAIT)"; descr = "An immediate MPI operation has been completed."; break;
+   case LogEventType::MPIWaitAll: event_tag = "MPI COMMUNICATION (WAITALL)"; descr = "A set of immediate MPI operations has been completed."; break;
    case LogEventType::Other: event_tag = "SPECIAL EVENT"; descr = "A special event has occurred.";
    default: event_tag = "UNKNOWN EVENT"; descr = "An unspecified event has ocurred"; break;
    };
    
-   auto timep = Logger::getCurrentTime();
-   real_t point = Logger::millisecondDuration( Logger::getStartTime(), timep );
-   Logger::getInstance() << "[" << point << " ms][LOGGER__>][P" << MPIManager::getCommRank() << "][EVENT - " << event_tag << " ]:   " 
-                         << descr << "   " << info << Logger::nl
-                         << ">--- From <" << file << " :" << line << " > ---<" << Logger::nl;
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][EVENT - " << event_tag << " ]:   " 
+      << descr << "   " << info << '\n' 
+      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      
    #ifdef __SN_LOGLEVEL_WRITE_EVENTS__
-      Logger::getInstance() << Logger::b_write;
+      lg.flushBuffer( true );
    #else
-      Logger::getInstance() << Logger::b_print;
+      lg.flushBuffer( false );
    #endif
 }
 
 
 
-void print_message_impl() {}
-void watch_impl() {}
+void watch_impl( Logger & ) {}
 
 }   // namespace impl
 }   // namespace logger

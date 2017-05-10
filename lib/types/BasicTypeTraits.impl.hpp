@@ -62,6 +62,11 @@ template< class TYPE > struct NoCVQ_R< volatile const TYPE & > { using type=TYPE
 template<> struct amb_void<true>    { using type = int; };
 template<> struct amb_void<false>   { using type = void; };
 
+// sizeof (array version) implementation
+template< typename ARR, small_t SIZE > struct sizeof_array_impl< ARR[SIZE] > {
+   enum { value = SIZE };
+};
+
 }   // namespace impl
 
 // Counts the number of variadic arguments
@@ -130,6 +135,8 @@ template< class TYPE, int SIZE > struct is_array< TYPE[SIZE] > : public impl::tr
 
 template< class ARR, class TYPE > struct is_array_of_type : public impl::false_type                     {};
 template< class TYPE, int SIZE > struct is_array_of_type< TYPE[SIZE], TYPE > : public impl::true_type   {};
+
+template< typename ARR > small_t sizeof_array( ARR ) { return impl::sizeof_array_impl< ARR >::value; }
 
 template< typename TYPE > struct is_basic_datatype : public is_integer<TYPE>, is_floating_point<TYPE>, is_bool<TYPE> {
    enum : bool { value = is_integer<TYPE>::value || is_floating_point<TYPE>::value || is_bool<TYPE>::value };

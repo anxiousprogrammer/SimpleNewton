@@ -1,6 +1,7 @@
 #ifndef MATRIX2_HPP
 #define MATRIX2_HPP
 
+#include <logger/Logger.hpp>
 #include <logger/BasicTypenameStr.hpp>
 #include "Container.hpp"
 
@@ -10,10 +11,9 @@ namespace simpleNewton {
 /* Let the compiler know that vector2 is a thing */
 template< typename T > class Vector2;
 template< typename T > class Matrix2;
-template< typename T >
-Vector2<T> operator*( const Matrix2<T> &, const Vector2<T> & );
-template< typename T >
-Matrix2<T> operator*( const Matrix2<T> &, const Matrix2<T> & );
+
+// Forward declarations of special products
+template< typename T > Vector2<T> operator*( const Matrix2<T> &, const Vector2<T> & );
 
 /**||***************************************************************************************************************************************
 *
@@ -24,13 +24,16 @@ Matrix2<T> operator*( const Matrix2<T> &, const Matrix2<T> & );
 template< typename TYPE_T >
 class Matrix2 : public Container< TYPE_T, 4 > {
 
-public:
+private:
    
    /* Unveil the underlaying body of container */
    using Container<TYPE_T, 4>::data_;
    
+public:
+   
    /* Specifying creation and destruction */
    /* NTC */ explicit Matrix2( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3, const TYPE_T & v4 ) : Container<TYPE_T, 4>() {
+   
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
@@ -49,43 +52,52 @@ public:
    
    /* Access */
    inline TYPE_T & operator()( small_t r, small_t c ) {
+   
       SN_ASSERT_INDEX_WITHIN_SIZE( r, 2 );
       SN_ASSERT_INDEX_WITHIN_SIZE( c, 2 );
       return data_[ 2*r + c ];
    }
    inline const TYPE_T & operator()( small_t r, small_t c ) const {
+   
       SN_ASSERT_INDEX_WITHIN_SIZE( r, 2 );
       SN_ASSERT_INDEX_WITHIN_SIZE( c, 2 );
       return data_[ 2*r + c ];
    }
    inline Matrix2<TYPE_T> t() const {
+   
       return Matrix2<TYPE_T>( data_[0], data_[2],
                               data_[1], data_[3] );
    }
    
    /* Arithmetic completion */
    inline Matrix2<TYPE_T> operator+( const Matrix2<TYPE_T> & operand ) const {
+   
       return Matrix2<TYPE_T>( data_[0] + operand.data_[0], data_[1] + operand.data_[1], 
                               data_[2] + operand.data_[2], data_[2] + operand.data_[2] );
    }
    inline Matrix2<TYPE_T> operator-( const Matrix2<TYPE_T> & operand ) const {
+   
       return Matrix2<TYPE_T>( data_[0] - operand.data_[0], data_[1] - operand.data_[1],
                               data_[2] - operand.data_[2], data_[3] - operand.data_[3] );
    }
    /* Operations with scalars */
    inline Matrix2<TYPE_T> operator+( const TYPE_T & operand ) const {
+   
       return Matrix2<TYPE_T>( data_[0] + operand, data_[1] + operand,
                               data_[2] + operand, data_[3] + operand );
    }
    inline Matrix2<TYPE_T> operator-( const TYPE_T & operand ) const {
+   
       return Matrix2<TYPE_T>( data_[0] - operand, data_[1] - operand,
                               data_[2] - operand, data_[3] - operand );
    }
    inline Matrix2<TYPE_T> operator*( const TYPE_T & operand ) const {
+   
       return Matrix2<TYPE_T>( data_[0] * operand, data_[1] * operand,
                               data_[2] * operand, data_[3] * operand );
    }
    inline Matrix2<TYPE_T> operator/( const TYPE_T & operand ) const {
+
       TYPE_T inv = static_cast<TYPE_T>(1.0)/operand;
       return Matrix2<TYPE_T>( data_[0] * inv, data_[1] * inv,
                               data_[2] * inv, data_[3] * inv );
@@ -93,11 +105,15 @@ public:
    
    /* Special products are friends */
    /* MV */
-   template< typename T >
-   friend Vector2<T> operator*( const Matrix2<T> &, const Vector2<T> & );
+   template< typename T > friend Vector2<T> operator*( const Matrix2<T> &, const Vector2<T> & );
    /* MM */
-   template< typename T >
-   friend Matrix2<T> operator*( const Matrix2<T> &, const Matrix2<T> & );
+   template< typename T > Matrix2<T> operator*( const Matrix2<T> & op2 ) {
+   
+      return Matrix2<T>( data_[0] * op2.data_[0] + data_[1] * op2.data_[2], 
+                         data_[0] * op2.data_[1] + data_[1] * op2.data_[3],
+                         data_[2] * op2.data_[0] + data_[3] * op2.data_[2], 
+                         data_[2] * op2.data_[1] + data_[3] * op2.data_[3] );
+   }
    
    /* Determinant */
    inline TYPE_T getDeterminant() {
@@ -106,9 +122,10 @@ public:
    
    /* Output */
    friend Logger & operator<<( Logger & lg, const Matrix2<TYPE_T> & mat ) {
+   
       lg.fixFP();
-      lg << Logger::nl << "Matrix (2x2) " << mat[0] << " " << mat[1] << Logger::nl
-                       << "             " << mat[2] << " " << mat[3] << Logger::nl;
+      lg << '\n' << "Matrix (2x2) " << mat[0] << " " << mat[1] << '\n' 
+                 << "             " << mat[2] << " " << mat[3] << '\n';
       lg.unfixFP();
       return lg;
    }

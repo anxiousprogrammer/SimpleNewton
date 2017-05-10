@@ -24,8 +24,8 @@ struct BasicTypeTraits_CPPHackClass {};
 namespace typetraits {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Type altering actions
-/////////////////////////
+/// Type altering actions and CT utility structures
+///////////////////////////////////////////////////
 
 // Add, remove reference
 template< class T > struct add_reference;
@@ -83,6 +83,9 @@ template< class T > using a_void = void;
 // Ambiguity void type: if expression is true then int.
 template< bool VAL > struct amb_void;
 
+// sizeof array
+template< typename ARR > struct sizeof_array_impl;
+
 }   // namespace impl
 
 
@@ -107,11 +110,12 @@ template< typename TYPE > struct is_string_t;
 template< typename TYPE > struct is_bool;
 template< typename TYPE > struct is_array;
 template< typename ARR, typename TYPE > struct is_array_of_type;
+template< typename ARR > small_t sizeof_array( ARR );
+template< typename TYPE > struct is_basic_datatype;
+template< typename TYPE > struct is_array_of_basic_datatype;
 template< typename TYPE > struct is_function;
 template< typename TYPE > struct is_class;
 template< typename TL > struct is_typelist;
-template< typename TYPE > struct is_basic_datatype;
-template< typename TYPE > struct is_array_of_basic_datatype;
 
 // Declarations -> pointer and reference types
 template< typename TYPE > struct is_pointer;

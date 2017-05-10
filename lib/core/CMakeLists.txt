@@ -1,2 +1,2 @@
-add_library( FASTLOOPS ULoops.cpp )
-add_library( MPIWRAPPER MPIManager.cpp Communicator.cpp )
+add_library( ULOOPS ULoops.cpp )
+add_library( COMMUNICATION ProcSingleton.cpp Communicator.cpp )

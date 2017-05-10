@@ -5,10 +5,9 @@
 #include <utility>
 
 #include <asserts/Asserts.hpp>
-#include <logger/Logger.hpp>
 #include <asserts/TypeConstraints.hpp>
 
-#include <core/ULoops.hpp>
+#include "RAIIWrapper.hpp"
 
 namespace simpleNewton {
 
@@ -27,29 +26,83 @@ class Container {
 
 public:
 
-   /* Copy and move control */
-   Container<TYPE_T, SIZE> & operator=( const TYPE_T & );
-   Container<TYPE_T, SIZE> & operator=( const Container<TYPE_T, SIZE> & );
-   Container<TYPE_T, SIZE> & operator=( Container<TYPE_T, SIZE> && );
-   
    /* Linear access */
    inline const TYPE_T & operator[]( small_t index ) const   { SN_ASSERT_INDEX_WITHIN_SIZE( index, SIZE ); return data_[index]; }
+   
+   /* Copy and move control */
+   Container<TYPE_T, SIZE> operator=( const TYPE_T & );
+   Container<TYPE_T, SIZE> operator=( const Container<TYPE_T, SIZE> & );
+   Container<TYPE_T, SIZE> operator=( Container<TYPE_T, SIZE> && );
    
 protected:
 
    /* Birth and death */
    Container() = default;
    explicit Container( const TYPE_T & );
-
    Container( const Container<TYPE_T, SIZE> & );
-   Container( Container<TYPE_T, SIZE> && );
-   ~Container();
+   Container( Container<TYPE_T, SIZE> && ) = default;
+   ~Container() = default;
    
    /* Members */
-   TYPE_T* data_ = new TYPE_T[SIZE];
+   RAIIWrapper< TYPE_T > data_ = createRAIIWrapper< TYPE_T >( SIZE );
 };
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///   IMPLEMENTATION
+////////////////////
+
+// Non-trivial constructor(s)
+template< class TYPE_T, small_t SIZE >
+Container< TYPE_T, SIZE > :: Container( const TYPE_T & val ) {
+   std::fill( data_.raw_ptr(), data_.raw_ptr() + SIZE, val );
+}
+
+
+
+// Copy constructor
+template< class TYPE_T, small_t SIZE >
+Container<TYPE_T, SIZE> :: Container( const Container<TYPE_T, SIZE> & ref ) {
+   std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + SIZE, data_.raw_ptr() );
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///   Copy and move control
+///////////////////////////
+
+// (Scalar) Copy control
+template< class TYPE_T, small_t SIZE >
+Container<TYPE_T, SIZE> Container<TYPE_T, SIZE> :: operator=( const TYPE_T & ref ) {
+
+   std::fill( data_.raw_ptr(), data_.raw_ptr() + SIZE, ref );
+   return *this;
+}
+
+
+
+// Copy control
+template< class TYPE_T, small_t SIZE >
+Container<TYPE_T, SIZE> Container<TYPE_T, SIZE> :: operator=( const Container<TYPE_T, SIZE> & ref ) {
+
+   std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + SIZE, data_.raw_ptr() );
+   return *this;
+}
+
+
+
+// Move control
+template< class TYPE_T, small_t SIZE >
+Container<TYPE_T, SIZE> Container<TYPE_T, SIZE> :: operator=( Container<TYPE_T, SIZE> && ref ) {
+
+   if( this != &ref ) {
+      data_ = std::move(ref.data_);
+   }
+   return *this;
+}
 
 }   // namespace simpleNewton
 
-#include "Container.impl.hpp"
 #endif

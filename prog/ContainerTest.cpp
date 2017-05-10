@@ -5,9 +5,8 @@
 
 using namespace simpleNewton;
 
-int main( int argc, char ** argv ) {
+int main() {
    
-   Logger::writeSettings< std::ofstream >( argc, argv );
    SN_LOG_MESSAGE( "Hi! Testing the logger." );
    
    Vector2<double> v1( 1.0, 2.0 ),      v2( 3.0, 4.0 );

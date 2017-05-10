@@ -12,11 +12,12 @@ namespace simpleNewton {
 |***************************************************************************************************************************************///+
 
 class NonConstructible {
+
 private:
-   NonConstructible() = default;
-   NonConstructible( const NonConstructible & ) = default;
-   NonConstructible( NonConstructible && ) = default;
-   ~NonConstructible() = default;
+   NonConstructible() = delete;
+   NonConstructible( const NonConstructible & ) = delete;
+   NonConstructible( NonConstructible && ) = delete;
+   ~NonConstructible() = delete;
 };
 
 
@@ -28,25 +29,38 @@ class NonInstantiable {
 
 
 class Singleton {
+
 private:
-   Singleton( const Singleton & ) = default;
-   Singleton & operator=( const Singleton & ) { return *this; }
-   Singleton( Singleton && ) = default;
+   Singleton( const Singleton & ) = delete;   // Copying is not allowed.
+   Singleton( Singleton && ) = default;       // Can be moved if that is required.
 
 protected:
-   Singleton() = default;
-   ~Singleton() = default;
+   Singleton() = default;    // Private inheritance == private creation.
+   ~Singleton() = default;   // Born within, died within.
 };
 
 
 
 class NonCopyable {
-   NonCopyable( const NonCopyable & ) = default;
-   NonCopyable operator=( const NonCopyable & ) { return *this; }
+
+   NonCopyable( const NonCopyable & ) = delete;
 
 protected:
    NonCopyable() = default;
+   NonCopyable( NonCopyable && ) = default;
    ~NonCopyable() = default;
+};
+
+
+
+class NonMovable {
+
+   NonMovable( NonMovable && ) = delete;
+
+protected:
+   NonMovable() = default;
+   NonMovable( const NonMovable & ) = default;
+   ~NonMovable() = default;
 };
 
 }   // namespace simpleNewton

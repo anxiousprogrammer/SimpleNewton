@@ -1,6 +1,7 @@
 #ifndef VECTOR2_HPP
 #define VECTOR2_HPP
 
+#include <logger/Logger.hpp>
 #include <logger/BasicTypenameStr.hpp>
 #include "Container.hpp"
 
@@ -10,10 +11,9 @@ namespace simpleNewton {
 template< class T > class Matrix2;
 template< class T > class Vector2;
 template< class T > class Vector2_t;
-template< typename T >
-Matrix2<T> operator*( const Vector2<T> &, const Vector2_t<T> & );
-template< typename T >
-Vector2_t<T> operator*( const Vector2_t<T> &, const Matrix2<T> & );
+
+// Forward declarations: Interactions with objects of other mathematical types
+template< typename T > Matrix2<T> operator*( const Vector2<T> &, const Vector2_t<T> & );     // Outer product
 
 /**||***************************************************************************************************************************************
 *
@@ -29,13 +29,16 @@ Vector2_t<T> operator*( const Vector2_t<T> &, const Matrix2<T> & );
 template< typename TYPE_T >
 class Vector2 : public Container< TYPE_T, 2 > {
 
-public:
+private:
    
    /* Unveil the underlaying body of container */
    using Container<TYPE_T, 2>::data_;
    
+public:
+   
    /* Specifying creation and destruction */
    /* NTC */ explicit Vector2( const TYPE_T & v1, const TYPE_T & v2 ) : Container<TYPE_T, 2>() {
+
       data_[0] = v1;
       data_[1] = v2;
       SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 2" + " (from Vector2 TC)" );
@@ -79,18 +82,21 @@ public:
       return Vector2<TYPE_T>( data_[0] * operand, data_[1] * operand );
    }
    inline Vector2<TYPE_T> operator/( const TYPE_T & operand ) const {
+
       TYPE_T inv = static_cast<TYPE_T>(1.0)/operand;
       return Vector2<TYPE_T>( data_[0] * inv, data_[1] * inv );
    }
    
    /* Outer product */
-   template< typename T >
-   friend Matrix2<T> operator*( const Vector2<T> &, const Vector2_t<T> & );
+   template< typename T > friend Matrix2<T> operator*( const Vector2<T> &, const Vector2_t<T> & );
+   /* Dot product needs permission */
+   template< typename T > friend T Vector2_t<T>::operator*( const Vector2<T> & ) const;
    
    /* Output */
    friend Logger & operator<<( Logger & lg, const Vector2<TYPE_T> & vec ) {
+
       lg.fixFP();
-      lg << Logger::nl << "Vector2 (t)   [" << vec[0] << "   " << vec[1] << "]   " << Logger::nl;
+      lg << '\n' << "Vector2 (t)   [" << vec[0] << "   " << vec[1] << "]   " << '\n';
       lg.unfixFP();
       return lg;
    }
@@ -104,10 +110,13 @@ public:
 
 template< class TYPE_T >
 class Vector2_t : public Container< TYPE_T, 2 > {
-public:
-   
+
+private:
+
    /* Unveil the underlaying body of container */
    using Container<TYPE_T, 2>::data_;
+   
+public:
    
    /* The only way to ever create a transpose */
    friend Vector2_t<TYPE_T> Vector2<TYPE_T>::t() const;
@@ -115,6 +124,7 @@ public:
    /* Specifying creation and destruction */
 private:
    /* NTC */ explicit Vector2_t( const TYPE_T & v1, const TYPE_T & v2 ) : Container<TYPE_T, 2>() {
+
       data_[0] = v1;
       data_[1] = v2;
       SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 2" + " (from Vector2_t TC)" );

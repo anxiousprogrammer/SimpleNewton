@@ -1,6 +1,7 @@
 #ifndef VECTOR3_HPP
 #define VECTOR3_HPP
 
+#include <logger/Logger.hpp>
 #include <logger/BasicTypenameStr.hpp>
 #include "Container.hpp"
 
@@ -10,8 +11,9 @@ namespace simpleNewton {
 template< class T > class Matrix3;
 template< class T > class Vector3;
 template< class T > class Vector3_t;
-template< typename T >
-Matrix3<T> operator*( const Vector3<T> &, const Vector3_t<T> & );
+
+// Forward declarations: special product
+template< typename T > Matrix3<T> operator*( const Vector3<T> &, const Vector3_t<T> & );   // outer product
 
 /**||***************************************************************************************************************************************
 *
@@ -27,13 +29,16 @@ Matrix3<T> operator*( const Vector3<T> &, const Vector3_t<T> & );
 template< typename TYPE_T >
 class Vector3 : public Container< TYPE_T, 3 > {
 
-public:
+private:
    
    /* Unveil the underlaying body of container */
    using Container<TYPE_T, 3>::data_;
    
+public:
+   
    /* Specifying creation and destruction */
    /* NTC */ explicit Vector3( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : Container<TYPE_T, 3>() {
+   
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
@@ -83,13 +88,15 @@ public:
    }
    
    /* Outer product */
-   template< typename T >
-   friend Matrix3<T> operator*( const Vector3<T> &, const Vector3_t<T> & );
+   template< typename T > friend Matrix3<T> operator*( const Vector3<T> &, const Vector3_t<T> & );
+   /* Dot product needs permission */
+   template< typename T > friend T Vector3_t<T>::operator*( const Vector3<T> & ) const;
    
    /* Output */
    friend Logger & operator<<( Logger & lg, const Vector3<TYPE_T> & vec ) {
+   
       lg.fixFP();
-      lg << Logger::nl << "Vector3 (t)   [" << vec[0] << "   " << vec[1] << "   " << vec[2] << "]   " << Logger::nl;
+      lg << '\n' << "Vector3 (t)   [" << vec[0] << "   " << vec[1] << "   " << vec[2] << "]   " << '\n';
       lg.unfixFP();
       return lg;
    }
@@ -103,17 +110,22 @@ public:
 
 template< class TYPE_T >
 class Vector3_t : public Container< TYPE_T, 3 > {
-public:
+
+private:
    
    /* Unveil the underlaying body of container */
    using Container<TYPE_T, 3>::data_;
    
+public:
+   
    /* Creation of transpose Vector3 is only possible by t() function */
    friend Vector3_t<TYPE_T> Vector3<TYPE_T>::t() const;
    
-   /* Specifying creation and destruction */
 private:
+   
+   /* Specifying creation and destruction */
    /* NTC */ explicit Vector3_t( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : Container<TYPE_T, 3>() {
+   
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;

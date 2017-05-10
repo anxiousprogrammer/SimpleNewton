@@ -6,6 +6,7 @@
 
 #include <GlobalConstants.hpp>
 #include <logger/Logger.hpp>
+#include <core/ProcSingleton.hpp>
 
 namespace simpleNewton {
 
@@ -50,9 +51,9 @@ template<> struct INT_IN_ASSERT< unsigned long long > { enum : bool { value = tr
 
 inline void assert( bool expr, const char * const file, int line ) {
    if( ! expr ) {
-      logger::impl::report_error( "An assertion has failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", 
-                                  file, line );
-      std::exit( EXIT_FAILURE );
+      
+      logger::impl::report_error( "An assertion has failed. The process will now be terminated.", file, line );
+      ProcSingleton::ExitProgram();
    }
 }
 
@@ -62,9 +63,9 @@ template< class T1, class T2 >
 inline void assert_equal( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) == static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Equality assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", 
-                                     file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Equality assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -75,8 +76,9 @@ template< class T1, class T2 >
 inline void assert_fp_equal( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) <= globalConstants::ZERO ) ) {
-         logger::impl::report_error( "Floating point equality assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Floating point equality assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -87,8 +89,9 @@ template< class T1, class T2 >
 inline void assert_inequal( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) != static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Inequality assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Inequality assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -99,8 +102,9 @@ template< class T1, class T2 >
 inline void assert_fp_inequal( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) > globalConstants::ZERO ) ) {
-         logger::impl::report_error( "Floating point inequality assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Floating point inequality assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -111,8 +115,9 @@ template< class T1, class T2 >
 inline void assert_less_than( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) < static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Less than assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Less than assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -123,8 +128,9 @@ template< class T1, class T2 >
 inline void assert_leq( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) <= static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Less than or equal to assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Less than or equal to assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -135,8 +141,9 @@ template< class T1, class T2 >
 inline void assert_greater_than( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) > static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Greater than assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+        
+         logger::impl::report_error( "Greater than assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -147,8 +154,9 @@ template< class T1, class T2 >
 inline void assert_greq( const T1 & VALUE, const T2 & REFERENCE, const char * const file, int line ) {
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) >= static_cast<T1>(REFERENCE) ) ) {
-         logger::impl::report_error( "Greater than or equal to assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+         
+         logger::impl::report_error( "Greater than or equal to assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -158,8 +166,9 @@ inline void assert_greq( const T1 & VALUE, const T2 & REFERENCE, const char * co
 template< class TYPE >
 inline void assert_zero( const TYPE & VALUE, const char * const file, int line ) {
    if( !static_cast< bool >( std::fabs(VALUE) <= globalConstants::ZERO ) ) {
-      logger::impl::report_error( "Equal to zero assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-      std::exit( EXIT_FAILURE );
+      
+      logger::impl::report_error( "Equal to zero assertion failed. The process will now be terminated.", file, line );
+      ProcSingleton::ExitProgram();
    }
 }
 
@@ -168,8 +177,9 @@ inline void assert_zero( const TYPE & VALUE, const char * const file, int line )
 template< class TYPE >
 inline void assert_positive( const TYPE & VALUE, const char * const file, int line ) {
    if( !static_cast< bool >( VALUE > globalConstants::ZERO ) ) {
-      logger::impl::report_error( "Positivity assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-      std::exit( EXIT_FAILURE );
+      
+      logger::impl::report_error( "Positivity assertion failed. The process will now be terminated.", file, line );
+      ProcSingleton::ExitProgram();
    }
 }
 
@@ -178,8 +188,9 @@ inline void assert_positive( const TYPE & VALUE, const char * const file, int li
 template< class TYPE >
 inline void assert_negative( const TYPE & VALUE, const char * const file, int line ) {
    if( !static_cast< bool >( VALUE < globalConstants::ZERO ) ) {
-      logger::impl::report_error( "Negativity assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-      std::exit( EXIT_FAILURE );
+     
+      logger::impl::report_error( "Negativity assertion failed. The process will now be terminated.", file, line );
+      ProcSingleton::ExitProgram();
    }
 }
 
@@ -188,6 +199,7 @@ inline void assert_negative( const TYPE & VALUE, const char * const file, int li
 template< bool constexpr_expr >
 inline void assert_msg( const char* const MSG, const char * const file, int line ) {
    if( !static_cast< bool >( constexpr_expr ) ) {
+     
       logger::impl::report_error( MSG, file, line );
       std::exit( EXIT_FAILURE );
    }
@@ -199,8 +211,9 @@ template< typename U_INT >
 inline void assert_size_same( const U_INT & SIZE, const U_INT & REF, const char * const file, int line ) {
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) == static_cast<unsigned long long>(REF) ) ) {
-         logger::impl::report_error( "Same size assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+        
+         logger::impl::report_error( "Same size assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -211,8 +224,9 @@ template< typename U_INT >
 inline void assert_size_less_than( const U_INT & SIZE, const U_INT & REF, const char * const file, int line ) {
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) <= static_cast<unsigned long long>(REF) ) ) {
-         logger::impl::report_error( "Size less than assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+       
+         logger::impl::report_error( "Size less than assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -223,8 +237,9 @@ template< typename U_INT >
 inline void assert_size_strictly_less_than( const U_INT & SIZE, const U_INT & REF, const char * const file, int line ) {
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) < static_cast<unsigned long long>(REF) ) ) {
-         logger::impl::report_error( "Size strictly less than assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+       
+         logger::impl::report_error( "Size strictly less than assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }
@@ -235,8 +250,9 @@ template< typename U_INT >
 inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, const char * const file, int line ) {
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(IND) < static_cast<unsigned long long>(SIZE) ) ) {
-         logger::impl::report_error( "Index within size assertion failed. The process will now be terminated by calling std::exit( EXIT_FAILURE ).", file, line );
-         std::exit( EXIT_FAILURE );
+      
+         logger::impl::report_error( "Index within size assertion failed. The process will now be terminated.", file, line );
+         ProcSingleton::ExitProgram();
       }
    }
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <core/MPIManager.hpp>
+#include <core/ProcSingleton.hpp>
 #include <core/Communicator.hpp>
 #include <logger/Logger.hpp>
 
@@ -8,22 +8,25 @@ using namespace simpleNewton;
 
 int main( int argc, char ** argv ) {
    
-   MPIManager::init( argc, argv );
-   Logger::writeSettings< std::ofstream >( argc, argv );
+   ProcSingleton::init( argc, argv );
+   
+   SN_LOG_EVENT_WATCH_REGION_LIMIT();
    
    SN_LOG_REPORT_WARNING( "Hi! Testing the MPI module." );
    
-   float j[] = { single_cast( SN_MPI_RANK() ), single_cast( SN_MPI_RANK() ), single_cast( SN_MPI_RANK() ) };
-
+   OpenStringBuffer j     = "Hallo, MPI World!";
+   OpenStringBuffer rec_j = "Not arrived";
+   MPI_Request r1, r2;
+   
    SN_MPI_PROC_REGION( 1 ) {
-      Communicator::BSend( &j, 3, SN_ROOT_PROC );
+      Communicator::send( j, SN_ROOT_PROC, MPISendMode::Immediate, &r1 );
+      Communicator::waitOnSend( &r1 );
    }
-   
-   float rec_j[] = { 20.0, 20.0, 20.0 };
-   
    SN_MPI_PROC_REGION( SN_ROOT_PROC ) {
-      Communicator::BRecv( &rec_j, 3, 1 );
-      SN_LOG_WATCH_VARIABLES( "The received value: ", single_cast(rec_j[0]), single_cast(rec_j[1]), single_cast(rec_j[2]) );
+   
+      Communicator::receive( rec_j, 17, 1, MPIRecvMode::Immediate, &r2 );
+      Communicator::waitOnRecv( &r2 );
+      SN_LOG_WATCH_VARIABLES( "The received value: ", std::string(rec_j), rec_j.getSize() );
    }
    
    return 0;

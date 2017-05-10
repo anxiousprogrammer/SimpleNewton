@@ -1,55 +1,59 @@
-#include "MPIManager.hpp"
+#include "ProcSingleton.hpp"
+
 #include <iostream>
 #include <ctime>
 
 namespace simpleNewton {
 
-/**||***************************************************************************************************************************************
+/**||**************************************************************************************************************************************
 *
-*   Description: implementation of the simpleNewton MPIManager
+*   Description: implementation of the simpleNewton ProcSingleton
 *
-|***************************************************************************************************************************************///+
+|**************************************************************************************************************************************///+
 
-const MPIManager & MPIManager::getInstance() {
+const ProcSingleton & ProcSingleton::getInstance() {
    
-   if( ! MPIManager::getPrivateInstance().is_initialized_ ) {
+   if( ! getPrivateInstance().is_initialized_ ) {
    
       SN_MPI_ROOTPROC_REGION() {
    
-         std::cout << "[MPIMAN__>][FATAL ERROR ]:   MPI Manager was not initialised before being called to service. "
-                   << "Please use the member function MPIManager::init for this purpose. The program will now exit."
+         std::cout << "[PROCMAN__>][ERROR ]:   MPI Manager was not initialised before being called to service. "
+                   << "Please use the member function ProcSingleton::init for this purpose. The program will now exit."
                    << std::endl;
       }
       
       /////////////////
       ///   EXIT POINT!
-      SN_EXIT();
+      ExitProgram();
       /////////////////
    }
-   return static_cast< const MPIManager & >( MPIManager::getPrivateInstance() );
+   return static_cast< const ProcSingleton & >( getPrivateInstance() );
 }
 
 
 
-void MPIManager::init( int argc, char ** argv ) {
-   if( ! MPIManager::getPrivateInstance().is_initialized_ ) {
+void ProcSingleton::init( int argc, char ** argv ) {
+   if( ! getPrivateInstance().is_initialized_ ) {
       
       if( argc < 1 || argv == nullptr ) {   // Killing that -Wunused-parameter warning when not using MPI
          SN_MPI_ROOTPROC_REGION() {
-            std::cout << "[MPIMAN__>][EVENT ]:   Improper initializing arguments provided to MPIManager::init." << std::endl;
+            std::cout << "[PROCMAN__>][EVENT ]:   Improper initializing arguments provided to ProcSingleton::init." << std::endl;
          }
          
          /////////////////
          ///   EXIT POINT!
-         SN_EXIT();
+         ExitProgram();
          /////////////////
       }
+      
+      // Exec name
+      getPrivateInstance().exec_name_ = argv[0];
       
       #ifdef __SN_USE_MPI__
       MPI_Init( &argc, &argv );
 
-      MPI_Comm_size( MPI_COMM_WORLD, & MPIManager::getPrivateInstance().comm_size_ );
-      MPI_Comm_rank( MPI_COMM_WORLD, & MPIManager::getPrivateInstance().comm_rank_ );
+      MPI_Comm_size( MPI_COMM_WORLD, & getPrivateInstance().comm_size_ );
+      MPI_Comm_rank( MPI_COMM_WORLD, & getPrivateInstance().comm_rank_ );
       #endif
       
       // Console initialization
@@ -61,7 +65,7 @@ void MPIManager::init( int argc, char ** argv ) {
                    << "********************************************************************************************************" 
                    << std::endl
                    << ">>>   Simple Newton framework running \'" << argv[0] 
-                   << "\' with start time: " << ctime( &_now ) << std::endl;
+                   << "\' with " <<  " start time: " << ctime( &_now ) << std::endl;
       }
       SN_MPI_BARRIER();
       
@@ -72,13 +76,19 @@ void MPIManager::init( int argc, char ** argv ) {
       #endif
 
       // Fly the flag: all is well!
-      MPIManager::getPrivateInstance().is_initialized_  = true;
+      getPrivateInstance().is_initialized_  = true;
    }
 }
 
 
 
-MPIManager::~MPIManager() {
+const std::string & ProcSingleton::getExecName() {
+   return getPrivateInstance().exec_name_;
+}
+
+
+
+ProcSingleton::~ProcSingleton() {
 
    SN_MPI_BARRIER();
    SN_MPI_ROOTPROC_REGION() {
@@ -98,6 +108,7 @@ MPIManager::~MPIManager() {
    MPI_Finalize();
    #endif
 
+   exec_name_ = "";
    is_initialized_ = false;
    comm_size_ = 0;
    comm_rank_ = 0;
@@ -105,8 +116,8 @@ MPIManager::~MPIManager() {
 
 
 
-bool MPIManager::isInitialized() {
-   return MPIManager::getPrivateInstance().is_initialized_;
+bool ProcSingleton::isInitialized() {
+   return getPrivateInstance().is_initialized_;
 }
 
 

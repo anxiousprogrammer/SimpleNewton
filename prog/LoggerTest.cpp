@@ -5,11 +5,12 @@
 using namespace simpleNewton;
 
 int main( int argc, char ** argv ) {
+
    SN_LOG_EVENT_WATCH_REGION_LIMIT();
    int j = 0;
    float k = 0.f;
-   MPIManager::init( argc, argv );
-   Logger::writeSettings< std::ofstream >( argc, argv );
+   ProcSingleton::init( argc, argv );
+
    SN_LOG_EVENT_WATCH_REGION_LIMIT();
    SN_LOG_MESSAGE( "Hi! Testing the logger." );
    SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "j, int, 3" );

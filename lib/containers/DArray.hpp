@@ -30,12 +30,6 @@ public:
    void resize( small_t );
    void fill( const TYPE_T & );
    
-   /* So much for encapsulation */
-   inline operator TYPE_T*()               { return data_; }
-   inline operator const TYPE_T*() const   { return data_; }
-   inline TYPE_T * getData()               { return data_; } 
-   inline const TYPE_T * getData() const   { return data_; } 
-   
    /* Copy and move control */
    DArray<TYPE_T> operator=( const TYPE_T & );
    DArray<TYPE_T> operator=( const DArray<TYPE_T> & );

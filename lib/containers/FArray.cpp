@@ -1,4 +1,4 @@
-#include "Container.hpp"
+#include "FArray.hpp"
 
 namespace simpleNewton {
 
@@ -8,6 +8,6 @@ namespace simpleNewton {
 *
 |***************************************************************************************************************************************///+
 
-template class Container< real_t, 1000000 >;
+template class FArray< real_t, 1000000 >;
 
 }   // namespace simpleNewton

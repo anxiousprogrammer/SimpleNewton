@@ -5,6 +5,8 @@ project( simpleNewton )
 set( simpleNewton_VERSION_MAJOR 1 )
 set( simpleNewton_VERSION_MINOR 0 )
 
+
+
 # Options
 option( SN_USE_MPI         "Include and use the message passing interface (MPI) libraries"   ON  )
 if( NOT CMAKE_BUILD_TYPE )
@@ -13,16 +15,21 @@ endif()
 option( SN_LOGLEVEL_ERROR            "Enables logging of errors"                             ON  )
 option( SN_LOGLEVEL_WARNING          "Enables logging of warnings"                           ON  )
 option( SN_LOGLEVEL_WATCH            "Enables watching of variables"                         ON  )
-option( SN_LOGLEVEL_EVENT            "Enables logging of events"                             ON  )
+option( SN_LOGLEVEL_L1_EVENT         "Enables logging of low-level events"                   ON  )
+option( SN_LOGLEVEL_L2_EVENT         "Enables logging of high-level events"                  ON  )
 option( SN_LOGLEVEL_WRITE_WARNINGS   "Enables writing warnings to log"                       ON  )
 option( SN_LOGLEVEL_WRITE_WATCHES    "Enables writing watches to log"                        OFF )
 option( SN_LOGLEVEL_WRITE_EVENTS     "Enables writing events to log"                         OFF )
+
+
 
 # Finding libraries/packages and such
 if( SN_USE_MPI )
    find_package( MPI REQUIRED )
    add_definitions( -D__SN_USE_MPI__ )
 endif()
+
+
 
 # Compiler - flags
 set( PROJECT_GENERAL_COMPILE_FLAGS "-O3 -std=c++11 -Wall -Winline -Wshadow -Wextra -Wpedantic" )
@@ -35,6 +42,8 @@ if( SN_USE_MPI )
       set( CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS} )
    endif()
 endif()
+
+
 
 # Important definitions
 if( CMAKE_BUILD_TYPE MATCHES Release )
@@ -49,8 +58,11 @@ endif()
 if( SN_LOGLEVEL_WATCH )
    add_definitions( -D__SN_LOGLEVEL_WATCH__ )
 endif()
-if( SN_LOGLEVEL_EVENT )
-   add_definitions( -D__SN_LOGLEVEL_EVENT__ )
+if( SN_LOGLEVEL_L1_EVENT )
+   add_definitions( -D__SN_LOGLEVEL_L1_EVENT__ )
+endif()
+if( SN_LOGLEVEL_L2_EVENT )
+   add_definitions( -D__SN_LOGLEVEL_L2_EVENT__ )
 endif()
 if( SN_LOGLEVEL_WRITE_WARNINGS )
    add_definitions( -D__SN_LOGLEVEL_WRITE_WARNINGS__ )
@@ -62,10 +74,14 @@ if( SN_LOGLEVEL_WRITE_EVENTS )
    add_definitions( -D__SN_LOGLEVEL_WRITE_EVENTS__ )
 endif()
 
+
+
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
    "${PROJECT_SOURCE_DIR}/simpleNewtonConfig.h.in"
    "${PROJECT_BINARY_DIR}/simpleNewtonConfig.h" )
+
+
 
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h
@@ -74,13 +90,18 @@ include_directories( "${PROJECT_BINARY_DIR}" )
 if( MPI_CXX_FOUND AND SN_USE_MPI )
    include_directories( ${MPI_INCLUDE_PATH} )
 endif()
+
 include_directories( "${PROJECT_SOURCE_DIR}/lib" )
+
 add_subdirectory( lib )
-set( BASIC_LIBRARIES COMMUNICATION LOGGER ASSERTS )
+
+set( BASIC_LIBRARIES TYPES PROCMAN LOGGER ASSERTS )
 if( SN_USE_MPI )
-   set( BASIC_LIBRARIES ${BASIC_LIBRARIES} ${MPI_CXX_LIBRARIES} )
+   set( BASIC_LIBRARIES ${BASIC_LIBRARIES} ${MPI_CXX_LIBRARIES} CONCURRENCY )
 endif()
-set( ALL_LIBRARIES ${BASIC_LIBRARIES} BASICTYPETRAITS TYPECONSTRAINTS ULOOPS CONTAINERS )
+set( ALL_LIBRARIES ${BASIC_LIBRARIES} BASICTYPETRAITS TYPECONSTRAINTS CONTAINERS )
+
+
 
 # add the executables
 add_executable( AssertTest ${PROJECT_SOURCE_DIR}/prog/AssertTest.cpp )
@@ -91,6 +112,6 @@ add_executable( TypelistTest ${PROJECT_SOURCE_DIR}/prog/TypelistTest.cpp )
 # link the execs
 target_link_libraries( AssertTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
 target_link_libraries( LoggerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
-target_link_libraries( ContainerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS ULOOPS CONTAINERS )
+target_link_libraries( ContainerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS CONTAINERS )
 target_link_libraries( MPITest ${BASIC_LIBRARIES} TYPECONSTRAINTS CONTAINERS )
 target_link_libraries( TypelistTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )

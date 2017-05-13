@@ -2,6 +2,7 @@
 #define TYPELIST_HPP
 
 #include <Types.hpp>
+#include <BasicBases.hpp>
 
 namespace simpleNewton {
 
@@ -51,7 +52,7 @@ struct typeNodes_removeDuplicates;
 // The do-all, no-instance wrapper
 // Definition of the typelist
 template< class... TYPES >
-struct SN_CT_TYPELIST {
+struct SN_CT_TYPELIST : private NonInstantiable {
    using list = typelist::impl::typeNodes<TYPES...>;
    
    // 'Function style' operations associated with typelist
@@ -71,8 +72,6 @@ struct SN_CT_TYPELIST {
    using removeFromList = typename typelist::impl::typeNodes_remove< REM_T, TYPES... >::list;
    /* Remove duplicates from typelist */
    using removeDuplicates = typename typelist::impl::typeNodes_removeDuplicates< TYPES... >::list;
-   
-   virtual void NoInstance() = 0;   // To prevent client to create instances of a typelist
 };
 
 }   // namespace simpleNewton

@@ -1,2 +1,1 @@
-add_library( ULOOPS ULoops.cpp )
-add_library( COMMUNICATION ProcSingleton.cpp Communicator.cpp )
+add_library( PROCMAN ProcSingleton.cpp )

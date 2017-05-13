@@ -17,7 +17,7 @@ namespace simpleNewton {
 |***************************************************************************************************************************************///+
 
 // Some enumerators
-enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBCast, 
+enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBcast, 
                            MPIWait, MPIWaitAll, Other };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,9 +98,10 @@ void catch_exception( std::exception & , const std::string & , int );
 
 void report_warning( const std::string & , const std::string & , int );
 
-void markEventHorizon();
+void markEventHorizon( const uint_t );
 
-void report_event( LogEventType , const std::string & , int , const std::string & );
+void report_L1_event( LogEventType , const std::string & , int , const std::string & );
+void report_L2_event( const std::string & , int , const std::string & , const std::string & );
 
 void watch_impl( Logger & );
 template< class HEAD_PARAM, class... TAIL_PARAM >
@@ -132,14 +133,18 @@ void watch_variables( const std::string & msg, const std::string & file, int lin
 
 
 #define SN_LOG_MESSAGE( MSG ) \
-do { logger::impl::print_message( std::string(MSG) ); } while(false)
+do { \
+      std::stringstream temporary_oss; \
+      temporary_oss << MSG; \
+      logger::impl::print_message( temporary_oss.str() ); } while(false)
 
 #ifdef NDEBUG
 
  #define SN_LOG_REPORT_ERROR( MSG )
  #define SN_LOG_CATCH_EXCEPTION( EX )
  #define SN_LOG_REPORT_WARNING( MSG )
- #define SN_LOG_REPORT_EVENT( EV, INFO )
+ #define SN_LOG_REPORT_L1_EVENT( EV, INFO )
+ #define SN_LOG_REPORT_L2_EVENT( EV, INFO )
  #define SN_LOG_WATCH_VARIABLES( MSG, ... )
 
 #else
@@ -147,7 +152,10 @@ do { logger::impl::print_message( std::string(MSG) ); } while(false)
    #ifdef __SN_LOGLEVEL_ERROR__
  
       #define SN_LOG_REPORT_ERROR( MSG ) \
-      do { logger::impl::report_error( std::string(MSG), std::string(__FILE__), __LINE__ ); } while(false)
+      do { \
+             std::stringstream temporary_oss; \
+             temporary_oss << MSG; \
+             logger::impl::report_error( temporary_oss.str(), std::string(__FILE__), __LINE__ ); } while(false)
   
       #define SN_LOG_CATCH_EXCEPTION( EX ) \
       do { logger::impl::catch_exception( EX, std::string(__FILE__), __LINE__ ); } while(false)
@@ -162,7 +170,10 @@ do { logger::impl::print_message( std::string(MSG) ); } while(false)
    #ifdef __SN_LOGLEVEL_WARNING__
  
       #define SN_LOG_REPORT_WARNING( MSG ) \
-      do { logger::impl::report_warning( std::string(MSG), std::string(__FILE__), __LINE__ ); } while(false)
+      do { \
+             std::stringstream temporary_oss; \
+             temporary_oss << MSG; \
+             logger::impl::report_warning( temporary_oss.str(), std::string(__FILE__), __LINE__ ); } while(false)
  
    #else
  
@@ -173,7 +184,10 @@ do { logger::impl::print_message( std::string(MSG) ); } while(false)
    #ifdef __SN_LOGLEVEL_WATCH__
  
       #define SN_LOG_WATCH_VARIABLES( MSG, ... ) \
-      do { logger::impl::watch_variables( std::string(MSG), std::string(__FILE__), __LINE__, __VA_ARGS__ ); } while(false)
+      do { \
+            std::stringstream temporary_oss; \
+            temporary_oss << MSG; \
+            logger::impl::watch_variables( temporary_oss.str(), std::string(__FILE__), __LINE__, __VA_ARGS__ ); } while(false)
  
    #else
  
@@ -181,18 +195,41 @@ do { logger::impl::print_message( std::string(MSG) ); } while(false)
  
    #endif
  
-   #ifdef __SN_LOGLEVEL_EVENT__
+   #ifdef __SN_LOGLEVEL_L1_EVENT__
  
-      #define SN_LOG_EVENT_WATCH_REGION_LIMIT() \
-      do { logger::impl::markEventHorizon(); } while(false)
+      #define SN_LOG_L1_EVENT_WATCH_REGION_LIMIT() \
+      do { logger::impl::markEventHorizon( 0 ); } while(false)
  
-      #define SN_LOG_REPORT_EVENT( EV, INFO ) \
-      do { logger::impl::report_event( EV, std::string(__FILE__), __LINE__, std::string(INFO) ); } while(false)
+      #define SN_LOG_REPORT_L1_EVENT( EV, INFO ) \
+      do { \
+            std::stringstream temporary_oss; \
+            temporary_oss << INFO; \
+            logger::impl::report_L1_event( EV, std::string(__FILE__), __LINE__, temporary_oss.str() ); } while(false)
  
    #else
  
-      #define SN_LOG_EVENT_WATCH_REGION_LIMIT()
-      #define SN_LOG_REPORT_EVENT( EV, INFO )
+      #define SN_LOG_L1_EVENT_WATCH_REGION_LIMIT()
+      #define SN_LOG_REPORT_L1_EVENT( EV, INFO )
+  
+   #endif
+   
+   #ifdef __SN_LOGLEVEL_L2_EVENT__
+   
+      #define SN_LOG_L2_EVENT_WATCH_REGION_LIMIT() \
+      do { logger::impl::markEventHorizon( 1 ); } while(false)
+ 
+      #define SN_LOG_REPORT_L2_EVENT( TAG, INFO ) \
+      do { \
+            std::stringstream temporary_oss_tag, temporary_oss_descr; \
+            temporary_oss_tag << TAG; \
+            temporary_oss_descr << INFO; \
+            logger::impl::report_L2_event( std::string(__FILE__), __LINE__, temporary_oss_tag.str(), \
+                                           temporary_oss_descr.str() ); } while(false)
+ 
+   #else
+ 
+      #define SN_LOG_L2_EVENT_WATCH_REGION_LIMIT()
+      #define SN_LOG_REPORT_L2_EVENT( TAG, INFO )
   
    #endif
 

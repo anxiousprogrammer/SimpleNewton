@@ -2,8 +2,8 @@
 #define MATRIX2_HPP
 
 #include <logger/Logger.hpp>
-#include <logger/BasicTypenameStr.hpp>
-#include "Container.hpp"
+#include <types/DTInfo.hpp>
+#include "FArray.hpp"
 
 
 namespace simpleNewton {
@@ -22,32 +22,33 @@ template< typename T > Vector2<T> operator*( const Matrix2<T> &, const Vector2<T
 |***************************************************************************************************************************************///+
 
 template< typename TYPE_T >
-class Matrix2 : public Container< TYPE_T, 4 > {
+class Matrix2 : public FArray< TYPE_T, 4 > {
 
 private:
    
-   /* Unveil the underlaying body of container */
-   using Container<TYPE_T, 4>::data_;
+   /* Unveil the underlaying body of FArray */
+   using FArray<TYPE_T, 4>::data_;
    
 public:
    
    /* Specifying creation and destruction */
-   /* NTC */ explicit Matrix2( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3, const TYPE_T & v4 ) : Container<TYPE_T, 4>() {
+   /* NTC */ explicit Matrix2( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3, const TYPE_T & v4 ) : FArray<TYPE_T, 4>() {
    
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
       data_[3] = v4;
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 4" + " (from Matrix2 TC)" );
+      
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 TC)" );
    }
-   /* CC */ Matrix2( const Matrix2<TYPE_T> & _ref ) : Container<TYPE_T, 4>(_ref) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 4" + " (from Matrix2 CC)" );
+   /* CC */ Matrix2( const Matrix2<TYPE_T> & _ref ) : FArray<TYPE_T, 4>(_ref) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 CC)" );
    }
-   /* MC */ Matrix2( Matrix2<TYPE_T> && _ref ) : Container<TYPE_T, 4>( std::move(_ref) ) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 4" + " (from Matrix2 MC)" );
+   /* MC */ Matrix2( Matrix2<TYPE_T> && _ref ) : FArray<TYPE_T, 4>( std::move(_ref) ) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 MC)" );
    }
    ~Matrix2() {
-      SN_LOG_REPORT_EVENT( LogEventType::ResDealloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 4" + " (from Matrix2 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 Destr.)" );
    }
    
    /* Access */

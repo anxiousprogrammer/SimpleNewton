@@ -23,7 +23,7 @@ public:
 
    /* The only way to create it */
    template< class CTYPE >
-   friend RAIIWrapper<CTYPE> createRAIIWrapper( small_t );
+   friend RAIIWrapper<CTYPE> createRAIIWrapper( small_t, const CTYPE & );
    
    /* Pointer functionality */
    void free() {
@@ -73,10 +73,15 @@ private:
 
 // The only way to create an instance of RAIIWrapper
 template< class TYPE >
-RAIIWrapper<TYPE> createRAIIWrapper( small_t size ) {
+RAIIWrapper<TYPE> createRAIIWrapper( small_t size, const TYPE & val = TYPE() ) {
 
    SN_ASSERT_POSITIVE( size );
-   return RAIIWrapper<TYPE>( new TYPE[size] );
+   RAIIWrapper<TYPE> new_packet( new TYPE[size] );
+   
+   // Initialization
+   std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
+   
+   return new_packet;
 }
 
 }   // namespace simpleNewton

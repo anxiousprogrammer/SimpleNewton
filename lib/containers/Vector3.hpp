@@ -2,8 +2,8 @@
 #define VECTOR3_HPP
 
 #include <logger/Logger.hpp>
-#include <logger/BasicTypenameStr.hpp>
-#include "Container.hpp"
+#include <types/DTInfo.hpp>
+#include "FArray.hpp"
 
 namespace simpleNewton {
 
@@ -27,37 +27,37 @@ template< typename T > Matrix3<T> operator*( const Vector3<T> &, const Vector3_t
 ///////////////////////////////
 
 template< typename TYPE_T >
-class Vector3 : public Container< TYPE_T, 3 > {
+class Vector3 : public FArray< TYPE_T, 3 > {
 
 private:
    
-   /* Unveil the underlaying body of container */
-   using Container<TYPE_T, 3>::data_;
+   /* Unveil the underlaying body of FArray */
+   using FArray<TYPE_T, 3>::data_;
    
 public:
    
    /* Specifying creation and destruction */
-   /* NTC */ explicit Vector3( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : Container<TYPE_T, 3>() {
+   /* NTC */ explicit Vector3( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : FArray<TYPE_T, 3>() {
    
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 TC)" );
    }
-   /* CC1 */ Vector3( const Vector3<TYPE_T> & _ref ) : Container<TYPE_T, 3>(_ref) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 CC1)" );
+   /* CC1 */ Vector3( const Vector3<TYPE_T> & _ref ) : FArray<TYPE_T, 3>(_ref) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 CC1)" );
    }
-   /* CC2 */ Vector3( const Vector3_t<TYPE_T> & _ref ) : Container<TYPE_T, 3>(_ref) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 CC2)" );
+   /* CC2 */ Vector3( const Vector3_t<TYPE_T> & _ref ) : FArray<TYPE_T, 3>(_ref) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 CC2)" );
    }
-   /* MC1 */ Vector3( Vector3<TYPE_T> && _ref ) : Container<TYPE_T, 3>( std::move(_ref) ) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 MC1)" );
+   /* MC1 */ Vector3( Vector3<TYPE_T> && _ref ) : FArray<TYPE_T, 3>( std::move(_ref) ) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 MC1)" );
    }
-   /* MC2 */ Vector3( Vector3_t<TYPE_T> && _ref ) : Container<TYPE_T, 3>( std::move(_ref) ) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 MC2)" );
+   /* MC2 */ Vector3( Vector3_t<TYPE_T> && _ref ) : FArray<TYPE_T, 3>( std::move(_ref) ) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 MC2)" );
    }
    ~Vector3() {
-      SN_LOG_REPORT_EVENT( LogEventType::ResDealloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 Destr.)" );
    }
    
    /* Access */
@@ -109,12 +109,12 @@ public:
 /////////////////////////////////
 
 template< class TYPE_T >
-class Vector3_t : public Container< TYPE_T, 3 > {
+class Vector3_t : public FArray< TYPE_T, 3 > {
 
 private:
    
-   /* Unveil the underlaying body of container */
-   using Container<TYPE_T, 3>::data_;
+   /* Unveil the underlaying body of FArray */
+   using FArray<TYPE_T, 3>::data_;
    
 public:
    
@@ -124,22 +124,23 @@ public:
 private:
    
    /* Specifying creation and destruction */
-   /* NTC */ explicit Vector3_t( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : Container<TYPE_T, 3>() {
+   /* NTC */ explicit Vector3_t( const TYPE_T & v1, const TYPE_T & v2, const TYPE_T & v3 ) : FArray<TYPE_T, 3>() {
    
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3_t TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t TC)" );
    }
 public:
-   /* CC */ Vector3_t( const Vector3_t<TYPE_T> & _ref ) : Container<TYPE_T, 3>(_ref) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3_t CC)" );
+   /* CC */ Vector3_t( const Vector3_t<TYPE_T> & _ref ) : FArray<TYPE_T, 3>(_ref) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t CC)" );
    }
-   /* MC */ Vector3_t( Vector3_t<TYPE_T> && _ref ) : Container<TYPE_T, 3>( std::move(_ref) ) {
-      SN_LOG_REPORT_EVENT( LogEventType::ResAlloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3_t MC)" );
+   /* MC */ Vector3_t( Vector3_t<TYPE_T> && _ref ) : FArray<TYPE_T, 3>( std::move(_ref) ) {
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t MC)" );
    }
    /* Mortality */ ~Vector3_t() {
-      SN_LOG_REPORT_EVENT( LogEventType::ResDealloc, "data_, " + SN_BASIC_TYPENAME_STR<TYPE_T>() + ", 3" + " (from Vector3_t Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3"
+                                                        << " (from Vector3_t Destr.)" );
    }
 
    /* V'M product */

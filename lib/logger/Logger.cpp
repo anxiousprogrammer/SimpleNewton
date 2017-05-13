@@ -79,7 +79,7 @@ Logger::~Logger() {
 namespace logger {
 namespace impl {
 
-bool eventWatchRegionSwitch_ = false;   // Here's a global!
+bool eventWatchRegionSwitch_[] = { false, false };   // Here's a global!
 
 
 void print_message( const std::string & msg ) {
@@ -130,39 +130,75 @@ void report_warning( const std::string & msg, const std::string & file, int line
 
 
 
-void markEventHorizon() {
-   eventWatchRegionSwitch_ = ! eventWatchRegionSwitch_;
+void markEventHorizon( const uint_t eventLevel ) {
+   eventWatchRegionSwitch_[ eventLevel ] = ! eventWatchRegionSwitch_[ eventLevel ];
 }
-void report_event( LogEventType event, const std::string & file, int line, const std::string & info ) {
+void report_L1_event( LogEventType event, const std::string & file, int line, const std::string & info ) {
    
-   if( ! eventWatchRegionSwitch_ )
+   if( ! eventWatchRegionSwitch_[0] )
       return;
    
    Logger lg( Logger::createInstance() );
-   std::string event_tag;
-   std::string descr;
+   
+   std::string event_tag = "N/A";
+   std::string descr = "N/A";
+
    switch( event ) {
-   case LogEventType::ResAlloc: event_tag = "RESOURCE ALLOCATED"; descr = "Pointer, Type, Size (in that order): "; break;
-   case LogEventType::ResDealloc: event_tag = "RESOURCE DEALLOCATED"; descr = "Pointer, Type, Size (in that order): "; break;
-   case LogEventType::OMPFork: event_tag = "OMP PARALLEL REGION ENTERED"; descr = "OpenMP fork occurred. "; break;
-   case LogEventType::OMPJoin: event_tag = "OMP PARALLEL REGION EXITED";  descr = "OpenMP operation synchronized. "; break;
-   case LogEventType::MPISend: event_tag = "MPI COMMUNICATION (SEND)"; descr = "Package, source, target (in that order): "; break;
-   case LogEventType::MPISsend: event_tag = "MPI COMMUNICATION (SYNC. SEND)"; descr = "Package, source, target (in that order): "; break;
-   case LogEventType::MPIIsend: event_tag = "MPI COMMUNICATION (ISEND)"; descr = "Package, source, target (in that order): "; break;
-   case LogEventType::MPIRecv: event_tag = "MPI COMMUNICATION (RECV)"; descr = "Package, source, target (in that order): "; break;
-   case LogEventType::MPIIrecv: event_tag = "MPI COMMUNICATION (IRECV)"; descr = "Package, source, target (in that order): "; break;
-   case LogEventType::MPIBCast: event_tag = "MPI COMMUNICATION (BCAST)"; descr = "Package, source (in that order): "; break;
-   case LogEventType::MPIWait: event_tag = "MPI COMMUNICATION (WAIT)"; descr = "An immediate MPI operation has been completed."; break;
-   case LogEventType::MPIWaitAll: event_tag = "MPI COMMUNICATION (WAITALL)"; descr = "A set of immediate MPI operations has been completed."; break;
-   case LogEventType::Other: event_tag = "SPECIAL EVENT"; descr = "A special event has occurred.";
-   default: event_tag = "UNKNOWN EVENT"; descr = "An unspecified event has ocurred"; break;
-   };
+      case LogEventType::ResAlloc: event_tag = "HEAP RESOURCE ALLOCATED"; descr = "Pointer, Type, Size (in that order): "; break;
+         
+      case LogEventType::ResDealloc: event_tag = "HEAP RESOURCE DEALLOCATED"; descr = "Pointer, Type, Size (in that order): "; break;
+         
+      case LogEventType::OMPFork: event_tag = "OMP PARALLEL REGION ENTERED"; descr = "OpenMP fork occurred. "; break;
+         
+      case LogEventType::OMPJoin: event_tag = "OMP PARALLEL REGION EXITED";  descr = "OpenMP operation synchronized. "; break;
+         
+      case LogEventType::MPISend: event_tag = "MPI COMMUNICATION (SEND)"; descr = "Package, source, target (in that order): "; break;
+         
+      case LogEventType::MPISsend: event_tag = "MPI COMMUNICATION (SYNC. SEND)"; 
+                                   descr = "Package, source, target (in that order): "; break;
+         
+      case LogEventType::MPIIsend: event_tag = "MPI COMMUNICATION (ISEND)"; descr = "Package, source, target (in that order): "; break;
+         
+      case LogEventType::MPIRecv: event_tag = "MPI COMMUNICATION (RECV)"; descr = "Package, source, target (in that order): "; break;
+        
+      case LogEventType::MPIIrecv: event_tag = "MPI COMMUNICATION (IRECV)"; descr = "Package, source, target (in that order): "; break;
+         
+      case LogEventType::MPIBcast: event_tag = "MPI COMMUNICATION (BCAST)"; descr = "Package, source (in that order): "; break;
+         
+      case LogEventType::MPIWait: event_tag = "MPI COMMUNICATION (WAIT)"; 
+                                  descr = "An immediate MPI operation has been completed."; break;
+         
+      case LogEventType::MPIWaitAll: event_tag = "MPI COMMUNICATION (WAITALL)"; 
+                                     descr = "A set of immediate MPI operations has been completed."; break;
+         
+      case LogEventType::Other: event_tag = "SPECIAL EVENT"; descr = "A special event has occurred.";
+         
+      default: event_tag = "UNKNOWN EVENT"; descr = "An unspecified event has ocurred"; break;
+   }
    
    real_t time_point = ProcSingleton::getDurationFromStart();
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][EVENT - " << event_tag << " ]:   " 
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L1 EVENT - " << event_tag << " ]:   " 
       << descr << "   " << info << '\n' 
       << ">--- From <" << file << " :" << line << " > ---<" << '\n';
-      
+   
+   #ifdef __SN_LOGLEVEL_WRITE_EVENTS__
+      lg.flushBuffer( true );
+   #else
+      lg.flushBuffer( false );
+   #endif
+}
+void report_L2_event( const std::string & file, int line, const std::string & event_tag, const std::string & descr ) {
+   
+   if( ! eventWatchRegionSwitch_[1] )
+      return;
+   
+   Logger lg( Logger::createInstance() );
+   
+   real_t time_point = ProcSingleton::getDurationFromStart();
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L2 EVENT - " << event_tag << " ]:   " 
+      << descr << '\n' 
+      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+   
    #ifdef __SN_LOGLEVEL_WRITE_EVENTS__
       lg.flushBuffer( true );
    #else

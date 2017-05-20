@@ -1,5 +1,5 @@
-#ifndef FARRAY_HPP
-#define FARRAY_HPP
+#ifndef SN_FARRAY_HPP
+#define SN_FARRAY_HPP
 
 #include <algorithm>
 #include <utility>
@@ -9,99 +9,115 @@
 
 #include "RAIIWrapper.hpp"
 
+//==========================================================================================================================================
+//
+//  This file is part of simpleNewton. simpleNewton is free software: you can 
+//  redistribute it and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation, either version 3 of 
+//  the License, or (at your option) any later version.
+//  
+//  simpleNewton is distributed in the hope that it will be useful, but WITHOUT 
+//  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+//  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+//  for more details.
+//  
+//  You should have received a copy of the GNU General Public License along
+//  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
+//
+///   Contains the class template FArray, which serves as the base class for every automatic resource allocated array.
+///   \file
+///   \addtogroup containers Containers
+///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
+//
+//==========================================================================================================================================
+
+/** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
-/**||***************************************************************************************************************************************
-*
-*   Description: The base classes of all fields and mathematical datatypes
-*
-|***************************************************************************************************************************************///+
+//=== CLASS ================================================================================================================================
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Basic container: can be large, small - whatever.
-//////////////////////////////////////////////////////
+/** FArray serves as the base class for all automatic resource allocated arrays. The size of the container is a compile time constant
+*   therefore lending operations upon its members open to compiler optimizations such as loop unrolling, SIMD and such.
+*
+*   \tparam TYPE_T   The underlying data type of the array.
+*   \tparam SIZE     The size of the FArray
+*/
+//==========================================================================================================================================
 
 template< typename TYPE_T, small_t SIZE >
 class FArray {
 
 public:
 
-   /* Linear access */
+   /** \name Constructors and Destructor
+   *   @{
+   */
+   /** Default trivial constructor */
+   FArray() = default;
+
+   /** Copy constructor with scalar reference.
+   *
+   *   \param val   The value with which the FArray is to be initialized.
+   */
+   explicit FArray( const TYPE_T & val ) {
+      std::fill( data_, data_ + SIZE, val );
+   }   
+   
+   /** Default copy constructor. */
+   FArray( const FArray<TYPE_T, SIZE> & ) = default;
+   
+   /** Default move constructor. */
+   FArray( FArray<TYPE_T, SIZE> && ) = default;
+   
+   /** Default destructor. */
+   ~FArray() = default;
+   
+   /** @} */
+   
+   
+   
+   /** \name Access
+   *   @{
+   */
+   /** Operator (const): element wise access.
+   *
+   *   \param index   The index with which to access the elements of the FArray.
+   *   \return        A const reference to the element.
+   */
    inline const TYPE_T & operator[]( small_t index ) const   { SN_ASSERT_INDEX_WITHIN_SIZE( index, SIZE ); return data_[index]; }
    
-   /* Copy and move control */
-   FArray<TYPE_T, SIZE> operator=( const TYPE_T & );
-   FArray<TYPE_T, SIZE> operator=( const FArray<TYPE_T, SIZE> & );
-   FArray<TYPE_T, SIZE> operator=( FArray<TYPE_T, SIZE> && );
-
-   /* Birth and death */
-   FArray() = default;
-   explicit FArray( const TYPE_T & );
-   FArray( const FArray<TYPE_T, SIZE> & );
-   FArray( FArray<TYPE_T, SIZE> && ) = default;
-   ~FArray() = default;
+   /** Operator (non-const): element wise access.
+   *
+   *   \param index   The index with which to access the elements of the FArray.
+   *   \return        A reference to the element.
+   */
+   inline TYPE_T & operator[]( small_t index )               { SN_ASSERT_INDEX_WITHIN_SIZE( index, SIZE ); return data_[index]; }
+   
+   /** @} */
+   
+   
+   
+   /** \name Assignment control
+   *   @{
+   */
+   /** Copy control with scalar reference.
+   *
+   *   \param ref   The scalar value with which to populate the FArray.
+   *   \return      An FArray upon assignment.
+   */
+   FArray<TYPE_T, SIZE> operator=( const TYPE_T & ref ) {
+   
+      std::fill( data_, data_ + SIZE, ref );
+      return *this;
+   }
+   
+   /** @} */
    
 protected:
    
    /* Member */
-   RAIIWrapper< TYPE_T > data_ = createRAIIWrapper< TYPE_T >( SIZE );
+   TYPE_T data_[SIZE];   ///< Basic data array.
 };
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   IMPLEMENTATION
-////////////////////
-
-// Non-trivial constructor(s)
-template< class TYPE_T, small_t SIZE >
-FArray< TYPE_T, SIZE > :: FArray( const TYPE_T & val ) {
-   std::fill( data_.raw_ptr(), data_.raw_ptr() + SIZE, val );
-}
-
-
-
-// Copy constructor
-template< class TYPE_T, small_t SIZE >
-FArray<TYPE_T, SIZE> :: FArray( const FArray<TYPE_T, SIZE> & ref ) {
-   std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + SIZE, data_.raw_ptr() );
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Copy and move control
-///////////////////////////
-
-// (Scalar) Copy control
-template< class TYPE_T, small_t SIZE >
-FArray<TYPE_T, SIZE> FArray<TYPE_T, SIZE> :: operator=( const TYPE_T & ref ) {
-
-   std::fill( data_.raw_ptr(), data_.raw_ptr() + SIZE, ref );
-   return *this;
-}
-
-
-
-// Copy control
-template< class TYPE_T, small_t SIZE >
-FArray<TYPE_T, SIZE> FArray<TYPE_T, SIZE> :: operator=( const FArray<TYPE_T, SIZE> & ref ) {
-
-   std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + SIZE, data_.raw_ptr() );
-   return *this;
-}
-
-
-
-// Move control
-template< class TYPE_T, small_t SIZE >
-FArray<TYPE_T, SIZE> FArray<TYPE_T, SIZE> :: operator=( FArray<TYPE_T, SIZE> && ref ) {
-
-   if( this != &ref ) {
-      data_ = std::move(ref.data_);
-   }
-   return *this;
-}
 
 }   // namespace simpleNewton
 

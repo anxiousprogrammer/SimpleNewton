@@ -17,7 +17,7 @@ namespace simpleNewton {
 |***************************************************************************************************************************************///+
 
 // Some enumerators
-enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBcast, 
+enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBcast, MPIIbcast, 
                            MPIWait, MPIWaitAll, Other };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,16 +92,16 @@ namespace impl {
 
 void print_message( const std::string & );
 
-void report_error( const std::string & , const std::string & , int );
+void report_error( const std::string & , const std::string & , int , const std::string & );
 
-void catch_exception( std::exception & , const std::string & , int );
+void catch_exception( const std::exception & , const std::string & , int , const std::string & );
 
-void report_warning( const std::string & , const std::string & , int );
+void report_warning( const std::string & , const std::string & , int , const std::string & );
 
 void markEventHorizon( const uint_t );
 
-void report_L1_event( LogEventType , const std::string & , int , const std::string & );
-void report_L2_event( const std::string & , int , const std::string & , const std::string & );
+void report_L1_event( LogEventType , const std::string & , int , const std::string & , const std::string & );
+void report_L2_event( const std::string & , int , const std::string & , const std::string & , const std::string & );
 
 void watch_impl( Logger & );
 template< class HEAD_PARAM, class... TAIL_PARAM >
@@ -111,7 +111,7 @@ void watch_impl( Logger & lg, const HEAD_PARAM & head, const TAIL_PARAM &... tai
    watch_impl( lg, tail... );   
 }
 template< class... PARAM >
-void watch_variables( const std::string & msg, const std::string & file, int line, PARAM... arg ) {
+void watch_variables( const std::string & msg, const std::string & file, int line, const std::string & func, PARAM... arg ) {
 
    Logger lg( Logger::createInstance() );
    real_t time_point = ProcSingleton::getDurationFromStart();
@@ -119,7 +119,7 @@ void watch_variables( const std::string & msg, const std::string & file, int lin
    
    watch_impl( lg, arg... );
    
-   lg << '\n' << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+   lg << '\n' << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    #ifdef __SN_LOGLEVEL_WRITE_WATCHES__
       lg.flushBuffer( true );
    #else
@@ -155,10 +155,10 @@ do { \
       do { \
              std::stringstream temporary_oss; \
              temporary_oss << MSG; \
-             logger::impl::report_error( temporary_oss.str(), std::string(__FILE__), __LINE__ ); } while(false)
+             logger::impl::report_error( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
   
       #define SN_LOG_CATCH_EXCEPTION( EX ) \
-      do { logger::impl::catch_exception( EX, std::string(__FILE__), __LINE__ ); } while(false)
+      do { logger::impl::catch_exception( EX, std::string(__FILE__), __LINE__, __func__ ); } while(false)
  
    #else
  
@@ -173,7 +173,7 @@ do { \
       do { \
              std::stringstream temporary_oss; \
              temporary_oss << MSG; \
-             logger::impl::report_warning( temporary_oss.str(), std::string(__FILE__), __LINE__ ); } while(false)
+             logger::impl::report_warning( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
  
    #else
  
@@ -187,7 +187,7 @@ do { \
       do { \
             std::stringstream temporary_oss; \
             temporary_oss << MSG; \
-            logger::impl::watch_variables( temporary_oss.str(), std::string(__FILE__), __LINE__, __VA_ARGS__ ); } while(false)
+            logger::impl::watch_variables( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__, __VA_ARGS__ ); } while(false)
  
    #else
  
@@ -204,7 +204,7 @@ do { \
       do { \
             std::stringstream temporary_oss; \
             temporary_oss << INFO; \
-            logger::impl::report_L1_event( EV, std::string(__FILE__), __LINE__, temporary_oss.str() ); } while(false)
+            logger::impl::report_L1_event( EV, std::string(__FILE__), __LINE__, __func__, temporary_oss.str() ); } while(false)
  
    #else
  
@@ -223,7 +223,7 @@ do { \
             std::stringstream temporary_oss_tag, temporary_oss_descr; \
             temporary_oss_tag << TAG; \
             temporary_oss_descr << INFO; \
-            logger::impl::report_L2_event( std::string(__FILE__), __LINE__, temporary_oss_tag.str(), \
+            logger::impl::report_L2_event( std::string(__FILE__), __LINE__, __func__, temporary_oss_tag.str(), \
                                            temporary_oss_descr.str() ); } while(false)
  
    #else

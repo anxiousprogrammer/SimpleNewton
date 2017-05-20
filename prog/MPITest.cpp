@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <core/ProcSingleton.hpp>
-#include <concurrency/Communicator.hpp>
+#include <concurrency/BaseComm.hpp>
 #include <logger/Logger.hpp>
 
 using namespace simpleNewton;
@@ -19,15 +19,20 @@ int main( int argc, char ** argv ) {
    MPIRequest< char > r1, r2;
    
    SN_MPI_PROC_REGION( 1 ) {
-      Communicator::send( j, SN_ROOT_PROC, MPISendMode::Immediate, r1 );
-      Communicator::waitOnSend( r1 );
+      BaseComm< char >::send< MPISendMode::Immediate >( j, SN_ROOTPROC, r1 );
+      BaseComm< char >::wait< MPIWaitOp::Send >( r1 );
    }
-   SN_MPI_PROC_REGION( SN_ROOT_PROC ) {
+   SN_MPI_PROC_REGION( SN_ROOTPROC ) {
    
-      Communicator::receive( rec_j, 17, 1, MPIRecvMode::Immediate, r2 );
-      Communicator::waitOnRecv( r2 );
-      SN_LOG_WATCH_VARIABLES( "The received value: ", rec_j, rec_j.getSize() );
+      BaseComm< char >::receive< MPIRecvMode::Immediate >( rec_j, 17, 1, r2 );
+      BaseComm< char >::wait< MPIWaitOp::Receive >( r2 );
+      SN_LOG_WATCH_VARIABLES( "The received value: ", make_std_string( rec_j ), rec_j.getSize() );
+      rec_j = "BCast fudda";
    }
+   
+   BaseComm< char >::autoBroadcast( rec_j, SN_ROOTPROC );
+   
+   SN_LOG_WATCH_VARIABLES( "The value received from the BCast is: ", make_std_string( rec_j ) );
    
    return 0;
 }

@@ -17,6 +17,20 @@ namespace types {
 // Take care of type first
 template< typename TYPE > struct DTInfo;
 
+
+/* bool */
+template<> struct DTInfo< bool > { 
+   
+   #ifdef __SN_USE_MPI__
+   static constexpr MPI_Datatype mpi_type = MPI_INT;
+   static constexpr char mpi_name[] = "MPI_INT";
+   #endif
+   
+   static constexpr char name[] = "bool";
+};
+
+
+
 /* char */
 template<> struct DTInfo< char > { 
    

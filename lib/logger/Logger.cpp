@@ -92,34 +92,34 @@ void print_message( const std::string & msg ) {
 
 
 
-void report_error( const std::string & msg, const std::string & file, int line ) {
+void report_error( const std::string & msg, const std::string & file, int line, const std::string & func ) {
 
    Logger lg( Logger::createInstance() );
    real_t time_point = ProcSingleton::getDurationFromStart();
    lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][ERROR ]:   " << msg << '\n' 
-      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.flushBuffer( true );
 }
 
 
 
-void catch_exception( std::exception & exc, const std::string & file, int line ) {
+void catch_exception( const std::exception & exc, const std::string & file, int line, const std::string & func ) {
 
    Logger lg( Logger::createInstance() );
    real_t time_point = ProcSingleton::getDurationFromStart();
    lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][EXCEPTION CAUGHT ]:   " << exc.what() << '\n'
-      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.flushBuffer( true );
 }
 
 
 
-void report_warning( const std::string & msg, const std::string & file, int line ) {
+void report_warning( const std::string & msg, const std::string & file, int line, const std::string & func ) {
 
    Logger lg( Logger::createInstance() );
    real_t time_point = ProcSingleton::getDurationFromStart();
    lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][WARNING ]:    " << msg << '\n'
-      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
       
    #ifdef __SN_LOGLEVEL_WRITE_WARNINGS__
       lg.flushBuffer( true );
@@ -133,7 +133,7 @@ void report_warning( const std::string & msg, const std::string & file, int line
 void markEventHorizon( const uint_t eventLevel ) {
    eventWatchRegionSwitch_[ eventLevel ] = ! eventWatchRegionSwitch_[ eventLevel ];
 }
-void report_L1_event( LogEventType event, const std::string & file, int line, const std::string & info ) {
+void report_L1_event( LogEventType event, const std::string & file, int line, const std::string & func, const std::string & info ) {
    
    if( ! eventWatchRegionSwitch_[0] )
       return;
@@ -179,7 +179,7 @@ void report_L1_event( LogEventType event, const std::string & file, int line, co
    real_t time_point = ProcSingleton::getDurationFromStart();
    lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L1 EVENT - " << event_tag << " ]:   " 
       << descr << "   " << info << '\n' 
-      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    
    #ifdef __SN_LOGLEVEL_WRITE_EVENTS__
       lg.flushBuffer( true );
@@ -187,7 +187,8 @@ void report_L1_event( LogEventType event, const std::string & file, int line, co
       lg.flushBuffer( false );
    #endif
 }
-void report_L2_event( const std::string & file, int line, const std::string & event_tag, const std::string & descr ) {
+void report_L2_event( const std::string & file, int line, const std::string & func, const std::string & event_tag, 
+                      const std::string & descr ) {
    
    if( ! eventWatchRegionSwitch_[1] )
       return;
@@ -197,7 +198,7 @@ void report_L2_event( const std::string & file, int line, const std::string & ev
    real_t time_point = ProcSingleton::getDurationFromStart();
    lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L2 EVENT - " << event_tag << " ]:   " 
       << descr << '\n' 
-      << ">--- From <" << file << " :" << line << " > ---<" << '\n';
+      << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    
    #ifdef __SN_LOGLEVEL_WRITE_EVENTS__
       lg.flushBuffer( true );

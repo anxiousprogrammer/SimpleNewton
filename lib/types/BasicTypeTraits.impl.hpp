@@ -62,11 +62,6 @@ template< class TYPE > struct NoCVQ_R< volatile const TYPE & > { using type=TYPE
 template<> struct amb_void<true>    { using type = int; };
 template<> struct amb_void<false>   { using type = void; };
 
-// sizeof (array version) implementation
-template< typename ARR, small_t SIZE > struct sizeof_array_impl< ARR[SIZE] > {
-   enum { value = SIZE };
-};
-
 }   // namespace impl
 
 // Counts the number of variadic arguments
@@ -86,7 +81,10 @@ template<> struct is_void<void> : public impl::true_type        {};
 
 // Specialization -> int types
 template< class TYPE > struct is_integer : public impl::false_type        {};
+template<> struct is_integer<char> : public impl::true_type               {};
+template<> struct is_integer<unsigned char> : public impl::true_type      {};
 template<> struct is_integer<short> : public impl::true_type              {};
+template<> struct is_integer<unsigned short> : public impl::true_type     {};
 template<> struct is_integer<int> : public impl::true_type                {};
 template<> struct is_integer<unsigned int> : public impl::true_type       {};
 template<> struct is_integer<long> : public impl::true_type               {};
@@ -136,23 +134,22 @@ template< class TYPE, int SIZE > struct is_array< TYPE[SIZE] > : public impl::tr
 template< class ARR, class TYPE > struct is_array_of_type : public impl::false_type                     {};
 template< class TYPE, int SIZE > struct is_array_of_type< TYPE[SIZE], TYPE > : public impl::true_type   {};
 
-template< typename ARR > small_t sizeof_array( ARR ) { return impl::sizeof_array_impl< ARR >::value; }
-
-template< typename TYPE > struct is_basic_datatype : public is_integer<TYPE>, is_floating_point<TYPE>, is_bool<TYPE> {
+template< typename TYPE > struct is_basic : public is_integer<TYPE>, is_floating_point<TYPE>, is_bool<TYPE> {
    enum : bool { value = is_integer<TYPE>::value || is_floating_point<TYPE>::value || is_bool<TYPE>::value };
 };
-template<> struct is_basic_datatype< char > : public impl::true_type   {};
+template<> struct is_basic< char > : public impl::true_type   {};
 
-template< typename TYPE > struct is_array_of_basic_datatype : public is_array_of_type< TYPE, char >, is_array_of_type< TYPE, short >, 
-                                                                     is_array_of_type< TYPE, int >, is_array_of_type< TYPE, long >, 
-                                                                     is_array_of_type< TYPE, long long >, 
-                                                                     is_array_of_type< TYPE, unsigned char >, 
-                                                                     is_array_of_type< TYPE, unsigned short >,
-                                                                     is_array_of_type< TYPE, unsigned int >,
-                                                                     is_array_of_type< TYPE, unsigned long >,
-                                                                     is_array_of_type< TYPE, unsigned long long >,
-                                                                     is_array_of_type< TYPE, float >, is_array_of_type< TYPE, double >,
-                                                                     is_array_of_type< TYPE, bool > {
+template< typename TYPE > struct is_array_of_basic_type : public is_array_of_type< TYPE, char >, is_array_of_type< TYPE, short >, 
+                                                                 is_array_of_type< TYPE, int >, is_array_of_type< TYPE, long >, 
+                                                                 is_array_of_type< TYPE, long long >, 
+                                                                 is_array_of_type< TYPE, unsigned char >, 
+                                                                 is_array_of_type< TYPE, unsigned short >,
+                                                                 is_array_of_type< TYPE, unsigned int >,
+                                                                 is_array_of_type< TYPE, unsigned long >,
+                                                                 is_array_of_type< TYPE, unsigned long long >,
+                                                                 is_array_of_type< TYPE, float >, is_array_of_type< TYPE, double >,
+                                                                 is_array_of_type< TYPE, bool > {
+                                                                 
    enum : bool { value = is_array_of_type< TYPE, char >::value || is_array_of_type< TYPE, short >::value ||
                          is_array_of_type< TYPE, int >::value || is_array_of_type< TYPE, long >::value ||
                          is_array_of_type< TYPE, long long >::value || is_array_of_type< TYPE, unsigned char >::value ||
@@ -578,13 +575,12 @@ struct can_divide< int TYPE1::*, int TYPE2::*, void,
 
 
 
-// A type can be assigned, added, subtracted and multiplied i.e., is arithmetic
+// A type can be assigned, added and subtracted i.e., is arithmetic
 /* Full definition, typetraits for non-class types which comply are inherited */
 template< class TYPE >
 struct is_arithmetic 
-: public is_assignable<TYPE, TYPE>, can_add<TYPE, TYPE>, can_subtract<TYPE, TYPE>, can_multiply<TYPE, TYPE> {
-   enum : bool { value = is_assignable<TYPE, TYPE>::value && can_add<TYPE, TYPE>::value && can_subtract<TYPE, TYPE>::value && 
-                         can_multiply<TYPE, TYPE>::value };
+: public is_assignable<TYPE, TYPE>, can_add<TYPE, TYPE>, can_subtract<TYPE, TYPE> {
+   enum : bool { value = is_assignable<TYPE, TYPE>::value && can_add<TYPE, TYPE>::value && can_subtract<TYPE, TYPE>::value };
 };
 
 

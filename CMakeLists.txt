@@ -8,18 +8,19 @@ set( simpleNewton_VERSION_MINOR 0 )
 
 
 # Options
-option( SN_USE_MPI         "Include and use the message passing interface (MPI) libraries"   ON  )
+option( SN_USE_MPI         "Include and use the message passing interface (MPI) libraries"     ON  )
 if( NOT CMAKE_BUILD_TYPE )
-   set( CMAKE_BUILD_TYPE   Debug CACHE STRING "Debug or Release" FORCE                           )
+   set( CMAKE_BUILD_TYPE   Debug CACHE STRING "Debug or Release" FORCE                             )
 endif()
-option( SN_LOGLEVEL_ERROR            "Enables logging of errors"                             ON  )
-option( SN_LOGLEVEL_WARNING          "Enables logging of warnings"                           ON  )
-option( SN_LOGLEVEL_WATCH            "Enables watching of variables"                         ON  )
-option( SN_LOGLEVEL_L1_EVENT         "Enables logging of low-level events"                   ON  )
-option( SN_LOGLEVEL_L2_EVENT         "Enables logging of high-level events"                  ON  )
-option( SN_LOGLEVEL_WRITE_WARNINGS   "Enables writing warnings to log"                       ON  )
-option( SN_LOGLEVEL_WRITE_WATCHES    "Enables writing watches to log"                        OFF )
-option( SN_LOGLEVEL_WRITE_EVENTS     "Enables writing events to log"                         OFF )
+option( SN_LOGLEVEL_ERROR              "Enables logging of errors"                             ON  )
+option( SN_LOGLEVEL_WARNING            "Enables logging of warnings"                           ON  )
+option( SN_LOGLEVEL_WATCH              "Enables watching of variables"                         ON  )
+option( SN_LOGLEVEL_L1_EVENT           "Enables logging of low-level events"                   ON  )
+option( SN_LOGLEVEL_L2_EVENT           "Enables logging of high-level events"                  ON  )
+option( SN_LOGLEVEL_WRITE_WARNINGS     "Enables writing warnings to log"                       ON  )
+option( SN_LOGLEVEL_WRITE_WATCHES      "Enables writing watches to log"                        OFF )
+option( SN_LOGLEVEL_WRITE_EVENTS       "Enables writing events to log"                         OFF )
+option( BUILD_DOXYDOC                  "Enables documentation using Doxygen"                   ON  )
 
 
 
@@ -28,12 +29,19 @@ if( SN_USE_MPI )
    find_package( MPI REQUIRED )
    add_definitions( -D__SN_USE_MPI__ )
 endif()
+if( BUILD_DOXYDOC )
+   find_package( Doxygen REQUIRED )
+   configure_file ( ${simpleNewton_SOURCE_DIR}/doc/doxycon.in ${simpleNewton_BINARY_DIR}/doc/doxygen.cfg @ONLY )
+   add_custom_target( doc
+                      COMMAND ${DOXYGEN_EXECUTABLE} ${simpleNewton_BINARY_DIR}/doc/doxygen.cfg
+                      COMMENT "Generating API documentation with Doxygen" VERBATIM )
+endif()
 
 
 
 # Compiler - flags
-set( PROJECT_GENERAL_COMPILE_FLAGS "-O3 -std=c++11 -Wall -Winline -Wshadow -Wextra -Wpedantic" )
-set( CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${PROJECT_GENERAL_COMPILE_FLAGS} )
+set( simpleNewton_GENERAL_COMPILE_FLAGS "-O3 -std=c++11 -Wall -Winline -Wshadow -Wextra -Wpedantic" )
+set( CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${simpleNewton_GENERAL_COMPILE_FLAGS} )
 if( SN_USE_MPI )
    if( MPI_COMPILE_FLAGS )
       set( CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${MPI_COMPILE_FLAGS} )
@@ -78,20 +86,20 @@ endif()
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
-   "${PROJECT_SOURCE_DIR}/simpleNewtonConfig.h.in"
-   "${PROJECT_BINARY_DIR}/simpleNewtonConfig.h" )
+   "${simpleNewton_SOURCE_DIR}/simpleNewtonConfig.h.in"
+   "${simpleNewton_BINARY_DIR}/simpleNewtonConfig.h" )
 
 
 
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h
-include_directories( "${PROJECT_BINARY_DIR}" )
+include_directories( "${simpleNewton_BINARY_DIR}" )
 # Now the libraries
 if( MPI_CXX_FOUND AND SN_USE_MPI )
    include_directories( ${MPI_INCLUDE_PATH} )
 endif()
 
-include_directories( "${PROJECT_SOURCE_DIR}/lib" )
+include_directories( "${simpleNewton_SOURCE_DIR}/lib" )
 
 add_subdirectory( lib )
 
@@ -104,11 +112,11 @@ set( ALL_LIBRARIES ${BASIC_LIBRARIES} BASICTYPETRAITS TYPECONSTRAINTS CONTAINERS
 
 
 # add the executables
-add_executable( AssertTest ${PROJECT_SOURCE_DIR}/prog/AssertTest.cpp )
-add_executable( LoggerTest ${PROJECT_SOURCE_DIR}/prog/LoggerTest.cpp )
-add_executable( ContainerTest ${PROJECT_SOURCE_DIR}/prog/ContainerTest.cpp )
-add_executable( MPITest ${PROJECT_SOURCE_DIR}/prog/MPITest.cpp )
-add_executable( TypelistTest ${PROJECT_SOURCE_DIR}/prog/TypelistTest.cpp )
+add_executable( AssertTest ${simpleNewton_SOURCE_DIR}/prog/AssertTest.cpp )
+add_executable( LoggerTest ${simpleNewton_SOURCE_DIR}/prog/LoggerTest.cpp )
+add_executable( ContainerTest ${simpleNewton_SOURCE_DIR}/prog/ContainerTest.cpp )
+add_executable( MPITest ${simpleNewton_SOURCE_DIR}/prog/MPITest.cpp )
+add_executable( TypelistTest ${simpleNewton_SOURCE_DIR}/prog/TypelistTest.cpp )
 # link the execs
 target_link_libraries( AssertTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
 target_link_libraries( LoggerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )

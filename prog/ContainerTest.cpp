@@ -1,11 +1,15 @@
 #include <iostream>
 
+#include <core/ProcSingleton.hpp>
 #include <logger/Logger.hpp>
 #include <containers/SmallMV.hpp>
+#include <containers/mpi/OpenMPIBuffer.hpp>
 
 using namespace simpleNewton;
 
-int main() {
+int main( int argc, char ** argv ) {
+   
+   ProcSingleton::init( argc, argv );
    
    SN_LOG_MESSAGE( "Hi! Testing the logger." );
    

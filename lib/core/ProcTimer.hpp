@@ -6,6 +6,9 @@
 #include <Types.hpp>
 #include <BasicBases.hpp>
 
+#include <iostream>
+#include <types/BasicTypeTraits.hpp>
+
 //==========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
@@ -43,7 +46,7 @@ template<> struct steady_clock_fallback< true >  { using type = std::chrono::hig
 template<> struct steady_clock_fallback< false > { using type = std::chrono::steady_clock;          };
 
 // Boolean SFINAE struct for partial specialization selection.
-template< bool T > struct amb_void;
+template< bool T > struct SFINAE_void;
 template<> struct SFINAE_void< true >  { using type = void; };
 template<> struct SFINAE_void< false > {};
 
@@ -51,20 +54,20 @@ template<> struct SFINAE_void< false > {};
 template< std::intmax_t , std::intmax_t , typename=void > struct ChosenResolution;
 
 template< std::intmax_t NUM, std::intmax_t DEN > 
-struct ChosenResolution< NUM, DEN, SFINAE_void< real_cast(NUM)/real_cast(DEN) < real_cast(1.0) && 
-                                                real_cast(NUM)/real_cast(DEN) > real_cast(10^-3)>::type > {
+struct ChosenResolution< NUM, DEN, typename SFINAE_void< ( real_cast(NUM)/real_cast(DEN) <  real_cast(1.0) && 
+                                                           real_cast(NUM)/real_cast(DEN) >= real_cast(1e-3) ) >::type > {
    using type = std::chrono::milliseconds;
 };
 
 template< std::intmax_t NUM, std::intmax_t DEN > 
-struct ChosenResolution< NUM, DEN, SFINAE_void< real_cast(NUM)/real_cast(DEN) < real_cast(10^-3) && 
-                                                real_cast(NUM)/real_cast(DEN) > real_cast(10^-6)>::type > {
+struct ChosenResolution< NUM, DEN, typename SFINAE_void< ( real_cast(NUM)/real_cast(DEN) <  real_cast(1e-3) && 
+                                                           real_cast(NUM)/real_cast(DEN) >= real_cast(1e-6) ) >::type > {
    using type = std::chrono::microseconds;
 };
 
 template< std::intmax_t NUM, std::intmax_t DEN > 
-struct ChosenResolution< NUM, DEN, SFINAE_void< real_cast(NUM)/real_cast(DEN) < real_cast(10^-6) && 
-                                                real_cast(NUM)/real_cast(DEN) > real_cast(10^-9)>::type > {
+struct ChosenResolution< NUM, DEN, typename SFINAE_void< ( real_cast(NUM)/real_cast(DEN) <  real_cast(1e-6) && 
+                                                           real_cast(NUM)/real_cast(DEN) >= real_cast(1e-9) ) >::type > {
    using type = std::chrono::nanoseconds;
 };
 
@@ -84,23 +87,53 @@ struct ChosenResolution< NUM, DEN, SFINAE_void< real_cast(NUM)/real_cast(DEN) < 
 class ProcTimer {
 
 public:
+
+   /** A type definition which selects the clock for the timer. If the std::chrono::high_resolution_clock is steady, it is chosen. 
+   *   Otherwise, std::chrono::steady_clock is selected.
+   */
+   using clock = timer::internal::steady_clock_fallback< std::chrono::high_resolution_clock::is_steady >::type;
+   /** A typedef which names the resolution type to be used for the clock: std::chrono::milliseconds, std::chrono::microseconds or 
+   *   std::chrono::nanoseconds.
+   */
+   using res = typename timer::internal::ChosenResolution< clock::period::num, clock::period::den >::type;
    
-   using clock = timer::internal::steady_clock_fallback< std::high_resolution_clock::is_steady() >::type;
-   using res = timer::internal::ChosenResolution< clock::period::num, clock::period::den >::type;
-   
+   /** \name Constructors and destructor
+   *   @{
+   */
+   /** Default trivial constructor. */
    ProcTimer() = default;
    
-   inline real_t getExactResolution()   { return resolution_; }
+   /** Default destructor. */
+   ~ProcTimer() = default;
+   
+   /** @} */
+   
+   /** \name Access
+   *   @{
+   */
+   /** A function to get the exact resolution of the clock being used.
+   *
+   *   \return   The time period of one tick of the clock.
+   */
+   static inline real_t getExactResolution()   { return real_cast( clock::period::num ) / real_cast( clock::period::den ); }
+   
+   /** A function to get the age of the timer in seconds.
+   *
+   *   \return   The time period between the function call and the construction of the timer.
+   */
    inline real_t getAge() {
       
       auto current_tp = clock::now();
-      return std::duration_cast< res >( current_tp - tp0_ ).count();
+      return std::chrono::duration_cast< res >( current_tp - tp0_ ).count() * res_;
    }
+   
+   /** @} */
    
 private:
 
-   real_t resolution_ = real_cast( clock::period::num ) / real_cast( clock::period::den );
-   std::chrono::time_point< clock > tp0_ = clock::now();
+   real_t res_ = real_cast( clock::period::num ) / real_cast( clock::period::den );   ///< Resolution of chosen clock.
+   std::chrono::time_point< clock > tp0_ = clock::now();                              ///< The starting time point.
 };
 
 }   // namespace simpleNewton
+#endif

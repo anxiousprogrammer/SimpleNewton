@@ -61,7 +61,12 @@ public:
    DArray( small_t size, const TYPE_T & val = {} ) : data_( createRAIIWrapper<TYPE_T>( size ) ) {
 
       size_ = size;
-      std::fill( data_.raw_ptr(), data_.raw_ptr() + size, val );
+      
+      try {
+         std::fill( data_.raw_ptr(), data_.raw_ptr() + size, val );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
    }
    
    /** Copy constructor is explicitly defined.
@@ -69,7 +74,12 @@ public:
    *   \param ref   The prvalue reference from which to copy data while constructing the new DArray.
    */
    DArray( const DArray<TYPE_T> & ref ) : data_( createRAIIWrapper<TYPE_T>( ref.size_ ) ), size_(ref.size_) {
-      std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
+      
+      try {
+         std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
    }
    
    /** Default move constructor. */
@@ -118,7 +128,12 @@ public:
    *   \param val   The value with which to fill the DArray.
    */
    void fill( const TYPE_T & val ) {
-      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, val );
+      
+      try {
+         std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, val );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
    }
    
    /** A function to ascertain if the DArray is empty i.e., containing elements having only TYPE_T() value.
@@ -147,8 +162,13 @@ public:
    *   \return      A new DArray upon assignment.
    */
    DArray<TYPE_T> operator=( const TYPE_T & ref ) {
-
-      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, ref );
+      
+      try {
+         std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, ref );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
+      
       return *this;
    }
    
@@ -165,8 +185,12 @@ public:
          size_ = ref.size_;
          data_ = createRAIIWrapper<TYPE_T>( ref.size_ );
       }
-   
-      std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
+      
+      try {
+         std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
       return *this;
    }
    

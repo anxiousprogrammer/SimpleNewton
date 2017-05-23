@@ -43,7 +43,7 @@ template< typename T > Matrix3<T> operator*( const Vector3<T> &, const Vector3_t
 
 //=== CLASS ================================================================================================================================
 
-/** Vector3 serves as a mathematical container which represents the 3-dimensional vector.
+/** This class serves as a mathematical container which represents the 3-dimensional vector.
 *
 *   \tparam TYPE_T   The underlying data type of the Vector3.
 */
@@ -202,7 +202,7 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Implementation of output
+//   Implementation of output
 //////////////////////////////
 
 /** Every container in the simpleNewton framework is naturally compatible with the Logger class.
@@ -223,7 +223,7 @@ Logger & operator<<( Logger & lg, const Vector3<TYPE_T> & vec ) {
 
 //=== CLASS ================================================================================================================================
 
-/** Vector3_t serves as a mathematical container which represents the transposed 3-dimensional vector.
+/** This class serves as a mathematical container which represents the transposed 3-dimensional vector.
 *
 *   \tparam TYPE_T   The underlying data type of the Vector3_t.
 */

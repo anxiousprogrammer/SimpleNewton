@@ -41,7 +41,7 @@ template< typename T > Vector3<T> operator*( const Matrix3<T> &, const Vector3<T
 
 //=== CLASS ================================================================================================================================
 
-/** Matrix3 serves as a mathematical container which represents the 3x3 matrix.
+/** This class serves as a mathematical container which represents the 3x3 matrix.
 *
 *   \tparam TYPE_T   The underlying data type of the Matrix3.
 */

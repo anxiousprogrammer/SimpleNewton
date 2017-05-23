@@ -41,7 +41,7 @@ template< typename T > Vector2<T> operator*( const Matrix2<T> &, const Vector2<T
 
 //=== CLASS ================================================================================================================================
 
-/** Matrix2 serves as a mathematical container which represents the 2x2 matrix.
+/** This class serves as a mathematical container which represents the 2x2 matrix.
 *
 *   \tparam TYPE_T   The underlying data type of the Matrix2.
 */

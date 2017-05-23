@@ -36,7 +36,7 @@ namespace simpleNewton {
 
 //=== CLASS ================================================================================================================================
 
-/** FArray serves as the base class for all automatic resource allocated arrays. The size of the container is a compile time constant
+/** This class serves as the base class for all automatic resource allocated arrays. The size of the container is a compile time constant
 *   therefore lending operations upon its members open to compiler optimizations such as loop unrolling, SIMD and such.
 *
 *   \tparam TYPE_T   The underlying data type of the array.
@@ -60,7 +60,12 @@ public:
    *   \param val   The value with which the FArray is to be initialized.
    */
    explicit FArray( const TYPE_T & val ) {
-      std::fill( data_, data_ + SIZE, val );
+      
+      try {
+         std::fill( data_, data_ + SIZE, val );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
    }   
    
    /** Default copy constructor. */
@@ -106,8 +111,12 @@ public:
    *   \return      An FArray upon assignment.
    */
    FArray<TYPE_T, SIZE> operator=( const TYPE_T & ref ) {
-   
-      std::fill( data_, data_ + SIZE, ref );
+      
+      try {
+         std::fill( data_, data_ + SIZE, ref );
+      } catch( const std::exception & ex ) {
+         SN_LOG_CATCH_EXCEPTION( ex );
+      }
       return *this;
    }
    

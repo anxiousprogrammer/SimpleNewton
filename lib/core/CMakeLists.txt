@@ -1,1 +1,2 @@
 add_library( PROCMAN ProcSingleton.cpp )
+add_library( EXCEPTIONS Exceptions.cpp )

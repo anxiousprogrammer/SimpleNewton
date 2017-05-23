@@ -29,7 +29,7 @@
 ///   Contains the class template MPIRequest, which serves as a bridge between a non-blocking MPI operation and its corresponding wait
 ///   function.
 ///   \file
-///   \defgroup containers Containers
+///   \defgroup mpi MPI
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //==========================================================================================================================================
@@ -48,6 +48,7 @@ namespace simpleNewton {
 */
 //==========================================================================================================================================
 
+#ifdef __SN_USE_MPI__
 template< typename TYPE_T >
 class MPIRequest : private NonCopyable {
 
@@ -57,20 +58,12 @@ public:
    * @{
    */
    
-   #ifdef __SN_USE_MPI__
-   
-   /** This constructor is compiled a little differently based on whether or not MPI is included. 
-   *   \param size   The number of operations which this MPIRequest container shall manage. Default value is 1 if MPI is included and 0
-   *                 when this is not the case.
+   /** Direct initialization constructor.
+   *
+   *   \param size   The number of operations which this MPIRequest container shall manage.
    */
    MPIRequest( small_t size = 1 ) : size_(size), count_( createRAIIWrapper< small_t >( size, 0 ) ), 
                                     req_( createRAIIWrapper< MPI_Request >( size, MPI_REQUEST_NULL ) ) {}
-
-   #else
-
-   MPIRequest( small_t size = 0 ) : size_(size) {}
-   
-   #endif   // MPI Guard
    
    /** Move constructor */
    MPIRequest( MPIRequest && ) = default;
@@ -90,17 +83,13 @@ public:
    */
    small_t getSize() const                                 { return size_; }
    
-   #ifdef __SN_USE_MPI__
-   
    /** A function to ascertain the exact transfer count of a non-blocking MPI operation pointed out by its corresponding container index. 
-   *   This function will not be compiled if MPI is not included.
    *   \param i   The index corresponding to a certain non-blocking MPI operation. Takes a default value of 0.
    *   \return    The exact transfer count i.e., the size of the message of the non-blocking MPI operation.
    */
    small_t getTransferCount( small_t i = 0 ) const         { SN_ASSERT( i < size_ ); return count_[i]; }
    
    /** A function to set the exact transfer count of a non-blocking MPI operation pointed out by its corresponding container index.
-   *   This function will not be compiled if MPI is not included.
    *   \param new_count   The value of the transfer count of a certain operation.
    *   \param i           The index corresponding to a certain non-blocking MPI operation. Takes a default value of 0.
    *   \return            The exact transfer count i.e., the size of the message of the non-blocking MPI operation.
@@ -112,13 +101,11 @@ public:
    */
    inline operator MPI_Request*()   { return req_; }
    
-   /** A function to expose the underlying MPI_Request array for when the user-defined conversion cannot be applied. This function will 
-   *   not be compiled if MPI is not included.
+   /** A function to expose the underlying MPI_Request array for when the user-defined conversion cannot be applied.
    *   \return   A pointer to the first element of the MPI_Request array.
    */
    inline MPI_Request * raw_ptr()   { return req_; }
    
-   #endif   // MPI Guard
    /** @} */
    
    
@@ -131,13 +118,11 @@ public:
       
       bool ret_val = true;
       
-      #ifdef __SN_USE_MPI__
       for( small_t i = 0; i < size_; ++i ) {
          
          if( req_[i] != MPI_REQUEST_NULL )
             ret_val = false;
       }
-      #endif
       
       return ret_val;
    }
@@ -146,12 +131,21 @@ private:
    
    small_t size_;   ///< Size of the request array. A single request container can contain multiple requests.
 
-   #ifdef __SN_USE_MPI__
    RAIIWrapper< small_t > count_;   ///< The container for the transfer counts. Each non-blocking MPI Op's data transfer count is recorded.
                                     ///  Will only be compiled if MPI is included.
    RAIIWrapper< MPI_Request > req_;   ///< The container of MPI_Request instances. Will only be compiled if MPI is included.
-   #endif
 };
+
+#else   // MPI Guard
+
+template< typename TYPE_T >
+class MPIRequest : private NonCopyable {
+
+public:
+
+   small_t getSize() const { return 0; }  
+};
+#endif   // MPI Guard
 
 }   // namespace simpleNewton
 

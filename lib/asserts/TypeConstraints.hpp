@@ -1055,7 +1055,7 @@ inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_INSTANCE_DERIVED_FROM
 /**   A compile-time constraint that a class has to be derived from at least one class contained in a specified typelist.
 *
 *     \tparam CLS    The derived class.
-*     \tparam TL     The specified typelist (of SN_CT_TYPELIST) which is required to have at least one class which is the base class of CLS.
+*     \tparam TL     The specified typelist (of SN_CT_TYPELIST) which is required to have at least one class as the base class of CLS.
 */
 template< class CLS, class TL >
 inline void __attribute__( (optimize("O0")) ) SN_CT_ASSERT_DERIVED_FROM_LIST_MEMBER() {

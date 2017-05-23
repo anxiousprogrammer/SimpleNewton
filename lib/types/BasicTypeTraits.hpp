@@ -83,9 +83,6 @@ template< class T > using a_void = void;
 // Ambiguity void type: if expression is true then int.
 template< bool VAL > struct amb_void;
 
-// sizeof array
-template< typename ARR > struct sizeof_array_impl;
-
 }   // namespace impl
 
 

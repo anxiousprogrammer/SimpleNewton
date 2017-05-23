@@ -158,7 +158,11 @@ RAIIWrapper<TYPE> createRAIIWrapper( small_t size, const TYPE & val = {} ) {
    RAIIWrapper<TYPE> new_packet( new TYPE[size] );
    
    // Initialization
-   std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
+   try {
+      std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
+   } catch( const std::exception & ex ) {
+      SN_LOG_CATCH_EXCEPTION( ex );
+   }
    
    return new_packet;
 }

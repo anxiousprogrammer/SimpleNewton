@@ -39,7 +39,7 @@ namespace simpleNewton {
 //
 ///   Contains the class template BaseComm.
 ///   \file
-///   \defgroup concurrency Concurrency
+///   \defgroup mpi MPI
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //=========================================================================================================================================

@@ -2040,6 +2040,11 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = __attribute__(x)= \
                          __SN_USE_MPI__ \
+                         __SN_LOGLEVEL_ERROR__ \
+                         __SN_LOGLEVEL_WARNING__ \
+                         __SN_LOGLEVEL_L1_EVENT__ \
+                         __SN_LOGLEVEL_L2_EVENT__ \
+                         __SN_LOGLEVEL_WATCH__ \
                          DOXYGEN_SHOULD_SKIP_THIS
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

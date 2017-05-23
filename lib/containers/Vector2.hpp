@@ -44,7 +44,7 @@ template< typename T > Matrix2<T> operator*( const Vector2<T> &, const Vector2_t
 
 //=== CLASS ================================================================================================================================
 
-/** Vector2 serves as a mathematical container which represents the 2-dimensional vector.
+/** This class serves as a mathematical container which represents the 2-dimensional vector.
 *
 *   \tparam TYPE_T   The underlying data type of the Vector2.
 */
@@ -203,7 +203,7 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Implementation of output
+//   Implementation of output
 //////////////////////////////
 
 /** Every container in the simpleNewton framework is naturally compatible with the Logger class.
@@ -224,7 +224,7 @@ Logger & operator<<( Logger & lg, const Vector2<TYPE_T> & vec ) {
 
 //=== CLASS ================================================================================================================================
 
-/** Vector2_t serves as a mathematical container which represents the transposed 2-dimensional vector.
+/** This class serves as a mathematical container which represents the transposed 2-dimensional vector.
 *
 *   \tparam TYPE_T   The underlying data type of the Vector2_t.
 */

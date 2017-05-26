@@ -1,13 +1,36 @@
-#ifndef BASICTYPETRAITS_HPP
-#define BASICTYPETRAITS_HPP
+#ifndef SN_BASICTYPETRAITS_HPP
+#define SN_BASICTYPETRAITS_HPP
 
 #include <Types.hpp>
 #include "Typelist.hpp"
 
+//==========================================================================================================================================
+//
+//  This file is part of simpleNewton. simpleNewton is free software: you can 
+//  redistribute it and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation, either version 3 of 
+//  the License, or (at your option) any later version.
+//  
+//  simpleNewton is distributed in the hope that it will be useful, but WITHOUT 
+//  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+//  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+//  for more details.
+//  
+//  You should have received a copy of the GNU General Public License along
+//  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
+//
+///   Contains a full set of typetraits functions specialized for the simpleNewton framework.
+///   \file
+///   \defgroup types Types
+///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
+//
+//==========================================================================================================================================
+
+/** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///   Hack: WE WANT CPP! To make it a self-sufficient compile unit.
+//   Hack: WE WANT CPP! To make it a self-sufficient compile unit.
 ///////////////////////////////////////////////////////////////////
 
 template< class TYPE >

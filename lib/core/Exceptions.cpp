@@ -22,7 +22,7 @@
 //
 //==========================================================================================================================================
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
@@ -47,16 +47,10 @@ PreconditionError::PreconditionError( const std::string & what_arg, /**< The mes
                                                                                                    ExceptionInfo( line, func ) {}
 
 /** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
-DomainError::DomainError( const std::string & what_arg, /**< The message returned by what() */
-                          uint_t line,                  /**< The line information. */
-                          const std::string & func      /**< The function name. */ ) : std::domain_error( what_arg ), 
-                                                                                       ExceptionInfo( line, func ) {}
-
-/** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
-MaxSizeError::MaxSizeError( const std::string & what_arg, /**< The message returned by what() */
-                            uint_t line,                  /**< The line information. */
-                            const std::string & func      /**< The function name. */ ) : std::length_error( what_arg ), 
-                                                                                         ExceptionInfo( line, func ) {}
+MathError::MathError( const std::string & what_arg, /**< The message returned by what() */
+                      uint_t line,                  /**< The line information. */
+                      const std::string & func      /**< The function name. */ ) : std::domain_error( what_arg ), 
+                                                                                   ExceptionInfo( line, func ) {}
 
 /** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
 OORError::OORError( const std::string & what_arg, /**< The message returned by what() */
@@ -117,4 +111,3 @@ MPIError::MPIError( const std::string & what_arg, /**< The message returned by w
                                                                                  ExceptionInfo( line, func ) {}
 
 }   // namespace simpleNewton
-#endif   // DOXYSKIP

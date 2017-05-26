@@ -156,7 +156,9 @@ inline Logger & operator<<( Logger & lg, const INP_T & input ) {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Template function stays in header
 namespace logger {
-namespace impl {
+namespace internal {
+
+void toggleConsole( bool );
 
 void print_message( const std::string & );
 
@@ -198,10 +200,17 @@ void watch_variables( const std::string & msg, const std::string & file, int lin
    #endif
 }
 
-}   // namespace impl
+}   // namespace internal
 }   // namespace logger
 #endif   // DOXYSKIP
 
+
+
+/** A function which switches off console display. */
+#define SN_LOG_SWITCH_OFF_CONSOLE_OUTPUT() logger::internal::toggleConsole( 0 )
+
+/** A function which switches on console display. */
+#define SN_LOG_SWITCH_ON_CONSOLE_OUTPUT() logger::internal::toggleConsole( 1 )
 
 /** A macro which prints a simple text message to screen.
 *
@@ -211,7 +220,7 @@ void watch_variables( const std::string & msg, const std::string & file, int lin
 do { \
       std::stringstream temporary_oss; \
       temporary_oss << MSG; \
-      logger::impl::print_message( temporary_oss.str() ); } while(false)
+      logger::internal::print_message( temporary_oss.str() ); } while(false)
 
 #ifdef NDEBUG
 
@@ -235,7 +244,7 @@ do { \
       do { \
              std::stringstream temporary_oss; \
              temporary_oss << MSG; \
-             logger::impl::report_error( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
+             logger::internal::report_error( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
       
       /** A macro which prints an exceptional error message to screen if __SN_LOGLEVEL_ERROR__ has been defined by the make system. If this 
       *   is the case, the content of the message will also be written to the process' log file.
@@ -243,7 +252,7 @@ do { \
       *   \param EX   A std::exception with details of the exceptional error.
       */
       #define SN_LOG_CATCH_EXCEPTION( EX ) \
-      do { logger::impl::catch_exception( EX, std::string(__FILE__), __LINE__, __func__ ); } while(false)
+      do { logger::internal::catch_exception( EX, std::string(__FILE__), __LINE__, __func__ ); } while(false)
  
    #else
  
@@ -263,7 +272,7 @@ do { \
       do { \
              std::stringstream temporary_oss; \
              temporary_oss << MSG; \
-             logger::impl::report_warning( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
+             logger::internal::report_warning( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__ ); } while(false)
  
    #else
  
@@ -285,7 +294,7 @@ do { \
       do { \
             std::stringstream temporary_oss; \
             temporary_oss << MSG; \
-            logger::impl::watch_variables( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__, __VA_ARGS__ ); } while(false)
+            logger::internal::watch_variables( temporary_oss.str(), std::string(__FILE__), __LINE__, __func__, __VA_ARGS__ ); } while(false)
  
    #else
  
@@ -303,7 +312,7 @@ do { \
       *   effectively be active.
       */
       #define SN_LOG_L1_EVENT_WATCH_REGION_LIMIT() \
-      do { logger::impl::markEventHorizon( 0 ); } while(false)
+      do { logger::internal::markEventHorizon( 0 ); } while(false)
       
       /** A macro which declares the completion of any of the basic events listed by the enumeration, LogEventType. This prints a brief 
       *   description of the event to screen if __SN_LOGLEVEL_L1_EVENT__ has been defined by the make system. The content of the message 
@@ -319,7 +328,7 @@ do { \
       do { \
             std::stringstream temporary_oss; \
             temporary_oss << INFO; \
-            logger::impl::report_L1_event( EV, std::string(__FILE__), __LINE__, __func__, temporary_oss.str() ); } while(false)
+            logger::internal::report_L1_event( EV, std::string(__FILE__), __LINE__, __func__, temporary_oss.str() ); } while(false)
  
    #else
  
@@ -338,7 +347,7 @@ do { \
       *   effectively be active.
       */
       #define SN_LOG_L2_EVENT_WATCH_REGION_LIMIT() \
-      do { logger::impl::markEventHorizon( 1 ); } while(false)
+      do { logger::internal::markEventHorizon( 1 ); } while(false)
       
       /** A macro which declares the completion of any high level event. This prints a brief description of the event to screen if 
       *   __SN_LOGLEVEL_L2_EVENT__ has been defined by the make system. The content of the message will be written to the process' log file 
@@ -352,8 +361,8 @@ do { \
             std::stringstream temporary_oss_tag, temporary_oss_descr; \
             temporary_oss_tag << TAG; \
             temporary_oss_descr << INFO; \
-            logger::impl::report_L2_event( std::string(__FILE__), __LINE__, __func__, temporary_oss_tag.str(), \
-                                           temporary_oss_descr.str() ); } while(false)
+            logger::internal::report_L2_event( std::string(__FILE__), __LINE__, __func__, temporary_oss_tag.str(), \
+                                               temporary_oss_descr.str() ); } while(false)
  
    #else
  

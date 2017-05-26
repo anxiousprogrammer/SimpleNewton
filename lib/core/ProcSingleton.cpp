@@ -156,7 +156,7 @@ const std::string & ProcSingleton::getExecName() {
 ProcSingleton::~ProcSingleton() {
 
    SN_MPI_BARRIER();
-   
+  
    #ifdef __SN_USE_MPI__
    if( getPrivateInstance().is_initialized_with_multithreading_ || getPrivateInstance().is_initialized_ ) {
       MPI_Finalize();
@@ -164,7 +164,7 @@ ProcSingleton::~ProcSingleton() {
    #endif
    
    SN_MPI_ROOTPROC_REGION() {
-   
+
       time_t _now = time(nullptr);
       //Wrap up I/O
       std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been finalized." << std::endl;

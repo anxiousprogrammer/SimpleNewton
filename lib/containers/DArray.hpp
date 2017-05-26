@@ -60,13 +60,11 @@ public:
    */
    DArray( small_t size, const TYPE_T & val = {} ) : data_( createRAIIWrapper<TYPE_T>( size ) ) {
 
+      SN_ASSERT_POSITIVE( size );
+      
       size_ = size;
       
-      try {
-         std::fill( data_.raw_ptr(), data_.raw_ptr() + size, val );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, val );
    }
    
    /** Copy constructor is explicitly defined.
@@ -74,12 +72,7 @@ public:
    *   \param ref   The prvalue reference from which to copy data while constructing the new DArray.
    */
    DArray( const DArray<TYPE_T> & ref ) : data_( createRAIIWrapper<TYPE_T>( ref.size_ ) ), size_(ref.size_) {
-      
-      try {
-         std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
    }
    
    /** Default move constructor. */
@@ -100,7 +93,16 @@ public:
    *   \param index   An index to access elements of the DArray.
    *   \return        A const qualified reference to the element.
    */
-   inline const TYPE_T & operator[]( small_t index ) const   { SN_ASSERT_INDEX_WITHIN_SIZE( index, size_ ); return data_[index]; }
+   inline const TYPE_T & operator[]( small_t index ) const {
+      
+      SN_ASSERT_INDEX_WITHIN_SIZE( index, size_ );
+      try {
+         return data_[index];
+      }
+      catch( const std::out_of_range & ex ) {
+         SN_THROW_OOR_ERROR( ex.what() );
+      }
+   }
    
    /** A function to get the size of the DArray.
    *
@@ -113,12 +115,15 @@ public:
    /** \name Utility
    *   @{
    */
-   /** A function to resize the DArray.
+   /** A function to resize the DArray. Notes on exception safety: strong safety guaranteed. An instance of AllocError or AllocSizeError
+   *   will be thrown if there resource allocation were not possible.
    *
    *   \param new_size   The new size with which it is desired to resize the DArray.
    */
    void resize( small_t new_size ) {
    
+      SN_ASSERT_POSITIVE( new_size );
+      
       size_ = new_size;
       data_ = createRAIIWrapper< TYPE_T >( size_ );
    }
@@ -128,12 +133,7 @@ public:
    *   \param val   The value with which to fill the DArray.
    */
    void fill( const TYPE_T & val ) {
-      
-      try {
-         std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, val );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, val );
    }
    
    /** A function to ascertain if the DArray is empty i.e., containing elements having only TYPE_T() value.
@@ -163,11 +163,7 @@ public:
    */
    DArray<TYPE_T> operator=( const TYPE_T & ref ) {
       
-      try {
-         std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, ref );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, ref );
       
       return *this;
    }
@@ -186,11 +182,8 @@ public:
          data_ = createRAIIWrapper<TYPE_T>( ref.size_ );
       }
       
-      try {
-         std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::copy( ref.data_.raw_ptr(), ref.data_.raw_ptr() + ref.size_, data_.raw_ptr() );
+
       return *this;
    }
    

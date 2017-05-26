@@ -16,82 +16,77 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains exception macros which make it easier and more convenient to throw exceptions.
+///   Contains macros for ease of use and convenience for throwing exceptions from Exceptions.hpp.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //==========================================================================================================================================
 
-#ifdef __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__
+#ifndef __SN_EXCEPTIONS_FUNC_LINE_INFO__
    
-   /** This macro throws an exception of type InvalidArgument. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_INVALID_ARGUMENT( WHAT )     do { throw InvalidArgument( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type PreconditionError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_PRECONDITION_ERROR( WHAT )   do { throw PreconditionError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type DomainError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_DOMAIN_ERROR( WHAT )         do { throw DomainError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type MaxSizeError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_MAX_SIZE_ERROR( WHAT )           do { throw SizeError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type OORError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_OOR_ERROR( WHAT )            do { throw OORError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type RangeError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_RANGE_ERROR( WHAT )          do { throw RangeError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type OverflowError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_OVERFLOW_ERROR( WHAT )       do { throw OverflowError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type UnderflowError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_UNDERFLOW_ERROR( WHAT )      do { throw UnderflowError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type IOError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_IO_ERROR( WHAT )             do { throw IOError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type FunctorError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_FUNCTOR_ERROR( WHAT )        do { throw FunctorError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type AllocError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_ALLOC_ERROR( WHAT )          do { throw AllocError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type AllocSizeError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_ALLOC_SIZE_ERROR( WHAT )     do { throw AllocSizeError( WHAT, __LINE__, __func__ ); } while(false)
-   
-   /** This macro throws an exception of type MPIError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
-   *   has been defined by the make system. */
-   #define SN_THROW_MPI_ERROR( WHAT )            do { throw MPIError( WHAT, __LINE__, __func__ ); } while(false)
+   #define SN_THROW_INVALID_ARGUMENT( WHAT )     do { throw simpleNewton::InvalidArgument( WHAT ); } while(false)
+   #define SN_THROW_PRECONDITION_ERROR( WHAT )   do { throw simpleNewton::PreconditionError( WHAT ); } while(false)
+   #define SN_THROW_MATH_ERROR( WHAT )           do { throw simpleNewton::DomainError( WHAT ); } while(false)
+   #define SN_THROW_OOR_ERROR( WHAT )            do { throw simpleNewton::OORError( WHAT ); } while(false)
+   #define SN_THROW_RANGE_ERROR( WHAT )          do { throw simpleNewton::RangeError( WHAT ); } while(false)
+   #define SN_THROW_OVERFLOW_ERROR( WHAT )       do { throw simpleNewton::OverflowError( WHAT ); } while(false)
+   #define SN_THROW_UNDERFLOW_ERROR( WHAT )      do { throw simpleNewton::UnderflowError( WHAT ); } while(false)
+   #define SN_THROW_IO_ERROR( WHAT )             do { throw simpleNewton::IOError( WHAT ); } while(false)
+   #define SN_THROW_FUNCTOR_ERROR()              do { throw simpleNewton::FunctorError(); } while(false)
+   #define SN_THROW_ALLOC_ERROR()                do { throw simpleNewton::AllocError(); } while(false)
+   #define SN_THROW_ALLOC_SIZE_ERROR()           do { throw simpleNewton::AllocSizeError(); } while(false)
+   #define SN_THROW_MPI_ERROR( WHAT )            do { throw simpleNewton::MPIError( WHAT ); } while(false)
 
 #else
    
-   #define SN_THROW_INVALID_ARGUMENT( WHAT )     do { throw InvalidArgument( WHAT ); } while(false)
-   #define SN_THROW_PRECONDITION_ERROR( WHAT )   do { throw PreconditionError( WHAT ); } while(false)
-   #define SN_THROW_DOMAIN_ERROR( WHAT )         do { throw DomainError( WHAT ); } while(false)
-   #define SN_THROW_SIZE_ERROR( WHAT )           do { throw SizeError( WHAT ); } while(false)
-   #define SN_THROW_OOR_ERROR( WHAT )            do { throw OORError( WHAT ); } while(false)
-   #define SN_THROW_RANGE_ERROR( WHAT )          do { throw RangeError( WHAT ); } while(false)
-   #define SN_THROW_OVERFLOW_ERROR( WHAT )       do { throw OverflowError( WHAT ); } while(false)
-   #define SN_THROW_UNDERFLOW_ERROR( WHAT )      do { throw UnderflowError( WHAT ); } while(false)
-   #define SN_THROW_IO_ERROR( WHAT )             do { throw IOError( WHAT ); } while(false)
-   #define SN_THROW_FUNCTOR_ERROR( WHAT )        do { throw FunctorError( WHAT ); } while(false)
-   #define SN_THROW_ALLOC_ERROR( WHAT )          do { throw AllocError( WHAT ); } while(false)
-   #define SN_THROW_ALLOC_SIZE_ERROR( WHAT )     do { throw AllocSizeError( WHAT ); } while(false)
-   #define SN_THROW_MPI_ERROR( WHAT )            do { throw MPIError( WHAT ); } while(false)
+   /** This macro throws an exception of type InvalidArgument. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_INVALID_ARGUMENT( WHAT )     do { throw simpleNewton::InvalidArgument( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type PreconditionError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_PRECONDITION_ERROR( WHAT )   do { throw simpleNewton::PreconditionError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type DomainError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_MATH_ERROR( WHAT )           do { throw simpleNewton::MathError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type OORError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_OOR_ERROR( WHAT )            do { throw simpleNewton::OORError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type RangeError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_RANGE_ERROR( WHAT )          do { throw simpleNewton::RangeError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type OverflowError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_OVERFLOW_ERROR( WHAT )       do { throw simpleNewton::OverflowError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type UnderflowError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_UNDERFLOW_ERROR( WHAT )      do { throw simpleNewton::UnderflowError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type IOError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_IO_ERROR( WHAT )             do { throw simpleNewton::IOError( WHAT, __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type FunctorError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_FUNCTOR_ERROR()              do { throw simpleNewton::FunctorError( __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type AllocError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_ALLOC_ERROR()                do { throw simpleNewton::AllocError( __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type AllocSizeError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_ALLOC_SIZE_ERROR()           do { throw simpleNewton::AllocSizeError( __LINE__, __func__ ); } while(false)
+   
+   /** This macro throws an exception of type MPIError. It includes function and line info if __SN_EXCEPTIONS_WITH_FUNC_LINE_INFO__ 
+   *   has been defined by the make system. */
+   #define SN_THROW_MPI_ERROR( WHAT )            do { throw simpleNewton::MPIError( WHAT, __LINE__, __func__ ); } while(false)
    
 #endif   // Line and func info flag
 #endif   // Header Guard

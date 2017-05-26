@@ -122,7 +122,7 @@ include_directories( "${simpleNewton_SOURCE_DIR}/lib" )
 
 add_subdirectory( lib )
 
-set( BASIC_LIBRARIES TYPES EXCEPTIONS PROCMAN LOGGER ASSERTS )
+set( BASIC_LIBRARIES ASSERTS LOGGER PROCMAN EXCEPTIONS TYPES )   # Opposite order makes sure dependencies are taken care of
 
 if( SN_USE_MPI )
    set( BASIC_LIBRARIES ${BASIC_LIBRARIES} ${MPI_CXX_LIBRARIES} MPI )

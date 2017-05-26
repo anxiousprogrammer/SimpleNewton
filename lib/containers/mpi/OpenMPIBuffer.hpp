@@ -88,6 +88,9 @@ public:
    ~OpenMPIBuffer() = default;
    /** @} */
    
+   /** \name Utility
+   *   @{
+   */
    /** Function to concatenate buffers of the same type.
    *
    *   \param operand   The OpenMPIBuffer object which has to be appended.
@@ -103,9 +106,16 @@ public:
       return newOMPIB;
    }
    
-   /* Logger compatibility */
+   /** @} */
+   
+   /** \name Output
+   *   @{
+   */
+   /** Output function which is compatible with the Logger. */
    template< typename T >
    friend Logger & operator<<( Logger & , const OpenMPIBuffer<T> & );
+   
+   /** @} */
    
    /* BaseComm can get in here */
    template< typename TYPE > friend class BaseComm; 
@@ -141,9 +151,16 @@ Logger & operator<<( Logger & lg, const OpenMPIBuffer<T> & buff ) {
 *   \return       A std::string object with the contents of buff.
 */
 std::string make_std_string( const OpenMPIBuffer< char > & buff ) { 
-      
+
    std::string str;
-   str.append( &buff[0], buff.getSize() );
+   
+   try {
+      str.append( &buff[0], buff.getSize() );
+   }
+   catch( const std::bad_alloc & ex ) {
+      SN_THROW_ALLOC_ERROR();
+   }
+   
    return str;
 }
 

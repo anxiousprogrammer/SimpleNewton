@@ -60,12 +60,7 @@ public:
    *   \param val   The value with which the FArray is to be initialized.
    */
    explicit FArray( const TYPE_T & val ) {
-      
-      try {
-         std::fill( data_, data_ + SIZE, val );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::fill( data_, data_ + SIZE, val );
    }   
    
    /** Default copy constructor. */
@@ -112,11 +107,7 @@ public:
    */
    FArray<TYPE_T, SIZE> operator=( const TYPE_T & ref ) {
       
-      try {
-         std::fill( data_, data_ + SIZE, ref );
-      } catch( const std::exception & ex ) {
-         SN_LOG_CATCH_EXCEPTION( ex );
-      }
+      std::fill( data_, data_ + SIZE, ref );
       return *this;
    }
    

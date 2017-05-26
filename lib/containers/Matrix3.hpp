@@ -242,7 +242,14 @@ public:
    *   \return          A Matrix3 object which is the result of the division.
    */
    inline Matrix3<TYPE_T> operator/( const TYPE_T & operand ) const {
-   
+      
+      SN_ASSERT_NOT_ZERO( operand );
+      
+      #ifdef NDEBUG
+      if( std::fabs(operand) <= globalConstants::ZERO )
+         SN_THROW_INVALID_ARGUMENT( "IA_Matrix3_Div_Zero" );
+      #endif
+      
       TYPE_T inv = static_cast<TYPE_T>(1.0)/operand;
       return Matrix3<TYPE_T>( data_[0] * inv, data_[1] * inv, data_[2] * inv,
                               data_[3] * inv, data_[4] * inv, data_[5] * inv,

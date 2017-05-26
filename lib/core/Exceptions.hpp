@@ -109,26 +109,15 @@ public:
 
 
 
-/** This class is intended for use when a mathematical function is provided an argument outside of its domain. */
-class DomainError : public std::domain_error, ExceptionInfo {
+/** This class is intended for use when a mathematical function performs an illegal mathematical operation e.g. division by zero or 
+*   out-of-domain input. */
+class MathError : public std::domain_error, ExceptionInfo {
 
 public:
    
-   DomainError( const std::string & ,
-                uint_t = {},
-                const std::string & = {} );
-};
-
-
-
-/** This class is intended for use when a mathematical function is provided an argument outside of its domain. */
-class MaxSizeError : public std::length_error, ExceptionInfo {
-
-public:
-   
-   MaxSizeError( const std::string & ,
-                 uint_t = {},
-                 const std::string & = {} );
+   MathError( const std::string & ,
+              uint_t = {},
+              const std::string & = {} );
 };
 
 
@@ -245,4 +234,4 @@ public:
 }   // namespace simpleNewton
 
 #include "ExceptionMacros.hpp"
-#endif
+#endif   // Header guard

@@ -154,6 +154,9 @@ private:
 #ifdef __SN_USE_MPI__
 
  /** A global function which can be used to obtain the rank of the process. */
+ #define SN_MPI_INITIALIZED()              ( ProcSingleton::isInitialized() || ProcSingleton::isInitializedWithMultithreading() )
+ 
+ /** A global function which can be used to obtain the rank of the process. */
  inline int SN_MPI_RANK()                  { return ProcSingleton::getCommRank(); }
  
  /** A global function which can be used to obtain the size of the communicator. */

@@ -8,6 +8,8 @@
 #include <BasicBases.hpp>
 #include <asserts/Asserts.hpp>
 
+#include <core/Exceptions.hpp>
+
 //==========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
@@ -145,7 +147,9 @@ private:
 
 
 
-/** This function performs resource allocation and directs the resource to a newly created RAIIWrapper.
+/** This function performs resource allocation and directs the resource to a newly created RAIIWrapper. Notes on exception safety: strong 
+*   exception safety guaranteed. An InvalidArgument exception is thrown if the size argument is not suitable. An AllocError or an 
+*   AllocSizeError exception, whichever may be the case, is thrown if resource allocation is not possible.
 *
 *   \param size   The size of the resource.
 *   \param val    The value with which the resource is to be initialised.
@@ -155,14 +159,27 @@ template< class TYPE >
 RAIIWrapper<TYPE> createRAIIWrapper( small_t size, const TYPE & val = {} ) {
 
    SN_ASSERT_POSITIVE( size );
-   RAIIWrapper<TYPE> new_packet( new TYPE[size] );
    
-   // Initialization
-   try {
-      std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
-   } catch( const std::exception & ex ) {
-      SN_LOG_CATCH_EXCEPTION( ex );
+   #ifdef NDEBUG
+   if( size <= 0 ) {
+      SN_THROW_INVALID_ARGUMENT( "IA_RAIIWrapper_Size_Error" );
    }
+   #endif
+   
+   TYPE * ptr = nullptr;   // vessel
+   
+   try {
+      ptr = new TYPE[size];
+   }
+   catch( const std::bad_alloc & ex ) {
+      SN_THROW_ALLOC_ERROR();
+   }
+   
+   RAIIWrapper<TYPE> new_packet( ptr );
+   ptr = nullptr;
+   
+   // Initialization.
+   std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
    
    return new_packet;
 }

@@ -47,7 +47,7 @@ template< class T > class Asserts_CPPHackClass {};
 
 
 namespace asserts {
-namespace impl {
+namespace internal {
 
 // Error trigger
 template< bool expr > struct TYPE_ERROR;
@@ -73,7 +73,7 @@ template<> struct INT_IN_ASSERT< unsigned long long > { enum : bool { value = tr
 inline void assert( bool expr, const char * const file, int line, const std::string & func ) {
    if( ! expr ) {
       
-      logger::impl::report_error( "An assertion has failed. The process will now be terminated.", file, line, func );
+      logger::internal::report_error( "An assertion has failed. The process will now be terminated.", file, line, func );
       ProcSingleton::ExitProgram();
    }
 }
@@ -85,7 +85,7 @@ inline void assert_equal( const T1 & VALUE, const T2 & REFERENCE, const char * c
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) == static_cast<T1>(REFERENCE) ) ) {
          
-         logger::impl::report_error( "Equality assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Equality assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -98,7 +98,7 @@ inline void assert_fp_equal( const T1 & VALUE, const T2 & REFERENCE, const char 
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) <= globalConstants::ZERO ) ) {
          
-         logger::impl::report_error( "Floating point equality assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Floating point equality assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -111,7 +111,7 @@ inline void assert_inequal( const T1 & VALUE, const T2 & REFERENCE, const char *
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) != static_cast<T1>(REFERENCE) ) ) {
          
-         logger::impl::report_error( "Inequality assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Inequality assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -124,7 +124,7 @@ inline void assert_fp_inequal( const T1 & VALUE, const T2 & REFERENCE, const cha
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) > globalConstants::ZERO ) ) {
          
-         logger::impl::report_error( "Floating point inequality assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Floating point inequality assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -137,7 +137,7 @@ inline void assert_less_than( const T1 & VALUE, const T2 & REFERENCE, const char
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) < static_cast<T1>(REFERENCE) ) ) {
          
-         logger::impl::report_error( "Less than assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Less than assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -150,7 +150,7 @@ inline void assert_leq( const T1 & VALUE, const T2 & REFERENCE, const char * con
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) <= static_cast<T1>(REFERENCE) ) ) {
          
-         logger::impl::report_error( "Less than or equal to assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Less than or equal to assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -163,7 +163,7 @@ inline void assert_greater_than( const T1 & VALUE, const T2 & REFERENCE, const c
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) > static_cast<T1>(REFERENCE) ) ) {
         
-         logger::impl::report_error( "Greater than assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Greater than assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -176,7 +176,7 @@ inline void assert_greq( const T1 & VALUE, const T2 & REFERENCE, const char * co
    if( ! TYPE_ERROR< SAME_TYPE_IN_ASSERT< T1, T2 >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<T2>(VALUE) >= static_cast<T1>(REFERENCE) ) ) {
          
-         logger::impl::report_error( "Greater than or equal to assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Greater than or equal to assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -188,7 +188,18 @@ template< class TYPE >
 inline void assert_zero( const TYPE & VALUE, const char * const file, int line, const std::string & func ) {
    if( !static_cast< bool >( std::fabs(VALUE) <= globalConstants::ZERO ) ) {
       
-      logger::impl::report_error( "Equal to zero assertion failed. The process will now be terminated.", file, line, func );
+      logger::internal::report_error( "Equal to zero assertion failed. The process will now be terminated.", file, line, func );
+      ProcSingleton::ExitProgram();
+   }
+}
+
+
+
+template< class TYPE >
+inline void assert_not_zero( const TYPE & VALUE, const char * const file, int line, const std::string & func ) {
+   if( !static_cast< bool >( std::fabs(VALUE) > globalConstants::ZERO ) ) {
+      
+      logger::internal::report_error( "Not equal to zero assertion failed. The process will now be terminated.", file, line, func );
       ProcSingleton::ExitProgram();
    }
 }
@@ -199,7 +210,7 @@ template< class TYPE >
 inline void assert_positive( const TYPE & VALUE, const char * const file, int line, const std::string & func ) {
    if( !static_cast< bool >( VALUE > globalConstants::ZERO ) ) {
       
-      logger::impl::report_error( "Positivity assertion failed. The process will now be terminated.", file, line, func );
+      logger::internal::report_error( "Positivity assertion failed. The process will now be terminated.", file, line, func );
       ProcSingleton::ExitProgram();
    }
 }
@@ -210,7 +221,7 @@ template< class TYPE >
 inline void assert_negative( const TYPE & VALUE, const char * const file, int line, const std::string & func ) {
    if( !static_cast< bool >( VALUE < globalConstants::ZERO ) ) {
      
-      logger::impl::report_error( "Negativity assertion failed. The process will now be terminated.", file, line, func );
+      logger::internal::report_error( "Negativity assertion failed. The process will now be terminated.", file, line, func );
       ProcSingleton::ExitProgram();
    }
 }
@@ -221,7 +232,7 @@ template< bool constexpr_expr >
 inline void assert_msg( const char* const MSG, const char * const file, int line, const std::string & func ) {
    if( !static_cast< bool >( constexpr_expr ) ) {
      
-      logger::impl::report_error( MSG, file, line, func );
+      logger::internal::report_error( MSG, file, line, func );
       std::exit( EXIT_FAILURE );
    }
 }
@@ -233,7 +244,7 @@ inline void assert_size_same( const U_INT & SIZE, const U_INT & REF, const char 
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) == static_cast<unsigned long long>(REF) ) ) {
         
-         logger::impl::report_error( "Same size assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Same size assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -246,7 +257,7 @@ inline void assert_size_less_than( const U_INT & SIZE, const U_INT & REF, const 
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) <= static_cast<unsigned long long>(REF) ) ) {
        
-         logger::impl::report_error( "Size less than assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Size less than assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -259,7 +270,7 @@ inline void assert_size_strictly_less_than( const U_INT & SIZE, const U_INT & RE
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) < static_cast<unsigned long long>(REF) ) ) {
        
-         logger::impl::report_error( "Size strictly less than assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Size strictly less than assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
@@ -272,13 +283,13 @@ inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, con
    if( ! TYPE_ERROR< INT_IN_ASSERT< U_INT >::value >::ASSERT_FAILED ) { // cast guard
       if( !static_cast< bool >( static_cast<unsigned long long>(IND) < static_cast<unsigned long long>(SIZE) ) ) {
       
-         logger::impl::report_error( "Index within size assertion failed. The process will now be terminated.", file, line, func );
+         logger::internal::report_error( "Index within size assertion failed. The process will now be terminated.", file, line, func );
          ProcSingleton::ExitProgram();
       }
    }
 }
 
-}   // namespace impl
+}   // namespace internal
 }   // namespace asserts
 
 #endif   // DOXYSKIP
@@ -293,7 +304,7 @@ inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, con
 *     \param EXPR bool expression which needs to be evaluated.
 */
 #define SN_REQUIRE( EXPR ) \
-do { asserts::impl::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -304,7 +315,7 @@ do { asserts::impl::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
 *     \param REF An instance of the same type as VAL which serves as reference for equality.
 */
 #define SN_REQUIRE_EQUAL( VAL, REF ) \
-do { asserts::impl::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -315,7 +326,7 @@ do { asserts::impl::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } wh
 *     \param REF An instance of the same type as VAL which serves as reference for equality.
 */
 #define SN_REQUIRE_FP_EQUAL( VAL, REF ) \
-do { asserts::impl::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -327,7 +338,7 @@ do { asserts::impl::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); }
 *     \param REF An instance of the same type as VAL which serves as reference for inequality.
 */
 #define SN_REQUIRE_INEQUAL( VAL, REF ) \
-do { asserts::impl::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -338,7 +349,7 @@ do { asserts::impl::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } 
 *     \param REF An instance of the same type as VAL which serves as reference for inequality.
 */
 #define SN_REQUIRE_FP_INEQUAL( VAL, REF ) \
-do { asserts::impl::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -349,7 +360,7 @@ do { asserts::impl::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ );
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_REQUIRE_LESS_THAN( VAL, REF ) \
-do { asserts::impl::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -360,7 +371,7 @@ do { asserts::impl::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); 
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_REQUIRE_LEQ( VAL, REF ) \
-do { asserts::impl::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -371,7 +382,7 @@ do { asserts::impl::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } whil
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_REQUIRE_GREATER_THAN( VAL, REF ) \
-do { asserts::impl::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -382,7 +393,7 @@ do { asserts::impl::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ 
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_REQUIRE_GREQ( VAL, REF ) \
-do { asserts::impl::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -392,7 +403,17 @@ do { asserts::impl::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } whi
 *     \param VAL An instance which needs to be zero valued.
 */
 #define SN_REQUIRE_ZERO( VAL ) \
-do { asserts::impl::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+
+
+
+/**   Run-time requirement that a value not be equal to zero in floating point arithmetic, failing which the program will exit with a 
+*     suitable error message. The macro will direct its output at the logger with information about the file, line and function.
+*
+*     \param VAL An instance which needs to be non-zero valued.
+*/
+#define SN_REQUIRE_NOT_ZERO( VAL ) \
+do { asserts::internal::assert_not_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -402,7 +423,7 @@ do { asserts::impl::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(fa
 *     \param VAL An instance which needs to be positive.
 */
 #define SN_REQUIRE_POSITIVE( VAL ) \
-do { asserts::impl::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -412,7 +433,7 @@ do { asserts::impl::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } whil
 *     \param VAL An instance which needs to be negative.
 */
 #define SN_REQUIRE_NEGATIVE( VAL ) \
-do { asserts::impl::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -423,7 +444,7 @@ do { asserts::impl::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } whil
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
 #define SN_REQUIRE_MSG( EXPR, MSG ) \
-do { asserts::impl::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -436,7 +457,7 @@ do { asserts::impl::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } w
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_REQUIRE_SIZE_SAME( SIZE, REF ) \
-do { asserts::impl::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                       __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -447,7 +468,7 @@ do { asserts::impl::assert_size_same( static_cast< const unsigned long >(SIZE), 
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_REQUIRE_SIZE_LESS_THAN( SIZE, REF ) \
-do { asserts::impl::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                            __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -459,7 +480,7 @@ do { asserts::impl::assert_size_less_than( static_cast< const unsigned long >(SI
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_REQUIRE_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
-do { asserts::impl::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                                     __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -470,7 +491,7 @@ do { asserts::impl::assert_size_strictly_less_than( static_cast< const unsigned 
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_REQUIRE_INDEX_WITHIN_SIZE( IND, REF ) \
-do { asserts::impl::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
                                               __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -511,7 +532,7 @@ do { asserts::impl::assert_index_within_size( static_cast< const unsigned long >
 *     \param EXPR bool expression which needs to be evaluated.
 */
 #define SN_ASSERT( EXPR ) \
-do { asserts::impl::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -522,7 +543,7 @@ do { asserts::impl::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
 *     \param REF An instance of the same type as VAL which serves as reference for equality.
 */
 #define SN_ASSERT_EQUAL( VAL, REF ) \
-do { asserts::impl::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -533,7 +554,7 @@ do { asserts::impl::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } wh
 *     \param REF An instance of the same type as VAL which serves as reference for equality.
 */
 #define SN_ASSERT_FP_EQUAL( VAL, REF ) \
-do { asserts::impl::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -544,7 +565,7 @@ do { asserts::impl::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); }
 *     \param REF An instance of the same type as VAL which serves as reference for inequality.
 */
 #define SN_ASSERT_INEQUAL( VAL, REF ) \
-do { asserts::impl::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -555,7 +576,7 @@ do { asserts::impl::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } 
 *     \param REF An instance of the same type as VAL which serves as reference for inequality.
 */
 #define SN_ASSERT_FP_INEQUAL( VAL, REF ) \
-do { asserts::impl::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -566,7 +587,7 @@ do { asserts::impl::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ );
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_ASSERT_LESS_THAN( VAL, REF ) \
-do { asserts::impl::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -577,7 +598,7 @@ do { asserts::impl::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); 
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_ASSERT_LEQ( VAL, REF ) \
-do { asserts::impl::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -588,7 +609,7 @@ do { asserts::impl::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } whil
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_ASSERT_GREATER_THAN( VAL, REF ) \
-do { asserts::impl::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -599,7 +620,7 @@ do { asserts::impl::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ 
 *     \param REF An instance of the same type as VAL which serves as reference for comparison.
 */
 #define SN_ASSERT_GREQ( VAL, REF ) \
-do { asserts::impl::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -609,7 +630,17 @@ do { asserts::impl::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } whi
 *     \param VAL An instance which needs to be zero valued.
 */
 #define SN_ASSERT_ZERO( VAL ) \
-do { asserts::impl::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+
+
+
+/**   DEBUG mode run-time requirement that a value not be equal to zero in floating point arithmetic, failing which the program will exit 
+*     with a suitable error message. The macro will direct its output at the logger with information about the file, line and function.
+*
+*     \param VAL An instance which needs to be non-zero valued.
+*/
+#define SN_ASSERT_NOT_ZERO( VAL ) \
+do { asserts::internal::assert_not_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -619,7 +650,7 @@ do { asserts::impl::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(fa
 *     \param VAL An instance which needs to be positive.
 */
 #define SN_ASSERT_POSITIVE( VAL ) \
-do { asserts::impl::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -629,7 +660,7 @@ do { asserts::impl::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } whil
 *     \param VAL An instance which needs to be negative.
 */
 #define SN_ASSERT_NEGATIVE( VAL ) \
-do { asserts::impl::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -640,7 +671,7 @@ do { asserts::impl::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } whil
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
 #define SN_ASSERT_MSG( EXPR, MSG ) \
-do { asserts::impl::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
+do { asserts::internal::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -653,7 +684,7 @@ do { asserts::impl::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } w
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_ASSERT_SIZE_SAME( SIZE, REF ) \
-do { asserts::impl::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                       __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -664,7 +695,7 @@ do { asserts::impl::assert_size_same( static_cast< const unsigned long >(SIZE), 
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_ASSERT_SIZE_LESS_THAN( SIZE, REF ) \
-do { asserts::impl::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                            __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -675,7 +706,7 @@ do { asserts::impl::assert_size_less_than( static_cast< const unsigned long >(SI
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
-do { asserts::impl::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
                                                     __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -687,7 +718,7 @@ do { asserts::impl::assert_size_strictly_less_than( static_cast< const unsigned 
 *     \param REF  An integer-valued container size reference.
 */
 #define SN_ASSERT_INDEX_WITHIN_SIZE( IND, REF ) \
-do { asserts::impl::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
+do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
                                               __FILE__, __LINE__, __func__ ); } while(false)
 
 #endif

@@ -31,6 +31,16 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace logger {
+namespace internal {
+bool eventWatchRegionSwitch_[] = { false, false };   // Here's a global!
+bool consoleSwitch_ = true;                          // Here's another global!
+}   // namespace internal
+}   // namespace logger
+#endif   // DOXYSKIP
+
+
 /** The buffer must be flushed after streaming to ensure output.
 *
 *   \param write   A flag which decides whether or not the buffer will be written to process' log file.
@@ -42,50 +52,84 @@ void Logger::flushBuffer( flag_t _write ) {
    
    static std::mutex proc_cout_mutex;
    std::lock_guard< std::mutex > cout_lock( proc_cout_mutex );   // std::cout is also a shared, 'external' resource.
-   std::cout << buffer_.str() << std::endl;
+   if( logger::internal::consoleSwitch_ )
+      std::cout << buffer_.str() << std::endl;
    buffer_.str( std::string() );
 }
 
 
 
-/** This function writes the buffer to process' log file with name, "<executable_name>_log_on_proc<process_rank>". */
+/** This function writes the buffer to process' log file with name, "<executable_name>_log_on_proc<process_rank>".
+*   Notes on exception safety: this function has a basic exception safety guarantee. It will throw IOError exceptions upon failure to 
+*   open, write or close the log file.
+*/
 void Logger::writeLog() {
    
    static std::mutex proc_file_mutex;   // Looks like lazy initialization; mutex is shared resource.
    static std::ofstream file;           // owned by process, not threads.
    
+   file.exceptions( std::ios_base::badbit );   // Exceptions to be thrown only for serious (non-logic) errors.
+   
    std::lock_guard< std::mutex > file_lock( proc_file_mutex );   // Thread safety
+
+   time_t _now = time(nullptr);                                  // Time stamp
    
-   file.open( ProcSingleton::getExecName() + "_log_on_proc" + std::to_string( SN_MPI_RANK() ), std::ios_base::app );
-   if( ! file.is_open() ) {
-   
-      real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-      fixFP(2);
-      std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
-                << "][FILE ERROR ]:   Could not open the log file for logger. "
-                << "The program will continue but the buffer was not written to process' log file in this instance.";
-      unfixFP();
+   try {
+      file.open( ProcSingleton::getExecName() + "_log_on_proc" + std::to_string( SN_MPI_RANK() ), std::ios_base::app );
+   }
+   catch( const std::ios_base::failure & ex ) {
       
-      return;
+      if( logger::internal::consoleSwitch_ ) {
+      
+         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
+         fixFP(2);
+         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+                   << "][FILE ERROR ]:   Could not open the log file for logger. A standard exception was caught. "
+                   << "Type: std::ios_base::failure; string: " << ex.what()
+                   << ". The program will continue but the buffer was not written to process' log file in this instance." << std::endl;
+         unfixFP();
+      }
+      
+      //SN_THROW_IO_ERROR( "IO_Log_File_Open_Error" );
+      throw IOError( "Hi" );
    }
    
-   time_t _now = time(nullptr);
    try {
       file << std::endl << ctime( &_now) << buffer_.str() << std::endl << std::endl;
    } 
-   catch( const std::exception & ex ) {
-
-      real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-      fixFP(2);
-      std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
-                << "][EXCEPTION CAUGHT ]: A standard exception was caught during the writing of the log file. "
-                << "The program will continue but the buffer was not written to process' log file in this instance. "
-                << ex.what() << std::endl;
-      unfixFP();
+   catch( const std::ios_base::failure & ex ) {
       
-      throw;
+      if( logger::internal::consoleSwitch_ ) {
+      
+         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
+         fixFP(2);
+         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+                   << "][EXCEPTION CAUGHT ]: A standard exception was caught during the writing of the log file. "
+                   << "Type: std::ios_base::failure; string: " << ex.what()
+                   << ". The program will continue but the buffer was not written to process' log file in this instance. "
+                   << std::endl;
+         unfixFP();
+      }
+      
+      //SN_THROW_IO_ERROR( "IO_Log_Write_To_File_Error" );
    }
-   file.close();
+   
+   try {
+      file.close();
+   }
+   catch( const std::ios_base::failure & ex ) {
+
+      if( logger::internal::consoleSwitch_ ) {
+         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
+         fixFP(2);
+         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+                   << "][EXCEPTION CAUGHT ]: A standard exception was caught while closing the log file. "
+                   << "Type: std::ios_base::failure; string: " << ex.what() << std::endl;
+         unfixFP();
+      }
+      
+      //SN_THROW_IO_ERROR( "IO_Log_Close_File_Error" );
+   }
 }
 
 
@@ -104,10 +148,11 @@ Logger::~Logger() {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace logger {
-namespace impl {
+namespace internal {
 
-bool eventWatchRegionSwitch_[] = { false, false };   // Here's a global!
-
+void toggleConsole( bool _switch ) {
+   consoleSwitch_ = _switch;
+}
 
 void print_message( const std::string & msg ) {
 
@@ -250,7 +295,7 @@ void report_L2_event( const std::string & file, int line, const std::string & fu
 
 void watch_impl( Logger & ) {}
 
-}   // namespace impl
+}   // namespace internal
 }   // namespace logger
 #endif   //DOXYSKIP
 

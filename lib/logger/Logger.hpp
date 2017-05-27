@@ -39,7 +39,7 @@ namespace simpleNewton {
 enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBcast, MPIIbcast, 
                            MPIWait, MPIWaitAll, Other };
 
-//==========================================================================================================================================
+//===CLASS==================================================================================================================================
 
 /** This class serves as the primary logging tool for the simpleNewton framework. Its features can be listed as such - lightweight, thread- 
 *   and basic exception safe.
@@ -51,7 +51,7 @@ class Logger {
 public:
    
    ///////////////////////////////
-   ///   Floating point formatting
+   //   Floating point formatting
    ///////////////////////////////
    
    /** \name Floating point output formatting
@@ -84,7 +84,7 @@ public:
    /** @} */
    
    //////////////////////////
-   ///   Lifecycle management
+   //   Lifecycle management
    //////////////////////////
 
    /** \name Constructors and destructor 
@@ -105,7 +105,7 @@ public:
    /** @} */
    
    ///////////////////////////
-   ///   Primary functionality
+   //   Primary functionality
    ///////////////////////////
    
    /** \name Primary functionality

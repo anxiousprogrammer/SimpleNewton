@@ -73,7 +73,7 @@ public:
       data_[0] = v1;
       data_[1] = v2;
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 DIC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 DIC)" );
    }
    
    /** Near-default copy constructor.
@@ -81,7 +81,7 @@ public:
    *   \param _ref   The reference Vector2 object whose values are to be used for initialization.
    */
    Vector2( const Vector2<TYPE_T> & _ref ) : FArray<TYPE_T, 2>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 CC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 CC)" );
    }
    
    /** Near-default move constructor.
@@ -89,12 +89,12 @@ public:
    *   \param _ref   The Vector2 object whose values are to be used for initialization.
    */
    Vector2( Vector2<TYPE_T> && _ref ) : FArray<TYPE_T, 2>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 MC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 MC)" );
    }
    
    /** Near-default destructor. */
    ~Vector2() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 Destr.)" );
    }
    
    /** @} */
@@ -251,7 +251,7 @@ private:
       data_[0] = v1;
       data_[1] = v2;
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t TC)" );
    }
 public:
    
@@ -263,7 +263,7 @@ public:
    *   \param _ref   The reference Vector2_t object whose values are to be used for initialization.
    */
    Vector2_t( const Vector2_t<TYPE_T> & _ref ) : FArray<TYPE_T, 2>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t CC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t CC)" );
    }
    
    /** Near-default move constructor.
@@ -271,12 +271,12 @@ public:
    *   \param _ref   The reference Vector2_t object whose values are to be used for initialization.
    */
    Vector2_t( Vector2_t<TYPE_T> && _ref ) : FArray<TYPE_T, 2>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t MC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t MC)" );
    }
    
    /** Near-default destructor */
    ~Vector2_t() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 2"
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 2"
                                                         << " (from Vector2_t Destr.)" );
    }
    

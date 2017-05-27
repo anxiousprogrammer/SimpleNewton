@@ -74,7 +74,7 @@ public:
       data_[2] = v3;
       data_[3] = v4;
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 TC)" );
    }
    
    /** Near-default copy constructor.
@@ -82,7 +82,7 @@ public:
    *   \param _ref   The reference Matrix2 object.
    */
    Matrix2( const Matrix2<TYPE_T> & _ref ) : FArray<TYPE_T, 4>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 CC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 CC)" );
    }
    
    /** Near-default move constructor.
@@ -90,12 +90,12 @@ public:
    *   \param _ref   The rvalue Matrix2 object which serves as the source of data.
    */
    Matrix2( Matrix2<TYPE_T> && _ref ) : FArray<TYPE_T, 4>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 MC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 MC)" );
    }
    
    /** Near-default destructor.*/
    ~Matrix2() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 4" << " (from Matrix2 Destr.)" );
    }
    
    /** @} */
@@ -190,15 +190,15 @@ public:
    
    /** Multiplication operator: operand is a 2x2 matrix.
    *
-   *   \param operand   A 2x2 matrix with whom the matrix is to be multiplied.
+   *   \param op        A 2x2 matrix with whom the matrix is to be multiplied.
    *   \return          A Matrix2 object which is the result of the multiplication.
    */
-   template< typename T > Matrix2<T> operator*( const Matrix2<T> & op2 ) {
+   template< typename T > Matrix2<T> operator*( const Matrix2<T> & op ) {
    
-      return Matrix2<T>( data_[0] * op2.data_[0] + data_[1] * op2.data_[2], 
-                         data_[0] * op2.data_[1] + data_[1] * op2.data_[3],
-                         data_[2] * op2.data_[0] + data_[3] * op2.data_[2], 
-                         data_[2] * op2.data_[1] + data_[3] * op2.data_[3] );
+      return Matrix2<T>( data_[0] * op.data_[0] + data_[1] * op.data_[2], 
+                         data_[0] * op.data_[1] + data_[1] * op.data_[3],
+                         data_[2] * op.data_[0] + data_[3] * op.data_[2], 
+                         data_[2] * op.data_[1] + data_[3] * op.data_[3] );
    }
    
    /** Multiplication operator: operand is a scalar.

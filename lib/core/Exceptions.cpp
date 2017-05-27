@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains implementations of the exceptions classes of the simpleNewton framework.
+///   Contains implementations of the exceptions classes of the framework.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>

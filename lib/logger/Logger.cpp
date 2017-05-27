@@ -43,7 +43,7 @@ bool consoleSwitch_ = true;                          // Here's another global!
 
 /** The buffer must be flushed after streaming to ensure output.
 *
-*   \param write   A flag which decides whether or not the buffer will be written to process' log file.
+*   \param _write   A flag which decides whether or not the buffer will be written to process' log file.
 */
 void Logger::flushBuffer( flag_t _write ) {
 
@@ -90,8 +90,7 @@ void Logger::writeLog() {
          unfixFP();
       }
       
-      //SN_THROW_IO_ERROR( "IO_Log_File_Open_Error" );
-      throw IOError( "Hi" );
+      SN_THROW_IO_ERROR( "IO_Log_File_Open_Error" );
    }
    
    try {
@@ -111,7 +110,7 @@ void Logger::writeLog() {
          unfixFP();
       }
       
-      //SN_THROW_IO_ERROR( "IO_Log_Write_To_File_Error" );
+      SN_THROW_IO_ERROR( "IO_Log_Write_To_File_Error" );
    }
    
    try {
@@ -128,7 +127,7 @@ void Logger::writeLog() {
          unfixFP();
       }
       
-      //SN_THROW_IO_ERROR( "IO_Log_Close_File_Error" );
+      SN_THROW_IO_ERROR( "IO_Log_Close_File_Error" );
    }
 }
 

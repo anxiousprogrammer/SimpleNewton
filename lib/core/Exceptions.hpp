@@ -24,10 +24,10 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains all the exception classes for the modules of the simpleNewton framework. These can be classified under logical errors 
-///   (invalid arguments, pre-condition errors, domain errors, size errors and out of range errors) and run-time errors (range, overflow, 
-///   underflow, input/output, functor, allocation, allocation size errors and MPI errors), and are derived from their respective standard 
-///   library representatives.
+///   Contains all the exception classes for the modules of the framework. These can be classified under logical errors (invalid arguments, 
+///   pre-condition errors, domain errors, size errors and out of range errors) and run-time errors (range, overflow, underflow, input/
+///   output, functor, allocation, allocation size errors and MPI errors), and are derived from their respective standard library 
+///   representatives.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>

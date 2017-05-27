@@ -114,7 +114,8 @@ public:
 *   of the MPI send operation is not MPI_SUCCESS.
 *
 *   \tparam TYPE_T   Datatype of the array, which must be basic as defined by the BasicTypeTraits library.
-*   \param buff     Array which contains the message to be sent/array which will receive the message.
+*   \param sbuff     Array which contains the message to be sent.
+*   \param rbuff     Array which will receive the message.
 *   \param source    The rank of the sending process.
 *   \param target    The rank of the receiving process.
 */
@@ -152,7 +153,7 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
    SN_MPI_PROC_REGION( source ) {
 
       // Sendd the contents of sbuff right away!
-      info = MPI_Send( sbuff.data_, sbuff.size_, types::DTInfo< TYPE_T >::mpi_type, target, tag, MPI_COMM_WORLD );
+      info = MPI_Send( sbuff.data_, sbuff.size_, DTInfo< TYPE_T >::mpi_type, target, tag, MPI_COMM_WORLD );
    
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -163,7 +164,7 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISend, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISend, "[ " << DTInfo< TYPE_T >::mpi_name
                                                      << ", " << std::to_string( sbuff.size_ ) << " ], "
                                                      << std::to_string( source ) << ", " << std::to_string( target )
                                                      << " --tag" << std::to_string( tag ) );
@@ -187,20 +188,20 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
       #endif
       
       // Get the size
-      MPI_Get_count( &stat, types::DTInfo< TYPE_T >::mpi_type, &recv_size );
+      MPI_Get_count( &stat, DTInfo< TYPE_T >::mpi_type, &recv_size );
       
       // Resize receiving container.
       rbuff.resize( recv_size );
       
       // Now receive the whole thing.
-      info = MPI_Recv( rbuff.data_, recv_size, types::DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, 
+      info = MPI_Recv( rbuff.data_, recv_size, DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, 
                        &stat );
       
       // Check status - count
       SN_ASSERT_EQUAL( stat.MPI_SOURCE, source );
       
       int count = 0;
-      MPI_Get_count( &stat, types::DTInfo< TYPE_T >::mpi_type, &count );
+      MPI_Get_count( &stat, DTInfo< TYPE_T >::mpi_type, &count );
       SN_ASSERT_EQUAL( count, recv_size );
       
       #ifdef NDEBUG
@@ -209,7 +210,7 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIRecv, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIRecv, "[ " << DTInfo< TYPE_T >::mpi_name
                                                      << ", " << std::to_string( recv_size ) << " ], "
                                                      << std::to_string( source ) << ", " << std::to_string( target ) );
    }
@@ -265,7 +266,7 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
    // Decision: the if-conditionals are evaluated at compile time.
    if( SMODE == MPISendMode::Standard ) {
       
-      info = MPI_Send( buff.data_, buff.getSize(), types::DTInfo< TYPE_T >::mpi_type, target, tag, MPI_COMM_WORLD );
+      info = MPI_Send( buff.data_, buff.getSize(), DTInfo< TYPE_T >::mpi_type, target, tag, MPI_COMM_WORLD );
       
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -276,14 +277,14 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISend, "[ " << types::DTInfo< TYPE_T >::mpi_name 
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISend, "[ " << DTInfo< TYPE_T >::mpi_name 
                                                      << ", " << std::to_string(buff.getSize()) << "], " 
                                                      << std::to_string(SN_MPI_RANK()) << ", " << std::to_string(target)
                                                      << " --tag" << std::to_string( tag ) );
    }
    else if( SMODE == MPISendMode::Synchronous ) {
       
-      info = MPI_Ssend( buff.data_, buff.getSize(), types::DTInfo< TYPE_T >::mpi_type, target, tag++, MPI_COMM_WORLD );
+      info = MPI_Ssend( buff.data_, buff.getSize(), DTInfo< TYPE_T >::mpi_type, target, tag++, MPI_COMM_WORLD );
       
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -294,14 +295,14 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISsend, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPISsend, "[ " << DTInfo< TYPE_T >::mpi_name
                                                       << ", " << std::to_string(buff.getSize()) << "], "
                                                       << std::to_string(SN_MPI_RANK()) << ", " << std::to_string(target)
                                                       << " --tag" << std::to_string( tag ) );
    }
    else if( SMODE == MPISendMode::Immediate ) {
       
-      info = MPI_Isend( buff.data_, buff.getSize(), types::DTInfo< TYPE_T >::mpi_type, target, tag++, MPI_COMM_WORLD, 
+      info = MPI_Isend( buff.data_, buff.getSize(), DTInfo< TYPE_T >::mpi_type, target, tag++, MPI_COMM_WORLD, 
                         mpiR );
       
       // Run-time error checking
@@ -313,7 +314,7 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIsend, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIsend, "[ " << DTInfo< TYPE_T >::mpi_name
                                                       << ", " << std::to_string(buff.getSize()) << "], " 
                                                       << std::to_string(SN_MPI_RANK()) << ", " << std::to_string(target)
                                                       << " --tag" << std::to_string( tag - 1 ) );
@@ -382,7 +383,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
    // Decision: the if conditionals are evaluated at compile time
    if( RMODE == MPIRecvMode::Standard ) {
       
-      info = MPI_Recv( buff.data_, size, types::DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, &stat );
+      info = MPI_Recv( buff.data_, size, DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, &stat );
       
       // Run-time error checking - success
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -393,14 +394,14 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIRecv, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIRecv, "[ " << DTInfo< TYPE_T >::mpi_name
                                                      << ", " << std::to_string(size) << " ], "
                                                      << std::to_string(source) << ", " << std::to_string(SN_MPI_RANK()) );
       // Check status - count
       SN_ASSERT_EQUAL( stat.MPI_SOURCE, source );
       
       int count = 0; 
-      MPI_Get_count( &stat, types::DTInfo< TYPE_T >::mpi_type, &count );
+      MPI_Get_count( &stat, DTInfo< TYPE_T >::mpi_type, &count );
       
       SN_ASSERT_EQUAL( count, size );
       
@@ -414,7 +415,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
       
       mpiR.setTransferCount( size );
       
-      info = MPI_Irecv( buff.data_, size, types::DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, mpiR );
+      info = MPI_Irecv( buff.data_, size, DTInfo< TYPE_T >::mpi_type, source, MPI_ANY_TAG, MPI_COMM_WORLD, mpiR );
       
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -425,7 +426,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIrecv, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIrecv, "[ " << DTInfo< TYPE_T >::mpi_name
                                                       << ", " << std::to_string(size) << " ], "
                                                       << std::to_string(source) << ", " << std::to_string(SN_MPI_RANK()) );
    }
@@ -499,7 +500,7 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
    }
    
    /* Next, the actual message */
-   info = MPI_Bcast( buff.data_, size_msg, types::DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD );
+   info = MPI_Bcast( buff.data_, size_msg, DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD );
    
    // Run-time error checking
    SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -510,7 +511,7 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
    }
    #endif
    
-   SN_LOG_REPORT_L1_EVENT( LogEventType::MPIBcast, "[ " << types::DTInfo< TYPE_T >::mpi_name
+   SN_LOG_REPORT_L1_EVENT( LogEventType::MPIBcast, "[ " << DTInfo< TYPE_T >::mpi_name
                                                    << ", " << std::to_string(size_msg) << " ], "
                                                    << std::to_string(source) );
    
@@ -576,7 +577,7 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
    /* Decision */
    if( BCMODE == MPIBcastMode::Standard ) {
       
-      info = MPI_Bcast( buff.data_, size, types::DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD );
+      info = MPI_Bcast( buff.data_, size, DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD );
       
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -587,13 +588,13 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIBcast, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIBcast, "[ " << DTInfo< TYPE_T >::mpi_name
                                                       << ", " << std::to_string(size) << " ], "
                                                       << std::to_string(source) );
    }
    else if( BCMODE == MPIBcastMode::Immediate ) {
       
-      info = MPI_Ibcast( buff.data_, size, types::DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD, mpiR );
+      info = MPI_Ibcast( buff.data_, size, DTInfo< TYPE_T >::mpi_type, source, MPI_COMM_WORLD, mpiR );
       
       // Run-time error checking
       SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -604,7 +605,7 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
       }
       #endif
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIbcast, "[ " << types::DTInfo< TYPE_T >::mpi_name
+      SN_LOG_REPORT_L1_EVENT( LogEventType::MPIIbcast, "[ " << DTInfo< TYPE_T >::mpi_name
                                                        << ", " << std::to_string(size) << " ], "
                                                        << std::to_string(source) );
    }
@@ -659,7 +660,7 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
    
    // Check status: Has every little bit of data arrived as expected?
    int actual_transfer_count = 0;
-   MPI_Get_count( &stat, types::DTInfo< TYPE_T >::mpi_type, &actual_transfer_count );
+   MPI_Get_count( &stat, DTInfo< TYPE_T >::mpi_type, &actual_transfer_count );
 
    // Run-time error checking - success and count
    SN_ASSERT_EQUAL( info, MPI_SUCCESS );
@@ -741,7 +742,7 @@ void BaseComm<TYPE_T>::waitAll( int count, MPIRequest< TYPE_T > & req ) {
   
       // Check status: Has every little bit of data arrived as expected?
       int actual_transfer_count = 0;
-      MPI_Get_count( &stat.data_[i], types::DTInfo< TYPE_T >::mpi_type, &actual_transfer_count );
+      MPI_Get_count( &stat.data_[i], DTInfo< TYPE_T >::mpi_type, &actual_transfer_count );
       
       // Run-time error checking - count
       SN_ASSERT_EQUAL( static_cast< small_t >( actual_transfer_count ), req.getTransferCount(i) );

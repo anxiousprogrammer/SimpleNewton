@@ -80,7 +80,7 @@ public:
       data_[3] = v4; data_[4] = v5; data_[5] = v6;
       data_[6] = v7; data_[7] = v8; data_[8] = v9;
      
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 TC)" );
    }
    
    /** Near-default copy constructor.
@@ -88,7 +88,7 @@ public:
    *   \param _ref   The reference Matrix3 object.
    */
    Matrix3( const Matrix3<TYPE_T> & _ref ) : FArray<TYPE_T, 9>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 CC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 CC)" );
    }
    
    /** Near-default move constructor.
@@ -96,12 +96,12 @@ public:
    *   \param _ref   The rvalue Matrix3 object which serves as the source of data.
    */
    Matrix3( Matrix3<TYPE_T> && _ref ) : FArray<TYPE_T, 9>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 MC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 MC)" );
    }
    
    /** Near-default destructor.*/
    ~Matrix3() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 9" << " (from Matrix3 Destr.)" );
    }
    
    /** @} */
@@ -203,21 +203,21 @@ public:
    
    /** Multiplication operator: operand is a Matrix3 object.
    *
-   *   \param operand   A 3x3 matrix with which the matrix is to be multiplied.
+   *   \param op        A 3x3 matrix with which the matrix is to be multiplied.
    *   \return          A Matrix3 object which is the result of the multiplication.
    */
    template< typename T >
-   Matrix3<T> operator*( const Matrix3<T> & op2 ) {
+   Matrix3<T> operator*( const Matrix3<T> & op ) {
    
-      return Matrix3<T>( data_[0] * op2.data_[0] + data_[1] * op2.data_[3] + data_[2] * op2.data_[6],
-                         data_[0] * op2.data_[1] + data_[1] * op2.data_[4] + data_[2] * op2.data_[7],
-                         data_[0] * op2.data_[2] + data_[1] * op2.data_[5] + data_[2] * op2.data_[8],
-                         data_[3] * op2.data_[0] + data_[4] * op2.data_[3] + data_[5] * op2.data_[6],
-                         data_[3] * op2.data_[1] + data_[4] * op2.data_[4] + data_[5] * op2.data_[7],
-                         data_[3] * op2.data_[2] + data_[4] * op2.data_[5] + data_[5] * op2.data_[8],
-                         data_[6] * op2.data_[0] + data_[7] * op2.data_[3] + data_[8] * op2.data_[6],
-                         data_[6] * op2.data_[1] + data_[7] * op2.data_[4] + data_[8] * op2.data_[7],
-                         data_[6] * op2.data_[2] + data_[7] * op2.data_[5] + data_[8] * op2.data_[8] );
+      return Matrix3<T>( data_[0] * op.data_[0] + data_[1] * op.data_[3] + data_[2] * op.data_[6],
+                         data_[0] * op.data_[1] + data_[1] * op.data_[4] + data_[2] * op.data_[7],
+                         data_[0] * op.data_[2] + data_[1] * op.data_[5] + data_[2] * op.data_[8],
+                         data_[3] * op.data_[0] + data_[4] * op.data_[3] + data_[5] * op.data_[6],
+                         data_[3] * op.data_[1] + data_[4] * op.data_[4] + data_[5] * op.data_[7],
+                         data_[3] * op.data_[2] + data_[4] * op.data_[5] + data_[5] * op.data_[8],
+                         data_[6] * op.data_[0] + data_[7] * op.data_[3] + data_[8] * op.data_[6],
+                         data_[6] * op.data_[1] + data_[7] * op.data_[4] + data_[8] * op.data_[7],
+                         data_[6] * op.data_[2] + data_[7] * op.data_[5] + data_[8] * op.data_[8] );
    }
    
    /** Multiplication operator: operand is a scalar.

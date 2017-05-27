@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Hack CPP: changes to header won't recompile all source files using it if it were its own unit.
+///   Pure compilation unit for the header, Asserts.
 ///   \file
 ///   \addtogroup asserts Asserts
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>

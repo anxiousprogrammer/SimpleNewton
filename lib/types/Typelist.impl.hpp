@@ -1,27 +1,32 @@
-/**||**************************************************************************************************************************************|
-*
-*   Description: Simple Newton's typelist implementation
-*
-|***************************************************************************************************************************************///+
+//==========================================================================================================================================
+//
+//  This file is part of simpleNewton. simpleNewton is free software: you can 
+//  redistribute it and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation, either version 3 of 
+//  the License, or (at your option) any later version.
+//  
+//  simpleNewton is distributed in the hope that it will be useful, but WITHOUT 
+//  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+//  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+//  for more details.
+//  
+//  You should have received a copy of the GNU General Public License along
+//  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
+//
+///   Contains the implementation of the internal structures of the typelist.
+///   \file
+///   \addtogroup types Types
+///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
+//
+//==========================================================================================================================================
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+/** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 namespace typelist {
-namespace impl {
 
-// Specialization -> tail-end of the typelist.
-template< class TAIL >
-struct typeNodes< TAIL > {
-   using head = TAIL;
-   using tail = NullType;
-};
-
-// Specialization -> Typelist peeler (note: recursive inheritance)
-template< class H, class... TYPES >
-struct typeNodes<H, TYPES...> : typeNodes<TYPES...> {
-   using head = H;
-   using tail = typeNodes<TYPES...>;
-};
-
+namespace internal {
 
 /*****************************************************************************************************************************************|
 *
@@ -35,14 +40,14 @@ struct typeNodes<H, TYPES...> : typeNodes<TYPES...> {
 /* Calculate length operation */
 // Terminator full specialization
 template< class TAIL >
-struct typeNodes_length< typeNodes< TAIL > > {
+struct length< TAIL > {
    enum { result = 1 };
 };
 
 // Recursive specialization
 template< class H, class... TYPES >
-struct typeNodes_length< typeNodes< H, TYPES... > > {
-   enum { result = 1 + typeNodes_length< typeNodes<TYPES...> >::result };
+struct length< H, TYPES... > {
+   enum { result = 1 + length< TYPES... >::result };
 };
 /* End: Calculate length operation */
 //+****************************************************************************************************************************************
@@ -75,7 +80,7 @@ struct is_in_list< TYPE, HEAD, TAIL...> {
 /* Append typelist operation */
 // Full definition
 template< class... ALL_TYPES >
-struct typeNodes_append {
+struct append {
    using list = SN_CT_TYPELIST< ALL_TYPES... >;
 };
 /* End: Append typelist operation */
@@ -86,12 +91,12 @@ struct typeNodes_append {
 /* Concatenate typelist operation */
 // Work-around full specialization: we pass typelist as argument but extract the template arguments by compiler-deducing them.
 template< class... NEW_TYPES, class... TYPES >
-struct typeNodes_concatenate< SN_CT_TYPELIST<NEW_TYPES...>, TYPES... > {
+struct concatenate< SN_CT_TYPELIST<NEW_TYPES...>, TYPES... > {
    using list = SN_CT_TYPELIST< TYPES..., NEW_TYPES... >;
 };
 // Partial specilization for empty typelist: sometimes we WANT empty typelists, especially when operating on other typelists.
 template< class... TYPES >
-struct typeNodes_concatenate< SN_CT_TYPELIST<NullType>, TYPES... > {
+struct concatenate< SN_CT_TYPELIST<NullType>, TYPES... > {
    using list = SN_CT_TYPELIST< TYPES... >;
 };
 /* End: Append typelist operation */
@@ -102,24 +107,24 @@ struct typeNodes_concatenate< SN_CT_TYPELIST<NullType>, TYPES... > {
 /* Remove a type from typelist operation */
 // 'Acting' specialization
 template< class REM_T, class... TAIL >
-struct typeNodes_remove< REM_T, REM_T, TAIL... > {
-   using list = typename typeNodes_remove< REM_T, TAIL... >::list;
+struct remove< REM_T, REM_T, TAIL... > {
+   using list = typename remove< REM_T, TAIL... >::list;
 };
 
 // Terminator specialization(s)
 template< class REM_T, class END >
-struct typeNodes_remove< REM_T, END > {
+struct remove< REM_T, END > {
    using list = SN_CT_TYPELIST< END >;
 };
 template< class REM_T >
-struct typeNodes_remove< REM_T, REM_T > {
+struct remove< REM_T, REM_T > {
    using list = SN_CT_TYPELIST< NullType >;
 };
 
 // Recursive specialization
 template< class REM_T, class HEAD, class... TAIL >
-struct typeNodes_remove< REM_T, HEAD, TAIL... > {
-   using list = typename SN_CT_TYPELIST< HEAD >::template concatenateList< typename typeNodes_remove< REM_T, TAIL... >::list >;
+struct remove< REM_T, HEAD, TAIL... > {
+   using list = typename SN_CT_TYPELIST< HEAD >::template concatenateList< typename remove< REM_T, TAIL... >::list >;
 };
 /* End: Append typelist operation */
 //+****************************************************************************************************************************************
@@ -128,23 +133,27 @@ struct typeNodes_remove< REM_T, HEAD, TAIL... > {
 //+****************************************************************************************************************************************
 /* Remove duplicates from typelist operation */
 // Empty specialization
-template<> struct typeNodes_removeDuplicates< NullType > {
+template<> struct removeDuplicates< NullType > {
    using list = SN_CT_TYPELIST< NullType >;
 };
 
 // Terminator specialization
 template< class END > 
-struct typeNodes_removeDuplicates< END > {
+struct removeDuplicates< END > {
    using list = SN_CT_TYPELIST< END >;
 };
 
 // Recursive specialization
 template< class HEAD, class... TAIL >
-struct typeNodes_removeDuplicates< HEAD, TAIL... > {
+struct removeDuplicates< HEAD, TAIL... > {
+
 private:
-   using R1 = typename typeNodes_removeDuplicates< TAIL... >::list;
+
+   using R1 = typename removeDuplicates< TAIL... >::list;
    using R2 = typename R1::template removeFromList< HEAD >;
+
 public:
+
    using list = typename SN_CT_TYPELIST< HEAD >::template concatenateList< R2 >;
 };
 /* End: Append typelist operation */
@@ -153,3 +162,5 @@ public:
 }   // namespace impl
 }   // namespace typelist
 }   // namespace simpleNewton
+
+#endif   // DOXYSKIP

@@ -73,7 +73,7 @@ public:
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 TC)" );
    }
    
    /** Near-default copy constructor.
@@ -81,7 +81,7 @@ public:
    *   \param _ref   The reference Vector3 object whose values are to be used for initialization.
    */
    Vector3( const Vector3<TYPE_T> & _ref ) : FArray<TYPE_T, 3>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 CC1)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 CC1)" );
    }
    
    /** Near-default move constructor.
@@ -89,12 +89,12 @@ public:
    *   \param _ref   The reference Vector3 object whose values are to be used for initialization.
    */
    Vector3( Vector3<TYPE_T> && _ref ) : FArray<TYPE_T, 3>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 MC1)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 MC1)" );
    }
    
    /** Near-default destructor. */
    ~Vector3() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 Destr.)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3 Destr.)" );
    }
    
    /** @} */
@@ -252,7 +252,7 @@ private:
       data_[0] = v1;
       data_[1] = v2;
       data_[2] = v3;
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t TC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t TC)" );
    }
    
 public:
@@ -265,7 +265,7 @@ public:
    *   \param _ref   The reference Vector3_t object whose values are to be used for initialization.
    */
    Vector3_t( const Vector3_t<TYPE_T> & _ref ) : FArray<TYPE_T, 3>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t CC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t CC)" );
    }
    
    /** Near-default move constructor.
@@ -273,12 +273,12 @@ public:
    *   \param _ref   The reference Vector3_t object whose values are to be used for initialization.
    */
    Vector3_t( Vector3_t<TYPE_T> && _ref ) : FArray<TYPE_T, 3>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t MC)" );
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 3" << " (from Vector3_t MC)" );
    }
    
    /** Near-default destructor. */
    ~Vector3_t() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << types::DTInfo< TYPE_T >::name << ", 3"
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 3"
                                                         << " (from Vector3_t Destr.)" );
    }
    

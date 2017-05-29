@@ -17,7 +17,7 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 SET_PROPERTY( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release )
 
-option( SN_EXCEPTION_WITH_FUNC_LINE_INFO   "Exceptions will carry function and line information"    ON  )
+option( SN_EXCEPTION_FUNC_LINE_INFO        "Exceptions will carry function and line information"    ON  )
 option( SN_LOGLEVEL_ERROR                  "Enables logging of errors"                              ON  )
 option( SN_LOGLEVEL_WARNING                "Enables logging of warnings"                            ON  )
 option( SN_LOGLEVEL_WATCH                  "Enables watching of variables"                          ON  )
@@ -73,7 +73,7 @@ endif()
 if( CMAKE_BUILD_TYPE MATCHES Release )
    add_definitions( -DNDEBUG )
 endif()
-if( SN_EXCEPTION_WITH_FUNC_LINE_INFO )
+if( SN_EXCEPTION_FUNC_LINE_INFO )
    add_definitions( -D__SN_EXCEPTION_WITH_FUNC_LINE_INFO__ )
 endif()
 if( SN_LOGLEVEL_ERROR )
@@ -122,18 +122,10 @@ include_directories( "${simpleNewton_SOURCE_DIR}/lib" )
 
 add_subdirectory( lib )
 
-set( BASIC_LIBRARIES ASSERTS LOGGER PROCMAN EXCEPTIONS TYPES )   # Opposite order makes sure dependencies are taken care of
-
-if( SN_USE_MPI )
-   set( BASIC_LIBRARIES ${BASIC_LIBRARIES} ${MPI_CXX_LIBRARIES} MPI )
-endif()
+set( BASIC_LIBRARIES ASSERTS LOGGER PROCMAN MPI OMP EXCEPTIONS TYPES )   # Opposite order makes sure dependencies are taken care of
 
 #if( SN_USE_MULTITHREADING )
 #   set( BASIC_LIBRARIES ${BASIC_LIBRARIES} CONCURRENCY )
-#endif()
-
-#if( SN_USE_OPENMP )
-#   set( BASIC_LIBRARIES ${BASIC_LIBRARIES} OMP )
 #endif()
 
 set( ALL_LIBRARIES ${BASIC_LIBRARIES} BASICTYPETRAITS TYPECONSTRAINTS CONTAINERS )

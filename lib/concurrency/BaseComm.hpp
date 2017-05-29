@@ -16,10 +16,6 @@
 #include <containers/mpi/OpenMPIBuffer.hpp>
 #include <containers/mpi/MPIRequest.hpp>
 
-
-/** The space in which all global entities of the framework are accessible */
-namespace simpleNewton {
-
 /** The count after which it is desired to reset the MPI tags. */
 #define __SN_MPI_LARGE_MESSAGE_COUNT__   1000
 
@@ -44,6 +40,9 @@ namespace simpleNewton {
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //=========================================================================================================================================
+
+/** The space in which all global entities of the framework are accessible */
+namespace simpleNewton {
 
 /** An enum which is used to select the type of MPI send operation: MPI_Send, MPI_Ssend or MPI_Isend */
 enum class MPISendMode   { Standard, Synchronous, Immediate };
@@ -124,6 +123,17 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)sbuff.getSize();
+   (void)rbuff.getSize();
+   (void)source;
+   (void)target;
+   
+   #endif   // MPI Guard
+   
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {      // Running with MPI but only 1 proc
       return;
    }
@@ -135,13 +145,13 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
    SN_ASSERT_LESS_THAN( source, SN_MPI_SIZE() );
    SN_ASSERT_LESS_THAN( target, SN_MPI_SIZE() );
    
+   #ifdef __SN_USE_MPI__   // MPI Guard
+   
    #ifdef NDEBUG
    if( sbuff.size_ <= 0 || target < 0 || target >= SN_MPI_SIZE() || source < 0 || source >= SN_MPI_SIZE() ) {
       SN_THROW_INVALID_ARGUMENT( "IA_MPI_Send" );
    }
    #endif
-   
-   #ifdef __SN_USE_MPI__   // MPI Guard
    
    int tag = source + target;
    int info = -1;
@@ -238,6 +248,16 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)buff.getSize();
+   (void)mpiR.getSize();
+   (void)target;
+   
+   #endif   // MPI Guard
+   
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {      // Running with MPI but only 1 proc
       return;
    }
@@ -320,9 +340,6 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
                                                       << " --tag" << std::to_string( tag - 1 ) );
    }
    
-   #else
-   (void)mpiR.getSize();   // Get rid of -Wunused
-   
    #endif   // MPI Guard
 }
 
@@ -351,6 +368,17 @@ template< MPIRecvMode RMODE >
 void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
+   
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)buff.getSize();
+   (void)mpiR.getSize();
+   (void)source;
+   (void)size;
+   
+   #endif   // MPI Guard
    
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {   // Running with MPI but only 1 proc
       return;
@@ -431,9 +459,6 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
                                                       << std::to_string(source) << ", " << std::to_string(SN_MPI_RANK()) );
    }
    
-   #else
-   (void)mpiR.getSize();   // Getting rid of that -Wunused
-   
    #endif   // MPI Guard
 }
 
@@ -455,6 +480,15 @@ template< typename TYPE_T >
 void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
+   
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)buff.getSize();
+   (void)source;
+   
+   #endif   // MPI Guard
    
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {   // Running with MPI but only 1 proc
       return;
@@ -515,9 +549,6 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
                                                    << ", " << std::to_string(size_msg) << " ], "
                                                    << std::to_string(source) );
    
-   #else
-   (void)buff.getSize();   // No -Wunused
-   
    #endif   // MPI Guard
 }
 
@@ -546,6 +577,17 @@ template< MPIBcastMode BCMODE >
 void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
+   
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)buff.getSize();
+   (void)mpiR.getSize();
+   (void)source;
+   (void)size;
+   
+   #endif   // MPI Guard
    
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {   // Running with MPI but only 1 proc
       return;
@@ -610,9 +652,6 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
                                                        << std::to_string(source) );
    }
    
-   #else
-   (void)mpiR.getSize();   // No -Wunused
-   
    #endif   // MPI Guard
 }
 
@@ -636,6 +675,14 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
 template < typename TYPE_T >
 template< MPIWaitOp WAIT_ON >
 void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
+   
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)req.getSize();
+   
+   #endif   // MPI Guard
    
    if( ! SN_MPI_INITIALIZED() || SN_MPI_SIZE() == 1 ) {   // Running with MPI but only 1 proc
       return;
@@ -706,6 +753,15 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
 
 template < typename TYPE_T >
 void BaseComm<TYPE_T>::waitAll( int count, MPIRequest< TYPE_T > & req ) {
+   
+   #ifndef __SN_USE_MPI__
+   return;               // Speedy return prevents adding an if conditional to serial overhead
+   
+   // Killing the -Wunused-parameter warnings in case of no MPI and release mode
+   (void)req.getSize();
+   (void)count;
+   
+   #endif   // MPI Guard
    
    // Logic check
    SN_ASSERT_EQUAL( count, static_cast< int >( req.getSize() ) );

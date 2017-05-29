@@ -180,6 +180,7 @@ private:
 #else
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
+ #define SN_MPI_INITIALIZED()              false
  inline int SN_MPI_RANK()                  { return 0; }
  inline int SN_MPI_SIZE()                  { return 1; }
  #define SN_MPI_ROOTPROC_REGION()          if( true  )

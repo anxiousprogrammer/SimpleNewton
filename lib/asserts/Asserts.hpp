@@ -513,6 +513,7 @@ do { asserts::internal::assert_index_within_size( static_cast< const unsigned lo
 #define SN_ASSERT_GREATER_THAN( VAL, REF )
 #define SN_ASSERT_GREQ( VAL, REF )
 #define SN_ASSERT_ZERO( VAL )
+#define SN_ASSERT_NOT_ZERO( VAL )
 #define SN_ASSERT_POSITIVE( VAL )
 #define SN_ASSERT_NEGATIVE( VAL )
 #define SN_ASSERT_MSG( EXPR, MSG )

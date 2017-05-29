@@ -159,7 +159,9 @@ ProcSingleton::~ProcSingleton() {
   
    #ifdef __SN_USE_MPI__
    if( getPrivateInstance().is_initialized_with_multithreading_ || getPrivateInstance().is_initialized_ ) {
+
       MPI_Finalize();
+      std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been finalized." << std::endl;
    }
    #endif
    
@@ -167,7 +169,6 @@ ProcSingleton::~ProcSingleton() {
 
       time_t _now = time(nullptr);
       //Wrap up I/O
-      std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been finalized." << std::endl;
       std::cout << ">>>   Program completed execution with end time " << ctime( &_now );
       std::cout << "********************************************************************************************************" << std::endl
                 << "========================================================================================================>" << std::endl;

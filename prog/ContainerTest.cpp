@@ -3,7 +3,7 @@
 #include <core/ProcSingleton.hpp>
 #include <logger/Logger.hpp>
 #include <containers/SmallMV.hpp>
-#include <containers/mpi/OpenMPIBuffer.hpp>
+#include <containers/mpi/FastBuffer.hpp>
 
 using namespace simpleNewton;
 
@@ -25,6 +25,9 @@ int main( int argc, char ** argv ) {
    Matrix2<double> m2_add = m1 + m1 + m1 + m1;
    Matrix3<double> m3_add = m2 + m2 + m2 + m2;
    double dot_p_2 = v1.t()*v2, dot_p_3 = v3.t()*v4;
+   
+   FastBuffer<char> fb1 = "string", fb2 = "1", fb3 = "_likeThat";
+   SN_LOG_WATCH_VARIABLES( "Fb's contents: ", fb1 + fb2 + fb3 );
    
    SN_LOG_WATCH_VARIABLES( "Results of addition test: ", v2_add, v3_add, m2_add, m3_add );
    SN_LOG_WATCH_VARIABLES( "Results of dot product test: ", dot_p_2, dot_p_3 );

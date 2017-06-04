@@ -1,6 +1,7 @@
 #include "ProcSingleton.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <ctime>
 
 //==========================================================================================================================================
@@ -50,7 +51,8 @@ const ProcSingleton & ProcSingleton::getInstance() {
 
 
 
-/** This function must be called at the beginning of any program making use of the simpleNewton framework.
+/** This function must be called at the beginning of any program making use of the simpleNewton framework. Exception safety: strong 
+*   exception safety guaranteed.
 *
 *   \param argc   The number of command arguments.
 *   \param argv   A pointer to the command arguments.
@@ -112,7 +114,7 @@ void ProcSingleton::init( int argc, char ** argv ) {
       
       // Console initialization
       SN_MPI_ROOTPROC_REGION() {
-      
+        
          time_t _now( time(nullptr) );
          std::cout << "========================================================================================================>" 
                    << std::endl
@@ -120,7 +122,17 @@ void ProcSingleton::init( int argc, char ** argv ) {
                    << std::endl
                    << ">>>   Simple Newton framework running \'" << argv[0] 
                    << "\' with " <<  " start time: " << ctime( &_now )
-                   << ">>>   Timer resolution : " << ProcTimer::getExactResolution() << " second" << std::endl;
+                   << "[" << std::setprecision(2) << std::fixed << getPrivateInstance().timer_.getAge() * real_cast(1e+3) << " ms]" 
+                   << "[PROCMAN__>][ROOTPROC]:" << std::ends;
+         
+         std::cout.unsetf( std::ios_base::floatfield );
+         
+         if( getPrivateInstance().timer_.isHighRes() )
+            std::cout << "   Using steady, high resolution clock." << std::ends;
+         else
+            std::cout << "   Using steady clock." << std::ends;
+         
+         std::cout << " Timer resolution : " << ProcTimer::getExactResolution() << " second" << std::endl;
       }
       SN_MPI_BARRIER();
       
@@ -128,12 +140,12 @@ void ProcSingleton::init( int argc, char ** argv ) {
       if( getPrivateInstance().is_initialized_with_multithreading_ ) {
          
          SN_MPI_ROOTPROC_REGION() {
-            std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been initialized with thread support." << std::endl << std::endl;
+            std::cout << "[PROCMAN__>][ROOTPROC][EVENT ]:   MPI has been initialized with thread support." << std::endl << std::endl;
          }
       } else if( getPrivateInstance().is_initialized_ ) {
          
          SN_MPI_ROOTPROC_REGION() {
-            std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been initialized." << std::endl << std::endl;
+            std::cout << "[PROCMAN__>][ROOTPROC][EVENT ]:   MPI has been initialized." << std::endl << std::endl;
          }
       }
       #endif
@@ -161,7 +173,12 @@ ProcSingleton::~ProcSingleton() {
    if( getPrivateInstance().is_initialized_with_multithreading_ || getPrivateInstance().is_initialized_ ) {
 
       MPI_Finalize();
-      std::cout << "[MPIMAN__>][ROOTPROC][EVENT ]:   MPI has been finalized." << std::endl;
+      std::cout << "[" << std::setprecision(2) << std::fixed << getPrivateInstance().timer_.getAge() * real_cast(1e+3) << " ms]"
+                << std::ends;
+      
+      std::cout.unsetf( std::ios_base::floatfield );
+      
+      std::cout << "[PROCMAN__>][ROOTPROC][EVENT ]:   MPI has been finalized." << std::endl;
    }
    #endif
    

@@ -5,9 +5,9 @@
 #include <string>
 #include <sstream>
 
+#include <core/ProcSingleton.hpp>
 #include <Types.hpp>
 
-#include <core/ProcSingleton.hpp>
 #include <core/Exceptions.hpp>
 
 //==========================================================================================================================================
@@ -36,8 +36,8 @@
 namespace simpleNewton {
 
 /** An enumerator which helps specify the event type for level 1 (basic) event watching. */
-enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, MPISend, MPISsend, MPIIsend, MPIRecv, MPIIrecv, MPIBcast, MPIIbcast, 
-                           MPIWait, MPIWaitAll, Other };
+enum class LogEventType  { ResAlloc = 0, ResDealloc, OMPFork, OMPJoin, ThreadFork, ThreadJoin, MPISend, MPISsend, MPIIsend, MPIRecv, 
+                           MPIIrecv, MPIBcast, MPIIbcast, MPIWait, MPIWaitAll, Other };
 
 //===CLASS==================================================================================================================================
 
@@ -143,7 +143,7 @@ private:   // MEMBERS
 */
 template< typename INP_T >
 inline Logger & operator<<( Logger & lg, const INP_T & input ) {
-
+   
    lg.buffer_ << input;
    return lg;
 }

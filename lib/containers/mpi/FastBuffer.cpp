@@ -1,4 +1,4 @@
-#include "OpenMPIBuffer.hpp"
+#include "FastBuffer.hpp"
 
 //==========================================================================================================================================
 //
@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains the explicit instantiations of class template OpenMPIBuffer with all basic data types.
+///   Contains the explicit instantiations of class template FastBuffer with all basic data types.
 ///   \file
 ///   \addtogroup containers Containers
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
@@ -25,16 +25,16 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace simpleNewton {
 
-template class OpenMPIBuffer< char >;
-template class OpenMPIBuffer< unsigned char >;
-template class OpenMPIBuffer< int >;
-template class OpenMPIBuffer< unsigned int >;
-template class OpenMPIBuffer< long >;
-template class OpenMPIBuffer< unsigned long >;
-template class OpenMPIBuffer< long long >;
-template class OpenMPIBuffer< unsigned long long >;
-template class OpenMPIBuffer< float >;
-template class OpenMPIBuffer< double >;
+template class FastBuffer< char >;
+template class FastBuffer< unsigned char >;
+template class FastBuffer< int >;
+template class FastBuffer< unsigned int >;
+template class FastBuffer< long >;
+template class FastBuffer< unsigned long >;
+template class FastBuffer< long long >;
+template class FastBuffer< unsigned long long >;
+template class FastBuffer< float >;
+template class FastBuffer< double >;
 
 }   // namespace simpleNewton
 #endif

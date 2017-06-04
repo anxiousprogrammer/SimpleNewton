@@ -90,12 +90,14 @@ template<> struct amb_void<false>   { using type = void; };
 
 // Counts the number of variadic arguments
 /* Empty set partial specialization */
-template<> struct argument_count< simpleNewton::NullType > { enum { value = 0 }; };
+template<> struct parameter_count< simpleNewton::NullType > { enum { value = 0 }; };
+
 /* Terminator partial specialization */
-template< class END > struct argument_count<END> { enum { value = 1 }; };
+template< class END > struct parameter_count<END> { enum { value = 1 }; };
+
 /* Recurring partial specialization */
-template< class HEAD, class... TAIL > struct argument_count<HEAD, TAIL...> {
-   enum { value = 1 + argument_count<TAIL...>::value };
+template< class HEAD, class... TAIL > struct parameter_count<HEAD, TAIL...> {
+   enum { value = 1 + parameter_count<TAIL...>::value };
 };
 
 
@@ -288,6 +290,22 @@ template< class TYPE > constexpr bool is_lvalue( TYPE && INST )  { return  are_t
 // Specialization -> exact type similarity
 template< class T1, class T2 > struct are_type_similar : public internal::false_type {};
 template< class T > struct are_type_similar< T, T > : public internal::true_type     {};
+
+
+
+// Specialization -> Homogeneity in parameter pack!
+template< class REF >
+struct is_homogeneous_pack< REF > : public internal::true_type {};
+
+template< class REF, class END >
+struct is_homogeneous_pack< REF, END > {
+   enum : bool { value = are_type_similar< REF, END >::value };
+};
+
+template< class REF, class HEAD, class... TAIL >
+struct is_homogeneous_pack< REF, HEAD, TAIL... > {
+   enum : bool { value = are_type_similar< REF, HEAD >::value && is_homogeneous_pack< REF, TAIL... >::value };
+};
 
 
 
@@ -561,7 +579,7 @@ struct is_copy_assignable<
                            int TYPE::*,
                            OTHER_TYPE,
                            typename internal::amb_void< is_class<OTHER_TYPE>::value >::type, 
-                           internal::a_void< decltype( static_cast< TYPE&(TYPE::*)( const OTHER_TYPE & ) >(&TYPE::operator=) ) >
+                           internal::a_void< decltype( static_cast< TYPE(TYPE::*)( const OTHER_TYPE & ) >(&TYPE::operator=) ) >
                          > : public internal::true_type {};
 
 /* Specialization: true case - class type, other class type */
@@ -570,7 +588,7 @@ struct is_copy_assignable<
                            int TYPE1::*,
                            int TYPE2::*,
                            void,
-                           internal::a_void< decltype( static_cast< TYPE1&(TYPE1::*)( const TYPE2 & ) >(&TYPE1::operator=) ) >
+                           internal::a_void< decltype( static_cast< TYPE1(TYPE1::*)( const TYPE2 & ) >(&TYPE1::operator=) ) >
                          > : public internal::true_type {};
 
 
@@ -586,7 +604,7 @@ struct is_move_assignable<
                            int TYPE::*,
                            OTHER_TYPE,
                            typename internal::amb_void< is_class<OTHER_TYPE>::value >::type, 
-                           internal::a_void< decltype( static_cast< TYPE&(TYPE::*)( OTHER_TYPE && ) >(&TYPE::operator=) ) >
+                           internal::a_void< decltype( static_cast< void(TYPE::*)( OTHER_TYPE && ) >(&TYPE::operator=) ) >
                          > : public internal::true_type {};
 
 /* Specialization: true case - class type, other class type */
@@ -595,7 +613,7 @@ struct is_move_assignable<
                            int TYPE1::*,
                            int TYPE2::*,
                            void,
-                           internal::a_void< decltype( static_cast< TYPE1&(TYPE1::*)( TYPE2 && ) >(&TYPE1::operator=) ) >
+                           internal::a_void< decltype( static_cast< void(TYPE1::*)( TYPE2 && ) >(&TYPE1::operator=) ) >
                          > : public internal::true_type {};
 
 

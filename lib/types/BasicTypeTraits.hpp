@@ -149,7 +149,7 @@ template< bool VAL > struct amb_void;
 /** A struct whose compile-time constant member, value, gives the number of template arguments contained in the parameter pack
 *   \tparam ARG   Parameter pack which is to be counted.
 */
-template< class... ARG > struct argument_count;
+template< class... ARG > struct parameter_count;
 
 
 
@@ -375,6 +375,12 @@ template< class TYPE > constexpr bool is_lvalue( TYPE && INST );
 *   \tparam T2   A second template parameter.
 */
 template< class T1, class T2 > struct are_type_similar;
+
+/** A struct whose compile-time constant boolean member, value, is true if all the parameters in a template parameter pack have the exact 
+*   same typename, and false if it they do not.
+*   \tparam PARAM   The parameter pack which may contain the same type.
+*/
+template< class REF, class... PARAM > struct is_homogeneous_pack;
 
 
 /** A struct whose compile-time constant boolean member, value, is true if the one class is derived from the other, and false if it is not.

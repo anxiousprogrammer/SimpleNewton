@@ -14,8 +14,8 @@ int main( int argc, char ** argv ) {
    
    SN_LOG_REPORT_WARNING( "Hi! Testing the MPI module." );
    
-   OpenMPIBuffer< char > j     = "Hallo, MPI World!";
-   OpenMPIBuffer< char > rec_j = "Not arrived";
+   FastBuffer< char > j     = "Hallo, MPI World!";
+   FastBuffer< char > rec_j = "Not arrived";
    MPIRequest< char > r1, r2;
    
    SN_MPI_PROC_REGION( 1 ) {

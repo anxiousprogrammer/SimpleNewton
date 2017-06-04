@@ -9,7 +9,7 @@
 #include "ProcTimer.hpp"
 
 #ifdef __SN_USE_MPI__
-#include <mpi.h>
+   #include <mpi.h>
 #endif
 
 //==========================================================================================================================================
@@ -47,7 +47,7 @@ namespace simpleNewton {
 //==========================================================================================================================================
 
 class ProcSingleton : private Singleton {
-
+   
 public:
    
    /** A function which setups the process singleton. */
@@ -91,7 +91,7 @@ public:
    */
    static inline real_t getProcTimerRes()   { return ProcTimer::getExactResolution(); }
    
-   /** A function which can be used to get the total duration from the start of the process.
+   /** A function which can be used to get the total duration from the start of the process in seconds.
    *
    *   \return   The duration from the start-point of the process in highest resolution.
    */
@@ -102,7 +102,7 @@ public:
    /** @} */
    
    /** A function which decides the unconventional exit strategy for errors, exceptions and other reasons. */
-   static inline void ExitProgram() { std::exit( EXIT_FAILURE ); }
+   static inline void ExitProgram() { std::quick_exit( EXIT_FAILURE ); }
    
 private:
    

@@ -1,8 +1,10 @@
-#ifndef SN_OPENMPIBUFFER_HPP
-#define SN_OPENMPIBUFFER_HPP
+#ifndef SN_FASTBUFFER_HPP
+#define SN_FASTBUFFER_HPP
 
 #include <logger/Logger.hpp>
 #include <containers/DArray.hpp>
+
+#include <BasicBases.hpp>
 
 //==========================================================================================================================================
 //
@@ -19,7 +21,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains the class template OpenMPIBuffer, which is a container meant to be used for MPI functions.
+///   Contains the class template FastBuffer, which is a container meant to be used for quick transfers.
 ///   \file
 ///   \addtogroup containers Containers
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
@@ -30,21 +32,21 @@
 namespace simpleNewton {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-// Forward declaring the basic communicator.
+// Forward declarations.
 template< typename TYPE_T > class BaseComm;
 #endif
 
 //===CLASS==================================================================================================================================
 
-/** This container serves as a buffer for MPI operations. It is highly recommended that the data be copied out of the buffer immediately 
-*   after use.
+/** This container serves as a move-only buffer for quick transfers between loopers, MPI functions and others. It is highly recommended 
+*   that the data be moved out of the buffer immediately after use. 
 *
 *   \tparam TYPE_T   The data type of the resource
 */
 //==========================================================================================================================================
 
 template< typename TYPE_T >
-class OpenMPIBuffer : public DArray< TYPE_T > {
+class FastBuffer : private NonCopyable, public DArray<TYPE_T> {
 
 private:
    
@@ -70,35 +72,47 @@ public:
    *
    *   \param arr   The literal from which the direct initialization (by copy) takes place.
    */
-   OpenMPIBuffer( const TYPE_T * arr ) : DArray<TYPE_T>( cptr_length( arr ) ) {
+   FastBuffer( const TYPE_T * arr ) : DArray<TYPE_T>( cptr_length( arr ) ) {
       std::copy( arr, arr + size_, data_.raw_ptr() );
    }
 
    /** Direct initialization constructor: size and reference value fill.
    *
-   *   \param size   The desired size of the OpenMPIBuffer object upon construction.
-   *   \param val    The value with which the contents of the OpenMPIBuffer need to be initialized. 
+   *   \param size   The desired size of the FastBuffer object upon construction.
+   *   \param val    The value with which the contents of the FastBuffer need to be initialized. 
    */
-   OpenMPIBuffer( small_t size, const TYPE_T & val = {} ) : DArray<TYPE_T>( size, val ) {}
-
-   /** Trivial constructor is deleted. */
-   OpenMPIBuffer() = delete;
+   FastBuffer( small_t size, const TYPE_T & val = {} ) : DArray<TYPE_T>( size, val ) {}
+   
+   /** Default move constructor. */
+   FastBuffer( FastBuffer<TYPE_T> && ) = default;
 
    /** Default destructor. */
-   ~OpenMPIBuffer() = default;
+   ~FastBuffer() = default;
+   
+   /** @} */
+   
+   /** \name Assignment control
+   *   @{
+   */
+   /** Assignment is possible as one-time move only. */
+   void operator=( FastBuffer<TYPE_T> && src ) {
+      DArray<TYPE_T>::operator=(src);
+   }
+   
    /** @} */
    
    /** \name Utility
    *   @{
    */
+   
    /** Function to concatenate buffers of the same type.
    *
-   *   \param operand   The OpenMPIBuffer object which has to be appended.
-   *   \return          The concatenated OpenMPIBuffer object. 
+   *   \param operand   The FastBuffer object which has to be appended.
+   *   \return          The concatenated FastBuffer object. 
    */
-   OpenMPIBuffer<TYPE_T> operator+( const OpenMPIBuffer<TYPE_T> & operand ) {
+   FastBuffer<TYPE_T> operator+( const FastBuffer<TYPE_T> & operand ) {
    
-      OpenMPIBuffer<TYPE_T> newOMPIB( size_ + operand.size_ );
+      FastBuffer<TYPE_T> newOMPIB( size_ + operand.size_ );
 
       std::copy( data_.raw_ptr(), data_.raw_ptr() + size_, newOMPIB.data_.raw_ptr() );
       std::copy( operand.data_.raw_ptr(), operand.data_.raw_ptr() + operand.size_, newOMPIB.data_.raw_ptr() + size_ );
@@ -113,7 +127,7 @@ public:
    */
    /** Output function which is compatible with the Logger. */
    template< typename T >
-   friend Logger & operator<<( Logger & , const OpenMPIBuffer<T> & );
+   friend Logger & operator<<( Logger & , const FastBuffer<T> & );
    
    /** @} */
    
@@ -124,19 +138,19 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//   FRIEND FUNCTION
-////////////////////
+//   FRIENDS AND EXTERNAL UTILITIES
+///////////////////////////////////
 
-/** A friend operator of OpenMPIBuffer which transfers data from the buffer to a Logger instance element-wise. Warning: this is not very 
+/** A friend operator of FastBuffer which transfers data from the buffer to a Logger instance element-wise. Warning: this is not very 
 *   performance optimized.
 *
-*   \tparam T     The basic data type of the OpenMPIBuffer.
+*   \tparam T     The basic data type of the FastBuffer.
 *   \param lg     A Logger instance.
 *   \param buff   The buffer from which the data has to be transferred to the Logger instance lg.
 *   \return       The Logger instance.
 */
 template< typename T >
-Logger & operator<<( Logger & lg, const OpenMPIBuffer<T> & buff ) {
+Logger & operator<<( Logger & lg, const FastBuffer<T> & buff ) {
    
    for( uint_t i=0; i<buff.size_; ++i )
       lg <<  buff.data_[i];
@@ -145,12 +159,12 @@ Logger & operator<<( Logger & lg, const OpenMPIBuffer<T> & buff ) {
 
 
 
-/** A function which creates a std::string object with the data contained in an OpenMPIBuffer<char> object.
+/** A function which creates a std::string object with the data contained in an FastBuffer<char> object.
 *
 *   \param buff   The buffer from which the data has to be copied into the std::string
 *   \return       A std::string object with the contents of buff.
 */
-std::string make_std_string( const OpenMPIBuffer< char > & buff ) { 
+std::string make_std_string( const FastBuffer< char > & buff ) { 
 
    std::string str;
    

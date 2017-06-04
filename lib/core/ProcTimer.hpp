@@ -129,6 +129,17 @@ public:
    
    /** @} */
    
+   /** \name State
+   *   @{
+   */
+   /** A function to find out if the high resolution clock is steady - and therefore - being used.
+   *
+   *   \return   True if the high resolution clock is steady, false if not.
+   */
+   inline bool isHighRes()   { return typetraits::are_type_similar< clock, std::chrono::high_resolution_clock >::value; }
+
+   /** @} */
+   
 private:
 
    real_t res_ = real_cast( clock::period::num ) / real_cast( clock::period::den );   ///< Resolution of chosen clock.

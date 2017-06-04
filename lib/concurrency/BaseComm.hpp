@@ -1,7 +1,9 @@
 #ifndef SN_BASECOMM_HPP
 #define SN_BASECOMM_HPP
 
-#include <mutex>
+#ifdef __SN_USE_STL_MULTITHREADING__
+   #include <mutex>
+#endif
 
 #include <Types.hpp>
 #include <types/DTInfo.hpp>
@@ -10,14 +12,13 @@
 #include <types/BasicTypeTraits.hpp> 
 #include <asserts/TypeConstraints.hpp>
 
+#include "OpenMP.hpp"
+
 #include <core/ProcSingleton.hpp>
 #include <core/Exceptions.hpp>
 
-#include <containers/mpi/OpenMPIBuffer.hpp>
+#include <containers/mpi/FastBuffer.hpp>
 #include <containers/mpi/MPIRequest.hpp>
-
-/** The count after which it is desired to reset the MPI tags. */
-#define __SN_MPI_LARGE_MESSAGE_COUNT__   1000
 
 //=========================================================================================================================================
 //
@@ -72,26 +73,26 @@ class BaseComm : public NonInstantiable {
 public:
    
    /** Function to send both the size as well as the contents of an array of basic data type from one process to another. */
-   static void autoSend( const OpenMPIBuffer<TYPE_T> & , OpenMPIBuffer<TYPE_T> & , int , int );
+   static void autoSend( const FastBuffer<TYPE_T> & , FastBuffer<TYPE_T> & , int , int );
    
    /** Function to send basic data types from one process to another. */
    template< MPISendMode = MPISendMode::Standard >
-   static void send( const OpenMPIBuffer<TYPE_T> & , int , MPIRequest<TYPE_T> & = {} );
+   static void send( const FastBuffer<TYPE_T> & , int , MPIRequest<TYPE_T> & = {} );
    
    /** Function to receive basic data types from one process to another. */
    template< MPIRecvMode = MPIRecvMode::Standard >
-   static void receive( OpenMPIBuffer<TYPE_T> & , int , int, MPIRequest<TYPE_T> & = {} );
+   static void receive( FastBuffer<TYPE_T> & , int , int, MPIRequest<TYPE_T> & = {} );
    
    /** Function to broadcast both the size as well as the contents of an array of basic data type from one process to the others. */
-   static void autoBroadcast( OpenMPIBuffer<TYPE_T> & , int );
+   static void autoBroadcast( FastBuffer<TYPE_T> & , int );
    
    /** Function to broadcast basic data types from one process to the others. */
    template< MPIBcastMode = MPIBcastMode::Standard >
-   static void broadcast( OpenMPIBuffer<TYPE_T> & , int , int , MPIRequest<TYPE_T> & = {} );
+   static void broadcast( FastBuffer<TYPE_T> & , int , int , MPIRequest<TYPE_T> & = {} );
    
    /* Operation: Reduce basic types to buffer */
    /*template< TYPE_T >
-   static void reduce( OpenMPIBuffer<TYPE_T> & , int );*/
+   static void reduce( FastBuffer<TYPE_T> & , int );*/
    
    /** Function to wait for the completion of non-blocking MPI operations. */
    template < MPIWaitOp >
@@ -108,7 +109,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument exception is thrown if the arguments are not logical. An MPIError exception is thrown if the return code 
 *   of the MPI send operation is not MPI_SUCCESS.
 *
@@ -119,7 +120,7 @@ public:
 *   \param target    The rank of the receiving process.
 */
 template< class TYPE_T >
-void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuffer<TYPE_T> & rbuff, int source, int target ) {
+void BaseComm<TYPE_T>::autoSend( const FastBuffer<TYPE_T> & sbuff, FastBuffer<TYPE_T> & rbuff, int source, int target ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
@@ -145,6 +146,7 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
    SN_ASSERT_LESS_THAN( source, SN_MPI_SIZE() );
    SN_ASSERT_LESS_THAN( target, SN_MPI_SIZE() );
    
+   
    #ifdef __SN_USE_MPI__   // MPI Guard
    
    #ifdef NDEBUG
@@ -157,8 +159,15 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
    int info = -1;
    
    /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex mt;
    std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    SN_MPI_PROC_REGION( source ) {
 
@@ -224,13 +233,17 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
                                                      << ", " << std::to_string( recv_size ) << " ], "
                                                      << std::to_string( source ) << ", " << std::to_string( target ) );
    }
-
+   
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
+   
    #endif   // MPI Guard
 }
 
 
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument exception is thrown if the arguments are not logical. An MPIError exception is thrown if the return code 
 *   of the MPI send operation is not MPI_SUCCESS.
 *
@@ -244,7 +257,7 @@ void BaseComm<TYPE_T>::autoSend( const OpenMPIBuffer<TYPE_T> & sbuff, OpenMPIBuf
 */
 template< class TYPE_T >
 template< MPISendMode SMODE >
-void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPIRequest<TYPE_T> & mpiR ) {
+void BaseComm<TYPE_T>::send( const FastBuffer<TYPE_T> & buff, int target, MPIRequest<TYPE_T> & mpiR ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
@@ -274,14 +287,22 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
    }
    #endif
 
+
    #ifdef __SN_USE_MPI__   // MPI Guard
    
    int tag = SN_MPI_RANK() + target;
    int info = -1;
    
    /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex mt;
    std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    // Decision: the if-conditionals are evaluated at compile time.
    if( SMODE == MPISendMode::Standard ) {
@@ -340,6 +361,10 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
                                                       << " --tag" << std::to_string( tag - 1 ) );
    }
    
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
+   
    #endif   // MPI Guard
 }
 
@@ -349,7 +374,7 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
 //   Definition of receive function
 ////////////////////////////////////
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument exception is thrown if the arguments are not logical. An MPIError exception is thrown if the return code 
 *   of the operation is not MPI_SUCCESS or if the transfer count doesn't match the size provided (in case of blocking send).
 *
@@ -365,7 +390,7 @@ void BaseComm<TYPE_T>::send( const OpenMPIBuffer<TYPE_T> & buff, int target, MPI
 
 template< typename TYPE_T >
 template< MPIRecvMode RMODE >
-void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
+void BaseComm<TYPE_T>::receive( FastBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
@@ -398,6 +423,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
    /* Firstly resize the buffer */
    buff.resize( size );
    
+   
    #ifdef __SN_USE_MPI__
    
    int info = -1;
@@ -405,8 +431,15 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
    MPI_Status stat;
    
    /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex mt;
    std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    // Decision: the if conditionals are evaluated at compile time
    if( RMODE == MPIRecvMode::Standard ) {
@@ -459,6 +492,10 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
                                                       << std::to_string(source) << ", " << std::to_string(SN_MPI_RANK()) );
    }
    
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
+   
    #endif   // MPI Guard
 }
 
@@ -468,7 +505,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
 //   Definition of automatic broadcast function
 ////////////////////////////////////////////////
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An MPIError exception is thrown if the return code of the operation is not MPI_SUCCESS.
 *
 *   \tparam TYPE_T   Datatype of the array, which must be basic as defined by the BasicTypeTraits library.
@@ -477,7 +514,7 @@ void BaseComm<TYPE_T>::receive( OpenMPIBuffer<TYPE_T> & buff, int size, int sour
 */
 
 template< typename TYPE_T >
-void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source ) {
+void BaseComm<TYPE_T>::autoBroadcast( FastBuffer<TYPE_T> & buff, int source ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
@@ -503,13 +540,21 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
    }
    #endif
    
+   
    #ifdef __SN_USE_MPI__
    
    int info = -1;
    
    /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex mt;
    std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    /* First, the broadcasting process broadcasts the size of the message */
    int size_msg = static_cast< int >( buff.getSize() );
@@ -549,6 +594,10 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
                                                    << ", " << std::to_string(size_msg) << " ], "
                                                    << std::to_string(source) );
    
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
+   
    #endif   // MPI Guard
 }
 
@@ -558,7 +607,7 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
 //   Definition of broadcast function
 //////////////////////////////////////
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument is thrown is the arguments are not suitable. An MPIError exception is thrown if the return code of the 
 *   operation is not MPI_SUCCESS.
 *
@@ -574,7 +623,7 @@ void BaseComm<TYPE_T>::autoBroadcast( OpenMPIBuffer<TYPE_T> & buff, int source )
 
 template< typename TYPE_T >
 template< MPIBcastMode BCMODE >
-void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
+void BaseComm<TYPE_T>::broadcast( FastBuffer<TYPE_T> & buff, int size, int source, MPIRequest<TYPE_T> & mpiR ) {
    
    SN_CT_REQUIRE< typetraits::is_basic<TYPE_T>::value >();   // Free template input prerequires a Türsteher.
    
@@ -608,13 +657,21 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
       buff.resize( static_cast< small_t >( size ) );
    }
    
+   
    #ifdef __SN_USE_MPI__
    
    int info = -1;
    
    /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex mt;
    std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    /* Decision */
    if( BCMODE == MPIBcastMode::Standard ) {
@@ -652,6 +709,10 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
                                                        << std::to_string(source) );
    }
    
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
+   
    #endif   // MPI Guard
 }
 
@@ -661,7 +722,7 @@ void BaseComm<TYPE_T>::broadcast( OpenMPIBuffer<TYPE_T> & buff, int size, int so
 //   Definitions of MPI_Wait functions
 ///////////////////////////////////////
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument exception is thrown if the request is invalid. An MPIError exception is thrown if the wait operation is 
 *   either unsuccessful or the transfer count doesn't match the one registered in the request container.
 *
@@ -688,6 +749,7 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
       return;
    }
    
+   
    #ifdef __SN_USE_MPI__
    
    int info = -1;
@@ -701,6 +763,17 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
    if( req.getSize() != 1 || *req == MPI_REQUEST_NULL ) {
       SN_THROW_INVALID_ARGUMENT( "IA_MPI_Wait" );
    }
+   #endif
+   
+   /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
+   static std::mutex mt;
+   std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
    #endif
    
    info = MPI_Wait( req, &stat );
@@ -730,8 +803,9 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
    else if( WAIT_ON == MPIWaitOp::Broadcast )
       SN_LOG_REPORT_L1_EVENT( LogEventType::MPIWait, "( IBCAST )" );
    
-   #else
-   (void)req.getSize();   // No -Wunused
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
    
    #endif   // MPI Guard
 }
@@ -742,7 +816,7 @@ void BaseComm<TYPE_T>::wait( MPIRequest<TYPE_T> & req ) {
 //   Definition of MPI_Waitall function
 ////////////////////////////////////////
 
-/** The container OpenMPIBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
+/** The container FastBuffer is used to provide pointer access to the underlying array. Notes on exception safety: basic safety 
 *   guaranteed. An InvalidArgument exception is thrown if the argument count does not equal the size of the MPIRequest container. An 
 *   MPIError exception is thrown if the return code is not MPI_SUCCESS.
 *
@@ -776,10 +850,22 @@ void BaseComm<TYPE_T>::waitAll( int count, MPIRequest< TYPE_T > & req ) {
       return;
    }
    
+   
    #ifdef __SN_USE_MPI__
    
    int info = -1;
-   OpenMPIBuffer< MPI_Status > stat( count );
+   FastBuffer< MPI_Status > stat( count );
+   
+   /* Thread safety is important */
+   #ifdef __SN_USE_STL_MULTITHREADING__
+   static std::mutex mt;
+   std::lock_guard< std::mutex > lguard( mt );
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
    
    info = MPI_Waitall( count, req, stat.data_ );
    
@@ -812,8 +898,9 @@ void BaseComm<TYPE_T>::waitAll( int count, MPIRequest< TYPE_T > & req ) {
    
    SN_LOG_REPORT_L1_EVENT( LogEventType::MPIWaitAll, "" );
    
-   #else
-   (void)req.getSize();   // No -Wunused
+   #ifdef __SN_USE_OPENMP__
+   }                          // Closing up the critical region
+   #endif
    
    #endif   // MPI Guard
 }

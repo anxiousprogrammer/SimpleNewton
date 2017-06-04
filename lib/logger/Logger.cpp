@@ -4,7 +4,12 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
-#include <mutex>
+
+#ifdef __SN_USE_STL_MULTITHREADING__
+   #include <mutex>
+#endif
+
+#include <concurrency/OpenMP.hpp>
 
 //==========================================================================================================================================
 //
@@ -34,8 +39,10 @@ namespace simpleNewton {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace logger {
 namespace internal {
+
 bool eventWatchRegionSwitch_[] = { false, false };   // Here's a global!
 bool consoleSwitch_ = true;                          // Here's another global!
+
 }   // namespace internal
 }   // namespace logger
 #endif   // DOXYSKIP
@@ -50,11 +57,24 @@ void Logger::flushBuffer( flag_t _write ) {
    if( _write && ! buffer_.str().empty() )
       writeLog();
    
+   #ifdef __SN_USE_STL_MULTITHREADING__
    static std::mutex proc_cout_mutex;
    std::lock_guard< std::mutex > cout_lock( proc_cout_mutex );   // std::cout is also a shared, 'external' resource.
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
+   
+   
    if( logger::internal::consoleSwitch_ )
       std::cout << buffer_.str() << std::endl;
    buffer_.str( std::string() );
+   
+   #ifdef __SN_USE_OPENMP__
+   }
+   #endif
 }
 
 
@@ -70,7 +90,14 @@ void Logger::writeLog() {
    
    file.exceptions( std::ios_base::badbit );   // Exceptions to be thrown only for serious (non-logic) errors.
    
+   #ifdef __SN_USE_STL_MULTITHREADING__
    std::lock_guard< std::mutex > file_lock( proc_file_mutex );   // Thread safety
+   #endif
+   
+   #ifdef __SN_USE_OPENMP__
+   OMP_CRITICAL_REGION()
+   {
+   #endif
 
    time_t _now = time(nullptr);                                  // Time stamp
    
@@ -129,6 +156,10 @@ void Logger::writeLog() {
       
       SN_THROW_IO_ERROR( "IO_Log_Close_File_Error" );
    }
+   
+   #ifdef __SN_USE_OPENMP__
+   }
+   #endif
 }
 
 
@@ -230,6 +261,10 @@ void report_L1_event( LogEventType event, const std::string & file, int line, co
       case LogEventType::OMPFork: event_tag = "OMP PARALLEL REGION ENTERED"; descr = "OpenMP fork occurred. "; break;
          
       case LogEventType::OMPJoin: event_tag = "OMP PARALLEL REGION EXITED";  descr = "OpenMP operation synchronized. "; break;
+      
+      case LogEventType::ThreadFork: event_tag = "THREAD PARALLEL REGION ENTERED";  descr = "Thread task begun. "; break;
+      
+      case LogEventType::ThreadJoin: event_tag = "THREAD PARALLEL REGION EXITED";  descr = "Thread joined with master. "; break;
          
       case LogEventType::MPISend: event_tag = "MPI COMMUNICATION (SEND)"; descr = "Package, source, target (in that order): "; break;
          
@@ -296,6 +331,7 @@ void watch_impl( Logger & ) {}
 
 }   // namespace internal
 }   // namespace logger
+
 #endif   //DOXYSKIP
 
 }   // namespace simpleNewton

@@ -110,6 +110,18 @@ public:
    */
    inline small_t getSize() const                            { return size_; }
    
+   /** A function which returns an iterator to the head of the array. 
+   *
+   *   \return   A const type qualified pointer to the head of the array.
+   */
+   inline const TYPE_T * begin() const   { return &data_[0]; }
+   
+   /** A function which returns an iterator to the tail of the array. 
+   *
+   *   \return   A const type qualified pointer to the tail of the array.
+   */
+   inline const TYPE_T * end() const     { return &data_[size_-1]; }
+   
    /** @} */
    
    /** \name Utility
@@ -192,16 +204,14 @@ public:
    *   \param ref   An rvalue DArray from which the data shall be assigned to the DArray object.
    *   \return      A new DArray upon assignment.
    */
-   DArray<TYPE_T> operator=( DArray<TYPE_T> && ref ) {
+   void operator=( DArray<TYPE_T> && ref ) {
 
       if( this != &ref ) {
    
          data_ = std::move(ref.data_);
-         size_ = std::move(ref.size_);
-      
+         size_ = ref.size_;
          ref.size_ = 0;
       }
-      return *this;
    }
    
    /** @} */

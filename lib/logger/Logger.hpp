@@ -162,6 +162,8 @@ void toggleConsole( bool );
 
 void print_message( const std::string & );
 
+void print_precise_time( const std::string & , real_t );
+
 void report_error( const std::string & , const std::string & , int , const std::string & );
 
 void catch_exception( const std::exception & , const std::string & , int , const std::string & );
@@ -206,10 +208,10 @@ void watch_variables( const std::string & msg, const std::string & file, int lin
 
 
 
-/** A function which switches off console display. */
+/** A macro which switches off console display. */
 #define SN_LOG_SWITCH_OFF_CONSOLE_OUTPUT() logger::internal::toggleConsole( 0 )
 
-/** A function which switches on console display. */
+/** A macro which switches on console display. */
 #define SN_LOG_SWITCH_ON_CONSOLE_OUTPUT() logger::internal::toggleConsole( 1 )
 
 /** A macro which prints a simple text message to screen.
@@ -221,6 +223,15 @@ do { \
       std::stringstream temporary_oss; \
       temporary_oss << MSG; \
       logger::internal::print_message( temporary_oss.str() ); } while(false)
+
+/** A macro which outputs high precision time/duration. */
+#define SN_LOG_PRINT_PRECISE_TIME( MSG, _TIME ) \
+do { \
+      std::stringstream temporary_oss; \
+      temporary_oss << MSG; \
+      logger::internal::print_precise_time( temporary_oss.str(), _TIME ); } while(false)
+
+
 
 #ifdef NDEBUG
 

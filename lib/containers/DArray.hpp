@@ -138,6 +138,8 @@ public:
       
       size_ = new_size;
       data_ = createRAIIWrapper< TYPE_T >( size_ );
+      
+      std::fill( data_.raw_ptr(), data_.raw_ptr() + size_, TYPE_T() );
    }
    
    /** A function to fill the DArray with a specified value.

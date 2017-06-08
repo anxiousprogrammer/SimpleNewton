@@ -1,17 +1,19 @@
 #ifndef SN_THREADPOOL_HPP
 #define SN_THREADPOOL_HPP
 
-#include <Types.hpp>
-#include <BasicBases.hpp>
-
 #include <algorithm>
 #include <vector>
-
-#include <logger/Logger.hpp>
 
 #ifdef __SN_USE_STL_MULTITHREADING__
    #include <thread>
 #endif
+
+#include <Types.hpp>
+#include <BasicBases.hpp>
+
+#include <asserts/Asserts.hpp>
+#include <logger/Logger.hpp>
+#include <core/Exceptions.hpp>
 
 //==========================================================================================================================================
 //
@@ -39,7 +41,7 @@
 namespace simpleNewton {
 
 /** A typedef which identifies a handle to a std::thread. */
-using ThreadHandle_t = std::thread * ;
+using ThreadHandle_t = ID_t ;
 
 //=== CLASS ================================================================================================================================
 
@@ -55,6 +57,8 @@ public:
    */
    /** Default trivial constructor */
    ThreadPool() = default;
+   /** Default move constructor */
+   ThreadPool( ThreadPool && ) = default;
    /** Explicitly defined destructor joins threads. */
    ~ThreadPool();
    
@@ -75,16 +79,58 @@ public:
    #ifdef __SN_USE_STL_MULTITHREADING__
    template< class RET_TYPE, class... PARAM, class... DATA >
    ThreadHandle_t spinThread( RET_TYPE(*task)( PARAM... ), DATA &&... data_args ) {
-
-      tp_.push_back( std::thread( task, data_args... ) );
+      
+      try {
+         tp_.push_back( std::thread( task, data_args... ) );
+      }
+      catch( const std::bad_alloc & ) {
+         SN_THROW_ALLOC_ERROR();
+      }
+      catch( const std::system_error & ex ) {
+         SN_THROW_SYSTEM_ERROR( ex.code(), "SYS_Resources_Unavailable_Error" );
+      }
+      
       SN_LOG_REPORT_L1_EVENT( LogEventType::ThreadFork, "" );
       
-      return &tp_.back();
+      return tp_.size() - 1;
    }
    #else
    template< class RET_TYPE, class... PARAM, class... DATA >
    ThreadHandle_t spinThread( RET_TYPE(*)( PARAM... ), DATA &&... ) { return nullptr; }
    #endif   // STL threading guard
+   
+   /** A function to join a specific thread with the master.
+   *
+   *   \param thread_handle   The handle to the thread which is to be rejoined with the master thread.
+   */
+   #ifdef __SN_USE_STL_MULTITHREADING__
+   void joinThread( ThreadHandle_t thread_handle ) {
+      
+      SN_ASSERT( thread_handle < tp_.size() );
+      
+      #ifdef NDEBUG
+      if( thread_handle >= tp_.size() ) {
+         SN_THROW_INVALID_ARGUMENT_ERROR( "IA_Invalid_Handle_Error" );
+      }
+      #endif
+      
+      try {
+         tp_.at( thread_handle ).join();
+      }
+      catch( const std::system_error & ex ) {
+         
+         if( ex.code() == std::errc::invalid_argument ) { SN_THROW_INVALID_ARGUMENT( "IA_Thread_Not_Joinable_Error" ); }
+         else if( ex.code() == std::errc::no_such_process ) { SN_THROW_INVALID_ARGUMENT( "IA_Invalid_Thread_Error" ); }
+         else if( ex.code() == std::errc::resource_deadlock_would_occur ) { SN_THROW_INVALID_ARGUMENT( "IL_Deadlock_Detected_Error" ); }
+      }
+      
+      SN_LOG_REPORT_L1_EVENT( LogEventType::ThreadJoin, "" );
+   }
+   #else
+   void joinThread( ThreadHandle_t ) {}
+   #endif   // STL threading guard
+   
+   /** @} */
 
 private:
    

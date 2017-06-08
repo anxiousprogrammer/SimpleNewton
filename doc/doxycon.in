@@ -2041,6 +2041,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = __attribute__(x)= \
                          __SN_USE_MPI__ \
+                         __SN_USE_STL_MULTITHREADING__ \
                          __SN_LOGLEVEL_ERROR__ \
                          __SN_LOGLEVEL_WARNING__ \
                          __SN_LOGLEVEL_L1_EVENT__ \

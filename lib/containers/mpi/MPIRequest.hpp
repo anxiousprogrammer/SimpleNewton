@@ -62,8 +62,12 @@ public:
    *
    *   \param size   The number of operations which this MPIRequest container shall manage.
    */
-   MPIRequest( small_t size = 1 ) : size_(size), count_( createRAIIWrapper< small_t >( size, 0 ) ), 
-                                    req_( createRAIIWrapper< MPI_Request >( size, MPI_REQUEST_NULL ) ) {}
+   MPIRequest( small_t size = 1 ) : size_(size), count_( createRAIIWrapper< small_t >( size ) ), 
+                                    req_( createRAIIWrapper< MPI_Request >( size ) ) {
+      
+      std::fill( count_.raw_ptr(), count_.raw_ptr() + size_, 0 );
+      std::fill( req_.raw_ptr(), req_.raw_ptr() + size_, MPI_REQUEST_NULL );
+   }
    
    /** Move constructor */
    MPIRequest( MPIRequest && ) = default;

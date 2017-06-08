@@ -1,5 +1,7 @@
 #include "Exceptions.hpp"
 
+#include <system_error>
+
 //==========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
@@ -105,9 +107,21 @@ AllocSizeError::AllocSizeError( uint_t line,                  /**< The line info
                                                                                              ExceptionInfo( line, func ) {}
 
 /** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
+SystemError::SystemError( std::error_code ec,           /**< The error code of the system_error. */
+                          const std::string & what_arg, /**< The message returned by what() */
+                          uint_t line,                  /**< The line information. */
+                          const std::string & func      /**< The function name. */ ) : std::system_error( ec, what_arg ), 
+                                                                                       ExceptionInfo( line, func ) {}
+
+/** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
 MPIError::MPIError( const std::string & what_arg, /**< The message returned by what() */
                     uint_t line,                  /**< The line information. */
                     const std::string & func      /**< The function name. */ ) : std::runtime_error( what_arg ), 
                                                                                  ExceptionInfo( line, func ) {}
 
+
+
+/** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
+UnknownError::UnknownError( uint_t line,                  /**< The line information. */
+                            const std::string & func      /**< The function name. */ ) : std::exception(), ExceptionInfo( line, func ) {}
 }   // namespace simpleNewton

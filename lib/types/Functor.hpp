@@ -1,6 +1,8 @@
 #ifndef SN_FUNCTOR_HPP
 #define SN_FUNCTOR_HPP
 
+#include <types/Typelist.hpp>
+#include <BasicBases.hpp>
 #include <core/Exceptions.hpp>
 
 //==========================================================================================================================================
@@ -28,6 +30,20 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
+
+/** This serves as the base class to all Functor classes and behaves accordingly. With the help of this class, arrays of functors with 
+*   different target function signatures can be conceptualized.
+*/
+class BasicFunctor {
+
+public:
+
+   /** The main function, which renders callability to the class. */
+   void operator()() {}
+};
+
+
+
 //===CLASS==================================================================================================================================
 
 /** This class serves as the standard function object for the framework.
@@ -38,12 +54,12 @@ namespace simpleNewton {
 //==========================================================================================================================================
 
 template< class RET_TYPE, class... PARAM >
-class Functor {
+class Functor : public BasicFunctor {
 
 public:
 
    /** This typedef describes the signature of the target function. */
-   using type = RET_TYPE (*)( PARAM... );
+   using function_type = RET_TYPE (*)( PARAM... );
    
    /** \name Constructors and destructor
    *   @{
@@ -52,7 +68,7 @@ public:
    *
    *   \param _F   The pointer to target function or lambda expression.
    */
-   Functor( type _F ) : func_ptr( _F ) {}
+   Functor( function_type _F ) : func_ptr( _F ) {}
    
    /** Default copy constructor. */
    Functor( const Functor< RET_TYPE, PARAM... > & _ref ) = default;
@@ -71,7 +87,7 @@ public:
    *   \param args   Argument pack for the target function.
    *   \return       The return value of the target function.
    */
-   inline RET_TYPE operator()( PARAM... args ) {
+   inline RET_TYPE operator()( PARAM... args ) const {
       
       try {
          return func_ptr( args... ); 
@@ -93,7 +109,7 @@ public:
 
 private:
 
-   type func_ptr;
+   function_type func_ptr;
 };
 
 }   // namespace simpleNewton

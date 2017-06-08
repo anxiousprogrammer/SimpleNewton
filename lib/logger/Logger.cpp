@@ -113,7 +113,7 @@ void Logger::writeLog() {
          std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
                    << "][FILE ERROR ]:   Could not open the log file for logger. A standard exception was caught. "
                    << "Type: std::ios_base::failure; string: " << ex.what()
-                   << ". The program will continue but the buffer was not written to process' log file in this instance." << std::endl;
+                   << ". The buffer was not written to process' log file in this instance." << std::endl;
          unfixFP();
       }
       
@@ -132,7 +132,7 @@ void Logger::writeLog() {
          std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
                    << "][EXCEPTION CAUGHT ]: A standard exception was caught during the writing of the log file. "
                    << "Type: std::ios_base::failure; string: " << ex.what()
-                   << ". The program will continue but the buffer was not written to process' log file in this instance. "
+                   << ". The buffer was not written to process' log file in this instance. "
                    << std::endl;
          unfixFP();
       }
@@ -194,7 +194,17 @@ void print_message( const std::string & msg ) {
    lg.flushBuffer( false );
 }
 
-
+void print_precise_time( const std::string & msg, real_t _time ) {
+   
+   Logger lg;
+   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
+   lg.fixFP(2);
+   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][HIGH-PRECISION TIME ]:   " << msg << " ->";
+   lg.fixFP( 10 );
+   lg << _time << " second\n";
+   lg.unfixFP();
+   lg.flushBuffer( false );
+}
 
 void report_error( const std::string & msg, const std::string & file, int line, const std::string & func ) {
 

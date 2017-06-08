@@ -3,13 +3,12 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <sstream>
 
 #include <GlobalConstants.hpp>
 #include <logger/Logger.hpp>
 #include <core/ProcSingleton.hpp>
 
-/** The space in which all global entities of the framework are accessible */
-namespace simpleNewton {
 
 //=========================================================================================================================================
 //
@@ -35,6 +34,9 @@ namespace simpleNewton {
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //=========================================================================================================================================
+
+/** The space in which all global entities of the framework are accessible */
+namespace simpleNewton {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -444,7 +446,10 @@ do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } 
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
 #define SN_REQUIRE_MSG( EXPR, MSG ) \
-do { asserts::internal::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
+do { \
+      std::stringstream oss; \
+      oss << MSG; \
+      asserts::internal::assert_msg< EXPR >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
@@ -672,7 +677,10 @@ do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } 
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
 #define SN_ASSERT_MSG( EXPR, MSG ) \
-do { asserts::internal::assert_msg< EXPR >( MSG, __FILE__, __LINE__, __func__ ); } while(false)
+do { \
+      std::stringstream oss; \
+      oss << MSG; \
+      asserts::internal::assert_msg< EXPR >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
 
 
 

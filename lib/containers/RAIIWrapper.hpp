@@ -137,7 +137,7 @@ public:
    
    /** A function which creates an instance of RAIIWrapper. */
    template< class CTYPE >
-   friend RAIIWrapper<CTYPE> createRAIIWrapper( small_t, const CTYPE & );
+   friend RAIIWrapper<CTYPE> createRAIIWrapper( small_t );
    
 private:
    
@@ -156,9 +156,9 @@ private:
 *   \return       An RAIIWrapper object which will be used to move initialise another.
 */
 template< class TYPE >
-RAIIWrapper<TYPE> createRAIIWrapper( small_t size, const TYPE & val = {} ) {
+RAIIWrapper<TYPE> createRAIIWrapper( small_t size ) {
 
-   SN_ASSERT_POSITIVE( size );
+   //SN_ASSERT_POSITIVE( size );
    
    #ifdef NDEBUG
    if( size <= 0 ) {
@@ -176,10 +176,6 @@ RAIIWrapper<TYPE> createRAIIWrapper( small_t size, const TYPE & val = {} ) {
    }
    
    RAIIWrapper<TYPE> new_packet( ptr );
-   ptr = nullptr;
-   
-   // Initialization.
-   std::fill( new_packet.raw_ptr(), new_packet.raw_ptr() + size, val );
    
    return new_packet;
 }

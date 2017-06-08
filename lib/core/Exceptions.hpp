@@ -221,6 +221,19 @@ public:
 
 
 
+/** This class is intended for use for when a system error occurs. */
+class SystemError : public std::system_error, ExceptionInfo {
+
+public:
+   
+   SystemError( std::error_code ,
+                const std::string & = {},
+                uint_t = {},
+                const std::string & = {} );
+};
+
+
+
 /** This class is intended for use when an MPI operation fails. */
 class MPIError : public std::runtime_error, ExceptionInfo {
 
@@ -229,6 +242,17 @@ public:
    MPIError( const std::string & ,
              uint_t = {},
              const std::string & = {} );
+};
+
+
+
+/** This class is intended to throw unknown exceptions. */
+class UnknownError : public std::exception, ExceptionInfo {
+
+public:
+   
+   UnknownError( uint_t = {},
+                 const std::string & = {} );
 };
 
 }   // namespace simpleNewton

@@ -51,7 +51,7 @@ class ProcSingleton : private Singleton {
 public:
    
    /** A function which setups the process singleton. */
-   static void init( int argc, char ** argv );
+   static void init( int argc, char ** argv, uint_t thread_count = 0 );
    
    /** \name Access
    *   @{
@@ -138,8 +138,11 @@ private:
    /** Timer */
    ProcTimer timer_ = {};
    
-   /** Size and Rank */
+   /** Process size and rank */
    int comm_size_ = 0, comm_rank_ = 0;
+   
+   /** Thread size */
+   int omp_thread_size_ = 0;
 };
 
 

@@ -58,8 +58,9 @@ const ProcSingleton & ProcSingleton::getInstance() {
 /** This function must be called at the beginning of any program making use of the simpleNewton framework. Exception safety: strong 
 *   exception safety guaranteed.
 *
-*   \param argc   The number of command arguments.
-*   \param argv   A pointer to the command arguments.
+*   \param argc           The number of command arguments.
+*   \param argv           A pointer to the command arguments.
+*   \param thread_count   In case OpenMP is being used, the daemon takes this to be the default number of threads for every parallel region.
 */
 void ProcSingleton::init( int argc, char ** argv, uint_t thread_count ) {
    

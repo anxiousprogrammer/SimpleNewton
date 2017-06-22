@@ -65,8 +65,12 @@ public:
    /** \name Utility
    *   @{
    */
-   /** A function which adds an element at the end of the array */
-   void pushBack( TYPE_T && _elem ) {
+   /** A function which adds an element at the end of the array. Notes on exception safety: strong safety guaranteed. The function throws 
+   *   an AllocError exception if the required resource allocation were not possible.
+   *
+   *   \param _elem   The element to be inserted at the end of the array.
+   */
+   void pushBack( TYPE_T && _elem = TYPE_T() ) {
       
       if( size_ == capacity_ ) {
          
@@ -89,13 +93,14 @@ public:
       size_++;
    }
    
-   /** A function which removes the element at the end of the array.
+   /** A function which removes the element at the end of the array. Notes on exception safety: strong safety guaranteed. The function 
+   *   throws a PreconditionError exception if the array is empty.
    *
    *   \return   The removed element.
    */
    TYPE_T popBack() {
       
-      SN_ASSERT_INEQUAL( size_, uint_cast(0) );
+      SN_ASSERT_INEQUAL( size_, large_cast(0) );
       
       #ifdef NDEBUG
       if( size_ == 0 )

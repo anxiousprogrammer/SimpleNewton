@@ -85,30 +85,52 @@ public:
    /** A function to ascertain the size of the MPIRequest container.
    *   \return   The size of the MPIRequest container.
    */
-   small_t getSize() const                                 { return size_; }
+   small_t getSize() const                                     { return size_; }
    
    /** A function to ascertain the exact transfer count of a non-blocking MPI operation pointed out by its corresponding container index. 
+   *   Notes on exception safety: strong safety guaranteed. The function throws an OORError exception if the provided index is invalid.
    *   \param i   The index corresponding to a certain non-blocking MPI operation. Takes a default value of 0.
    *   \return    The exact transfer count i.e., the size of the message of the non-blocking MPI operation.
    */
-   small_t getTransferCount( small_t i = 0 ) const         { SN_ASSERT( i < size_ ); return count_[i]; }
+   small_t getTransferCount( small_t i = 0 ) const {
    
-   /** A function to set the exact transfer count of a non-blocking MPI operation pointed out by its corresponding container index.
+      SN_ASSERT_INDEX_WITHIN_SIZE( i, size_ );
+      
+      #ifdef NDEBUG
+      if( i >= size_ )
+         SN_THROW_OOR_ERROR();
+      #endif
+      
+      return count_[i];
+   }
+   
+   /** A function to set the exact transfer count of a non-blocking MPI operation pointed out by its corresponding container index. Notes 
+   *   on exception safety: strong safety guaranteed. The function throws an OORError exception if the provided index is invalid.
    *   \param new_count   The value of the transfer count of a certain operation.
    *   \param i           The index corresponding to a certain non-blocking MPI operation. Takes a default value of 0.
    *   \return            The exact transfer count i.e., the size of the message of the non-blocking MPI operation.
    */
-   void setTransferCount( small_t new_count, small_t i = 0 )   { SN_ASSERT( i < size_ ); count_[i] = new_count; }
+   void setTransferCount( small_t new_count, small_t i = 0 ) {
+
+      SN_ASSERT_INDEX_WITHIN_SIZE( i, size_ );
+
+      #ifdef NDEBUG
+      if( i >= size_ )
+         SN_THROW_OOR_ERROR();
+      #endif
+      
+      count_[i] = new_count;
+   }
    
    /** A user-defined conversion to expose the underlying MPI_Request array. This function will not be compiled if MPI is not included.
    *   \return   A pointer to the first element of the MPI_Request array.
    */
-   inline operator MPI_Request*()   { return req_; }
+   inline operator MPI_Request*()                              { return req_; }
    
    /** A function to expose the underlying MPI_Request array for when the user-defined conversion cannot be applied.
    *   \return   A pointer to the first element of the MPI_Request array.
    */
-   inline MPI_Request * raw_ptr()   { return req_; }
+   inline MPI_Request * raw_ptr()                              { return req_; }
    
    /** @} */
    

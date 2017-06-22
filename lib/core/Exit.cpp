@@ -1,13 +1,6 @@
-#ifndef SN_DBLOCK_HPP
-#define SN_DBLOCK_HPP
+#include <Exit.hpp>
 
-#ifdef __SN_USE_OPENMP__
-   #include <omp.h>
-#endif
-
-#include <logger/Logger.hpp>
-
-//==========================================================================================================================================
+//=========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
 //  redistribute it and/or modify it under the terms of the GNU General Public
@@ -22,10 +15,19 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains the class DBlock which represents a domain block, the elementary unit in a World.
+///   This file provides the implementation of the header, Exit.
 ///   \file
-///   \defgroup core Core
+///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
-//==========================================================================================================================================
+//=========================================================================================================================================
 
+/** The space in which all global entities of the framework are accessible */
+namespace simpleNewton {
+
+void ExitProgram() {
+   
+   std::quick_exit( EXIT_FAILURE );
+}
+
+}   // namespace simpleNewton

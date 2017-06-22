@@ -58,7 +58,7 @@ public:
    *   \param size   The desired size of the DArray.
    *   \param val    The default value with which to initialize the DArray.
    */
-   DArray( small_t size, const TYPE_T & val = {} ) : data_( createRAIIWrapper<TYPE_T>( size ) ) {
+   DArray( large_t size, const TYPE_T & val = {} ) : data_( createRAIIWrapper<TYPE_T>( size ) ) {
 
       SN_ASSERT_POSITIVE( size );
       
@@ -88,27 +88,23 @@ public:
    /** \name Access
    *   @{
    */
-   /** Operator: primary access function.
+   /** Operator (const): primary access function.
    *
    *   \param index   An index to access elements of the DArray.
    *   \return        A const qualified reference to the element.
    */
-   inline const TYPE_T & operator[]( small_t index ) const {
+   inline const TYPE_T & operator[]( large_t index ) const {
       
       SN_ASSERT_INDEX_WITHIN_SIZE( index, size_ );
-      try {
-         return data_[index];
-      }
-      catch( const std::out_of_range & ex ) {
-         SN_THROW_OOR_ERROR( ex.what() );
-      }
+      
+      return data_[index];
    }
    
    /** A function to get the size of the DArray.
    *
    *   \return   The size of the array.
    */
-   inline small_t getSize() const                            { return size_; }
+   inline large_t getSize() const        { return size_; }
    
    /** A function which returns an iterator to the head of the array. 
    *
@@ -132,7 +128,7 @@ public:
    *
    *   \param new_size   The new size with which it is desired to resize the DArray.
    */
-   void resize( small_t new_size ) {
+   void resize( large_t new_size ) {
    
       SN_ASSERT_POSITIVE( new_size );
       
@@ -157,7 +153,7 @@ public:
    bool isEmpty() {
    
       bool ret_val = true;   // optimistic approach
-      for( small_t i = 0; i < size_; ++i ) {
+      for( large_t i = 0; i < size_; ++i ) {
       
          if( data_[i] != TYPE_T() )
             ret_val = false;   // Disillusionment!
@@ -222,7 +218,7 @@ protected:
 
    /* Members */
    RAIIWrapper< TYPE_T > data_;   ///< Basic data member. Packed in an RAIIWrapper.
-   small_t size_ = 0;             ///< The size data member.
+   large_t size_ = 0;             ///< The size data member.
 };
 
 }   // namespace simpleNewton

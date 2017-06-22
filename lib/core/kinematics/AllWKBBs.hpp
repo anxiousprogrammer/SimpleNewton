@@ -1,18 +1,5 @@
-#ifndef SN_KINEMATICINTEGRATOR_HPP
-#define SN_KINEMATICINTEGRATOR_HPP
-
-#include <algorithm>
-#include <vector>
-
-#include <Types.hpp>
-#include <BasicBases.hpp>
-
-#include <asserts/Asserts.hpp>
-#include <asserts/TypeConstraints.hpp>
-
-#include <logger/Logger.hpp>
-#include <core/Exceptions.hpp>
-
+#ifndef SN_ALLWKBBS_HPP
+#define SN_ALLWKBBS_HPP
 
 //==========================================================================================================================================
 //
@@ -29,18 +16,14 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains the class KinematicIntegrator
+///   Contains an inclusion list for all kinematics black-boxes.
 ///   \file
 ///   \addtogroup math Math
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
 //==========================================================================================================================================
 
-/** The space in which all global entities of the framework are accessible */
-namespace simpleNewton {
+#include "WorldKinematicsBB.hpp"
+#include "EulerExplicitWKBB.hpp"
 
-
-
-}   // namespace simpleNewton
-
-#endif
+#endif   // header guard

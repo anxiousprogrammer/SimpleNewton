@@ -49,15 +49,20 @@ PreconditionError::PreconditionError( const std::string & what_arg, /**< The mes
                                                                                                    ExceptionInfo( line, func ) {}
 
 /** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
+PostconditionError::PostconditionError( const std::string & what_arg, /**< The message returned by what() */
+                                        uint_t line,                  /**< The line information. */
+                                        const std::string & func      /**< The function name. */ ) : std::logic_error( what_arg ), 
+                                                                                                     ExceptionInfo( line, func ) {}
+
+/** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
 MathError::MathError( const std::string & what_arg, /**< The message returned by what() */
                       uint_t line,                  /**< The line information. */
                       const std::string & func      /**< The function name. */ ) : std::domain_error( what_arg ), 
                                                                                    ExceptionInfo( line, func ) {}
 
 /** Direct initialization constructor sets up the exception and distributes the information to its corresponding base classes. */
-OORError::OORError( const std::string & what_arg, /**< The message returned by what() */
-                    uint_t line,                  /**< The line information. */
-                    const std::string & func      /**< The function name. */ ) : std::out_of_range( what_arg ), 
+OORError::OORError( uint_t line,                  /**< The line information. */
+                    const std::string & func      /**< The function name. */ ) : std::out_of_range( string_cast("OOR_Access_Error") ), 
                                                                                  ExceptionInfo( line, func ) {}
 
 

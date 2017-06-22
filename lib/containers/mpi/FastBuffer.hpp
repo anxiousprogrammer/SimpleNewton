@@ -101,6 +101,27 @@ public:
    
    /** @} */
    
+   /** \name Access
+   *   @{
+   */
+   /** Operator (const): primary access function. Notes on exception safety: strong safety guaranteed. The function throws an OORError
+   *   exception if the provided index is invalid.
+   *
+   *   \param index   The index used to access the corresponding element.
+   *   \return        A const reference to the element required to be accessed.
+   */
+   inline const TYPE_T & operator[]( large_t index ) const {
+      
+      #ifdef NDEBUG
+      if( index >= size_ )
+         SN_THROW_OOR_ERROR();
+      #endif
+      
+      return DArray<TYPE_T>::operator[]( index );
+   }
+   
+   /** @} */
+   
    /** \name Utility
    *   @{
    */

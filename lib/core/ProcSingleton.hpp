@@ -8,6 +8,8 @@
 
 #include "ProcTimer.hpp"
 
+#include "World.hpp"
+
 #ifdef __SN_USE_MPI__
    #include <mpi.h>
 #endif
@@ -47,6 +49,9 @@ namespace simpleNewton {
 //==========================================================================================================================================
 
 class ProcSingleton : private Singleton {
+
+   /* A friend indeed! */
+   template< typename FP_T > friend class Simulator;
    
 public:
    
@@ -143,6 +148,9 @@ private:
    
    /** Thread size */
    int omp_thread_size_ = 0;
+   
+   /** Simulation space -> the world */
+   World world_;
 };
 
 

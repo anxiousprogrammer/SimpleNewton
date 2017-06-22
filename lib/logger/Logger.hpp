@@ -5,7 +5,10 @@
 #include <string>
 #include <sstream>
 
-#include <core/ProcSingleton.hpp>
+#ifdef __SN_USE_MPI__
+   #include <mpi.h>
+#endif
+
 #include <Types.hpp>
 
 #include <core/Exceptions.hpp>
@@ -186,11 +189,12 @@ template< class... PARAM >
 void watch_variables( const std::string & msg, const std::string & file, int line, const std::string & func, PARAM... arg ) {
 
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-
-   lg.fixFP( 2 );
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][VARIABLE WATCH ]:   " << "<Description>   " << msg << "   ";
-   lg.unfixFP();
+   
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   lg << "[LOGGER__>][P" << rank << "][VARIABLE WATCH ]:   " << "<Description>   " << msg << "   ";
    
    watch_impl( lg, arg... );
    

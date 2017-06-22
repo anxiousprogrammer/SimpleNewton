@@ -6,6 +6,7 @@
 
 #include <Types.hpp>
 #include <BasicBases.hpp>
+
 #include <asserts/Asserts.hpp>
 
 #include <core/Exceptions.hpp>
@@ -152,13 +153,12 @@ private:
 *   AllocSizeError exception, whichever may be the case, is thrown if resource allocation is not possible.
 *
 *   \param size   The size of the resource.
-*   \param val    The value with which the resource is to be initialised.
 *   \return       An RAIIWrapper object which will be used to move initialise another.
 */
 template< class TYPE >
 RAIIWrapper<TYPE> createRAIIWrapper( small_t size ) {
 
-   //SN_ASSERT_POSITIVE( size );
+   SN_ASSERT_POSITIVE( size );
    
    #ifdef NDEBUG
    if( size <= 0 ) {

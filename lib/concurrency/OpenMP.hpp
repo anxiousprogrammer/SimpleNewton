@@ -33,37 +33,46 @@
    
    #ifndef DOXYGEN_SHOULD_SKIP_THIS // <--- Internal macros
    #define __SN_PRAGMA__(X)
-   
-   
-   
-   #define SN_OPENMP_FORK_REGION( ... )
-
-   #define SN_OPENMP_SYNC()
-   #define OMP_THREADS( N )
    #endif   // DOXYSKIP   <--- Now begins the interface
 
 
-
+   /** This macro initiates an OpenMP parallel region. The daemon wakes up supporting threads. All OpenMP constructs are to be used within 
+   *   parallel regions only.
+   */
+   #define SN_OPENMP_FORK( ... )
+   
+   /** This macro performs a synchronization operation i.e., joins all secondary threads to the primary. This signifies the end of a 
+   *   parallel region.
+   */
+   #define SN_OPENMP_SYNC()
+   
+   /** This macro definition can be passed as an argument to the forking macro and instructs the daemon to launch the following parallel 
+   *   region with a provided number of threads.
+   *
+   *   \param N   The number of threads required to be used in the following parallel region.
+   */
+   #define OMP_THREADS( N )
+   
    /** This macro defines the data-sharing construct for the following parallel region. The ellipsis captures the arguments.
    */
    #define OMP_DEFAULT( TYPE )
 
-   /** This macro takes the arguments as shared data for the following parallel region. Warning -  the incorrect use of this construct can 
+   /** This macro takes arguments as shared data for the following parallel region. Warning -  the incorrect use of this construct can 
    *   lead to very poor performances and incorrect results. The ellipsis captures the arguments.
    */
    #define OMP_SHARED( ... )
    
-   /** This macro takes th arguments as private data for the following parallel region. Furthermore, the private instances will be 
+   /** This macro takes arguments as private data for the following parallel region. Furthermore, the private instances will be 
    *   initialised with their default values. The ellipsis captures the arguments.
    */
    #define OMP_PRIVATE( ... )
    
-   /** This macro takes the arguments as private data for the following parallel region but copies their values from the master thread
+   /** This macro takes arguments as private data for the following parallel region but copies their values from the master thread
    *   instances into the respective slave thread instances. The ellipsis captures the arguments.
    */
    #define OMP_FIRST_PRIVATE( ... )
    
-   /** This macro takes the arguments as private data for the following parallel region but copies the values of the slowest/last finishing 
+   /** This macro takes arguments as private data for the following parallel region but copies the values of the slowest/last finishing 
    *   thread instances into the master thread instances. The ellipsis captures the arguments.
    */
    #define OMP_LAST_PRIVATE( ... )
@@ -76,30 +85,41 @@
    */
    #define OMP_FOR_LOOP( ... )
 
-   /** This macro can be passed as an argument to a parallel for-loop to select static task distribution. The iterations are allocated to 
+   /** This macro can be passed as an argument to a parallel for-loop to select static scheduling. The iterations are allocated to 
    *   the threads only once, at the beginning.
+   */
+   #define OMP_STATIC
+   
+   /** This definition can be passed as an argument to a parallel for-loop to select dynamic scheduling. The iterations are handed out to 
+   *   the threads as and when they complete the previously allocated tasks/iterations. This mode allows better parallelization for 
+   *   iterations with heterogeneous computational intensities. When this is not the case, using this can come with significant overheads.
+   */
+   #define OMP_DYNAMIC
+   
+   /** This definition can be passed as an argument to a parallel for-loop to select guided scheduling. The iterations are handed out to 
+   *   the threads as and when they complete the previously allocated tasks/iterations. The only difference from the dynamic mode is 
+   *   that the chunk size starts off relatively large and is subsequently reduced upon each task completion to better balance the load.
+   */
+   #define OMP_GUIDED
+   
+   /** Same as OMP_STATIC, but the user must specify a chunk size as argument to the scheduler.
    *
    *   \param C_SZ   The chunk size decides the interval of the distribution. The default value is TOTAL_LOOP_COUNT/NUMBER_OF_THREADS.
    */
    #define OMP_STATIC_CS( C_SZ )
    
-   /** This definition can be passed as an argument to a parallel for-loop to select dynamic task distribution. The iterations are handed 
-   *   out to the threads as and when they complete the previously allocated tasks/iterations. This mode allows better parallelization for 
-   *   iterations with heterogeneous computational intensities. However, for iterations which are approximately equally computationally 
-   *   intensive, this can come with significant overheads.
+   /** Same as OMP_DYNAMIC, but the user must specify a chunk size as argument to the scheduler.
    *
    *   \param C_SZ   The chunk size decides the interval of the distribution. The default value is 1.
    */
-   #define OMP_DYNAMIC_CS( P )
+   #define OMP_DYNAMIC_CS( C_SZ )
    
-   /** This definition can be passed as an argument to a parallel for-loop to select guided task distribution. The iterations are handed 
-   *   out to the threads as and when they complete the previously allocated tasks/iterations. The only difference from the dynamic mode is 
-   *   that the chunk size starts off relatively large and is subsequently reduced upon each task completion to better balance the load.
+   /** Same as OMP_GUIDED, but the user must specify a starting chunk size as argument to the scheduler.
    *
    *   \param C_SZ   The chunk size decides the interval of the distribution at the start. The default starting value is TOTAL_LOOP_COUNT/
    *                 NUMBER_OF_THREADS.
    */
-   #define OMP_GUIDED_CS( P )
+   #define OMP_GUIDED_CS( C_SZ )
    
    /** This definition can be passed as an argument to a parallel for-loop to select automatic task distribution. The task scheduling 
    *   strategy is then decided by the compiler at compile-time.
@@ -135,17 +155,17 @@
    /** This macro declares an SIMD for-loop. The following iterations will be executed concurrently in the SIMD lanes available to the
    *   thread. The ellipsis captures the various attributes of the directive.
    */
-   #define OMP_SIMD_LOOP( ... )
+   #define SN_OPENMP_SIMD_LOOP( ... )
    
    /** This macro declares a parallelized loop which also uses SIMD. The following iterations are executed by threads which utilize the 
    *   available SIMD lanes. The ellipsis captures the various attributes of the directive.
    */
-   #define OMP_FOR_SIMD_LOOP( ... )
+   #define SN_OPENMP_FOR_SIMD_LOOP( ... )
    
    /** This macro declares that the following function be made compatible for a SIMD loop. This enables the creation of a SIMD version of
    *   the function. The ellipsis captures the various attributes of the directive.
    */
-   #define OMP_DECLARE_SIMD( ... )
+   #define SN_OPENMP_DECLARE_SIMD( ... )
    
    /** This attribute definition can be passed as an argument to a SIMD loop macro. It decides the maximum logical distance 
    *   in the iteration space between any two iterations to be executed concurrently. This can be used to control dependencies.
@@ -225,7 +245,7 @@
    
    
    
-   #define SN_OPENMP_FORK_REGION( ... )           SN_LOG_REPORT_L1_EVENT( LogEventType::OMPFork, "" ); \
+   #define SN_OPENMP_FORK( ... )                  SN_LOG_REPORT_L1_EVENT( LogEventType::OMPFork, "" ); \
                                                   __SN_PRAGMA__( omp parallel __VA_ARGS__ ) \
                                                   {
    #define SN_OPENMP_SYNC()                       } \
@@ -246,6 +266,9 @@
    /* Work-sharing constructs */
    #define OMP_FOR_LOOP( ... )         __SN_PRAGMA__( omp for __VA_ARGS__ )
 
+   #define OMP_STATIC                  schedule( static )
+   #define OMP_DYNAMIC                 schedule( dynamic )
+   #define OMP_GUIDED                  schedule( guided )
    #define OMP_STATIC_CS( P )          schedule( static, P )
    #define OMP_DYNAMIC_CS( P )         schedule( dynamic, P )
    #define OMP_GUIDED_CS( P )          schedule( guided, P )
@@ -255,9 +278,9 @@
    #define OMP_NOWAIT                  nowait
    #define OMP_ORDERED                 ordered
    
-   #define OMP_SIMD_LOOP( ... )        __SN_PRAGMA__( omp simd )
-   #define OMP_FOR_SIMD_LOOP( ... )    __SN_PRAGMA__( omp for simd )
-   #define OMP_DECLARE_SIMD( ... )     __SN_PRAGMA__( omp declare simd )
+   #define SN_OPENMP_SIMD_LOOP( ... )        __SN_PRAGMA__( omp simd )
+   #define SN_OPENMP_FOR_SIMD_LOOP( ... )    __SN_PRAGMA__( omp for simd )
+   #define SN_OPENMP_DECLARE_SIMD( ... )     __SN_PRAGMA__( omp declare simd )
    
    #define OMP_SAFELEN( L )            safelen( L )
    #define OMP_SIMDLEN( L )            simdlen( L )

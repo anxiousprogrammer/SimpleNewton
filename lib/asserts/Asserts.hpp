@@ -6,8 +6,9 @@
 #include <sstream>
 
 #include <GlobalConstants.hpp>
+#include <Exit.hpp>
+
 #include <logger/Logger.hpp>
-#include <core/ProcSingleton.hpp>
 
 
 //=========================================================================================================================================
@@ -76,7 +77,7 @@ inline void assert( bool expr, const char * const file, int line, const std::str
    if( ! expr ) {
       
       logger::internal::report_error( "An assertion has failed. The process will now be terminated.", file, line, func );
-      ProcSingleton::ExitProgram();
+      ExitProgram();
    }
 }
 
@@ -88,7 +89,7 @@ inline void assert_equal( const T1 & VALUE, const T2 & REFERENCE, const char * c
       if( !static_cast< bool >( static_cast<T2>(VALUE) == static_cast<T1>(REFERENCE) ) ) {
          
          logger::internal::report_error( "Equality assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -101,7 +102,7 @@ inline void assert_fp_equal( const T1 & VALUE, const T2 & REFERENCE, const char 
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) <= globalConstants::ZERO ) ) {
          
          logger::internal::report_error( "Floating point equality assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -114,7 +115,7 @@ inline void assert_inequal( const T1 & VALUE, const T2 & REFERENCE, const char *
       if( !static_cast< bool >( static_cast<T2>(VALUE) != static_cast<T1>(REFERENCE) ) ) {
          
          logger::internal::report_error( "Inequality assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -127,7 +128,7 @@ inline void assert_fp_inequal( const T1 & VALUE, const T2 & REFERENCE, const cha
       if( !static_cast< bool >( std::fabs( static_cast<T2>(VALUE) - static_cast<T1>(REFERENCE) ) > globalConstants::ZERO ) ) {
          
          logger::internal::report_error( "Floating point inequality assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -140,7 +141,7 @@ inline void assert_less_than( const T1 & VALUE, const T2 & REFERENCE, const char
       if( !static_cast< bool >( static_cast<T2>(VALUE) < static_cast<T1>(REFERENCE) ) ) {
          
          logger::internal::report_error( "Less than assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -153,7 +154,7 @@ inline void assert_leq( const T1 & VALUE, const T2 & REFERENCE, const char * con
       if( !static_cast< bool >( static_cast<T2>(VALUE) <= static_cast<T1>(REFERENCE) ) ) {
          
          logger::internal::report_error( "Less than or equal to assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -166,7 +167,7 @@ inline void assert_greater_than( const T1 & VALUE, const T2 & REFERENCE, const c
       if( !static_cast< bool >( static_cast<T2>(VALUE) > static_cast<T1>(REFERENCE) ) ) {
         
          logger::internal::report_error( "Greater than assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -179,7 +180,7 @@ inline void assert_greq( const T1 & VALUE, const T2 & REFERENCE, const char * co
       if( !static_cast< bool >( static_cast<T2>(VALUE) >= static_cast<T1>(REFERENCE) ) ) {
          
          logger::internal::report_error( "Greater than or equal to assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -191,7 +192,7 @@ inline void assert_zero( const TYPE & VALUE, const char * const file, int line, 
    if( !static_cast< bool >( std::fabs(VALUE) <= globalConstants::ZERO ) ) {
       
       logger::internal::report_error( "Equal to zero assertion failed. The process will now be terminated.", file, line, func );
-      ProcSingleton::ExitProgram();
+      ExitProgram();
    }
 }
 
@@ -202,7 +203,7 @@ inline void assert_not_zero( const TYPE & VALUE, const char * const file, int li
    if( !static_cast< bool >( std::fabs(VALUE) > globalConstants::ZERO ) ) {
       
       logger::internal::report_error( "Not equal to zero assertion failed. The process will now be terminated.", file, line, func );
-      ProcSingleton::ExitProgram();
+      ExitProgram();
    }
 }
 
@@ -213,7 +214,7 @@ inline void assert_positive( const TYPE & VALUE, const char * const file, int li
    if( !static_cast< bool >( VALUE > globalConstants::ZERO ) ) {
       
       logger::internal::report_error( "Positivity assertion failed. The process will now be terminated.", file, line, func );
-      ProcSingleton::ExitProgram();
+      ExitProgram();
    }
 }
 
@@ -224,7 +225,7 @@ inline void assert_negative( const TYPE & VALUE, const char * const file, int li
    if( !static_cast< bool >( VALUE < globalConstants::ZERO ) ) {
      
       logger::internal::report_error( "Negativity assertion failed. The process will now be terminated.", file, line, func );
-      ProcSingleton::ExitProgram();
+      ExitProgram();
    }
 }
 
@@ -247,7 +248,7 @@ inline void assert_size_same( const U_INT & SIZE, const U_INT & REF, const char 
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) == static_cast<unsigned long long>(REF) ) ) {
         
          logger::internal::report_error( "Same size assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -260,7 +261,7 @@ inline void assert_size_less_than( const U_INT & SIZE, const U_INT & REF, const 
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) <= static_cast<unsigned long long>(REF) ) ) {
        
          logger::internal::report_error( "Size less than assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -273,7 +274,7 @@ inline void assert_size_strictly_less_than( const U_INT & SIZE, const U_INT & RE
       if( !static_cast< bool >( static_cast<unsigned long long>(SIZE) < static_cast<unsigned long long>(REF) ) ) {
        
          logger::internal::report_error( "Size strictly less than assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }
@@ -286,7 +287,7 @@ inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, con
       if( !static_cast< bool >( static_cast<unsigned long long>(IND) < static_cast<unsigned long long>(SIZE) ) ) {
       
          logger::internal::report_error( "Index within size assertion failed. The process will now be terminated.", file, line, func );
-         ProcSingleton::ExitProgram();
+         ExitProgram();
       }
    }
 }

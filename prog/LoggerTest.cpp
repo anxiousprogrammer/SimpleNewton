@@ -2,6 +2,8 @@
 
 #include <logger/Logger.hpp>
 
+#include <core/ProcSingleton.hpp>
+
 using namespace simpleNewton;
 
 int main( int argc, char ** argv ) {

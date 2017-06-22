@@ -109,6 +109,18 @@ public:
 
 
 
+/** This class is intended for use when a function's post-condition is not met. */
+class PostconditionError : public std::logic_error, ExceptionInfo {
+
+public:
+   
+   PostconditionError( const std::string & ,
+                       uint_t = {},
+                       const std::string & = {} );
+};
+
+
+
 /** This class is intended for use when a mathematical function performs an illegal mathematical operation e.g. division by zero or 
 *   out-of-domain input. */
 class MathError : public std::domain_error, ExceptionInfo {
@@ -127,8 +139,7 @@ class OORError : public std::out_of_range, ExceptionInfo {
 
 public:
    
-   OORError( const std::string & ,
-             uint_t = {},
+   OORError( uint_t = {},
              const std::string & = {} );
 };
 

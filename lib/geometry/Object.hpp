@@ -41,6 +41,9 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
+/** This typedef identifies handles to physical objects. */
+using Object_ID_t = ID_t;
+
 //===CLASS==================================================================================================================================
 
 /** This class provides the base for every geometric object representable in a World. */
@@ -54,23 +57,13 @@ public:
    /** \name Constructors and destructor
    *   @{
    */
-   /** Deleted trivial constructor. */
-   Object() = delete;
-   
-   /** Direct initialization constructor in which the arguments are moved into the members. */
-   Object( Vector3<TYPE_T> && _c, Vector3<TYPE_T> && _v, Vector3<TYPE_T> && _a ) : center_( std::move(_c) ),
-                                                                                   velocity_( std::move(_v) ),
-                                                                                   acceleration_( std::move(_a) ) {}
-   
-   /** Direct initialization constructor in which the arguments are copied into the members. */
-   Object( const Vector3<TYPE_T> & _c, const Vector3<TYPE_T> & _v, const Vector3<TYPE_T> & _a ) : center_(_c), 
-                                                                                                  velocity_(_v),
-                                                                                                  acceleration_(_a) {}
+   /** Default trivial constructor. */
+   Object() = default;
    
    /** Default move constructor. */
    Object( Object && ) = default;
    
-   /** Default destructor. */
+   /** Pure virtual destructor. The abstract object cannot be instantiated. */
    virtual ~Object() = 0;
    
    /** @} */
@@ -78,22 +71,17 @@ public:
    /** \name Access
    *   @{
    */
-   /** A function to get the global position of the object. */
-   const Vector3<TYPE_T> & getCentre() const         { return center_; }
-   
-   /** A function to get the global velocity of the object. */
-   const Vector3<TYPE_T> & getVelocity() const       { return velocity_; }
-   
-   /** A function to get the global acceleration of the object. */
-   const Vector3<TYPE_T> & getAcceleration() const   { return acceleration_; }
-   
+   /** A function to obtain the handle of the object within a world.
+   *
+   *   \return   The handle to the object, which grants the world containing it access to it.
+   */
+   inline Object_ID_t getHandle() const { return handle_; }
+
    /** @} */
 
 protected:
    
-   Vector3<TYPE_T> center_;
-   Vector3<TYPE_T> velocity_;
-   Vector3<TYPE_T> acceleration_;
+   Object_ID_t handle_ = {};
 };
 
 }   // namespace simpleNewton

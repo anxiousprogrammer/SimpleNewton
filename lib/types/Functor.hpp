@@ -30,20 +30,6 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
-
-/** This serves as the base class to all Functor classes and behaves accordingly. With the help of this class, arrays of functors with 
-*   different target function signatures can be conceptualized.
-*/
-class BasicFunctor {
-
-public:
-
-   /** The main function, which renders callability to the class. */
-   void operator()() {}
-};
-
-
-
 //===CLASS==================================================================================================================================
 
 /** This class serves as the standard function object for the framework.
@@ -54,7 +40,7 @@ public:
 //==========================================================================================================================================
 
 template< class RET_TYPE, class... PARAM >
-class Functor : public BasicFunctor {
+class Functor {
 
 public:
 
@@ -64,6 +50,9 @@ public:
    /** \name Constructors and destructor
    *   @{
    */
+   /** Default trivial constructor. */
+   Functor() = default;
+   
    /** Direct initialization constructor.
    *
    *   \param _F   The pointer to target function or lambda expression.
@@ -109,7 +98,7 @@ public:
 
 private:
 
-   function_type func_ptr;
+   function_type func_ptr = nullptr;
 };
 
 }   // namespace simpleNewton

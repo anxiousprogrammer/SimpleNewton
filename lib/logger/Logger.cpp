@@ -101,20 +101,22 @@ void Logger::writeLog() {
 
    time_t _now = time(nullptr);                                  // Time stamp
    
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
    try {
-      file.open( ProcSingleton::getExecName() + "_log_on_proc" + std::to_string( SN_MPI_RANK() ), std::ios_base::app );
+      file.open( "_log_on_proc" + std::to_string( rank ), std::ios_base::app );
    }
    catch( const std::ios_base::failure & ex ) {
       
       if( logger::internal::consoleSwitch_ ) {
-      
-         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-         fixFP(2);
-         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+         
+         std::cerr << "[LOGGER__>][P" << rank
                    << "][FILE ERROR ]:   Could not open the log file for logger. A standard exception was caught. "
                    << "Type: std::ios_base::failure; string: " << ex.what()
                    << ". The buffer was not written to process' log file in this instance." << std::endl;
-         unfixFP();
       }
       
       SN_THROW_IO_ERROR( "IO_Log_File_Open_Error" );
@@ -126,15 +128,12 @@ void Logger::writeLog() {
    catch( const std::ios_base::failure & ex ) {
       
       if( logger::internal::consoleSwitch_ ) {
-      
-         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-         fixFP(2);
-         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+         
+         std::cerr << "[LOGGER__>][P" << rank
                    << "][EXCEPTION CAUGHT ]: A standard exception was caught during the writing of the log file. "
                    << "Type: std::ios_base::failure; string: " << ex.what()
                    << ". The buffer was not written to process' log file in this instance. "
                    << std::endl;
-         unfixFP();
       }
       
       SN_THROW_IO_ERROR( "IO_Log_Write_To_File_Error" );
@@ -146,12 +145,10 @@ void Logger::writeLog() {
    catch( const std::ios_base::failure & ex ) {
 
       if( logger::internal::consoleSwitch_ ) {
-         real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-         fixFP(2);
-         std::cerr << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK()
+
+         std::cerr << "[LOGGER__>][P" << rank
                    << "][EXCEPTION CAUGHT ]: A standard exception was caught while closing the log file. "
                    << "Type: std::ios_base::failure; string: " << ex.what() << std::endl;
-         unfixFP();
       }
       
       SN_THROW_IO_ERROR( "IO_Log_Close_File_Error" );
@@ -187,21 +184,27 @@ void toggleConsole( bool _switch ) {
 void print_message( const std::string & msg ) {
 
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][MESSAGE ]:   " << msg << '\n';
-   lg.unfixFP();
+   
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][MESSAGE ]:   " << msg << '\n';
    lg.flushBuffer( false );
 }
 
 void print_precise_time( const std::string & msg, real_t _time ) {
    
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][HIGH-PRECISION TIME ]:   " << msg << " ->";
-   lg.fixFP( 10 );
-   lg << _time << " second\n";
+   
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg.fixFP(10);
+   lg << "[LOGGER__>][P" << rank << "][HIGH-PRECISION TIME ]:   " << msg << " ->" << _time << " second\n";
    lg.unfixFP();
    lg.flushBuffer( false );
 }
@@ -209,11 +212,14 @@ void print_precise_time( const std::string & msg, real_t _time ) {
 void report_error( const std::string & msg, const std::string & file, int line, const std::string & func ) {
 
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][ERROR ]:   " << msg << '\n' 
+
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][ERROR ]:   " << msg << '\n' 
       << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
-   lg.unfixFP();
    lg.flushBuffer( true );
 }
 
@@ -222,9 +228,13 @@ void report_error( const std::string & msg, const std::string & file, int line, 
 void catch_exception( const std::exception & exc, const std::string & file, int line, const std::string & func ) {
 
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][EXCEPTION CAUGHT ]:   " << exc.what() << '\n'
+   
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][EXCEPTION CAUGHT ]:   " << exc.what() << '\n'
       << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.unfixFP();
    lg.flushBuffer( true );
@@ -235,9 +245,13 @@ void catch_exception( const std::exception & exc, const std::string & file, int 
 void report_warning( const std::string & msg, const std::string & file, int line, const std::string & func ) {
 
    Logger lg;
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][WARNING ]:    " << msg << '\n'
+   
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][WARNING ]:    " << msg << '\n'
       << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.unfixFP();
       
@@ -300,9 +314,12 @@ void report_L1_event( LogEventType event, const std::string & file, int line, co
       default: event_tag = "UNKNOWN EVENT"; descr = "An unspecified event has ocurred"; break;
    }
    
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L1 EVENT - " << event_tag << " ]:   " 
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][L1 EVENT - " << event_tag << " ]:   " 
       << descr << "   " << info << '\n' 
       << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.unfixFP();
@@ -321,9 +338,12 @@ void report_L2_event( const std::string & file, int line, const std::string & fu
    
    Logger lg;
    
-   real_t time_point = ProcSingleton::getDurationFromStart() * real_cast(1e+3);
-   lg.fixFP(2);
-   lg << "[" << time_point << " ms][LOGGER__>][P" << SN_MPI_RANK() << "][L2 EVENT - " << event_tag << " ]:   " 
+   int rank = 0;
+   #ifdef __SN_USE_MPI__
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   #endif
+   
+   lg << "[LOGGER__>][P" << rank << "][L2 EVENT - " << event_tag << " ]:   " 
       << descr << '\n' 
       << ">--- From function, " << func << " <" << file << " :" << line << " > ---<" << '\n';
    lg.unfixFP();

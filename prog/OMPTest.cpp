@@ -19,11 +19,11 @@ int main( int argc, char ** argv ) {
    
    SN_LOG_L1_EVENT_WATCH_REGION_LIMIT();
    
-   SN_OPENMP_FORK_REGION( OMP_THREADS(5) )
+   SN_OPENMP_FORK( OMP_THREADS(5) )
       
       SN_LOG_MESSAGE( "Critical region test passed." );   // All Logger functions are inherently atomic ops.
       
-      OMP_FOR_LOOP( OMP_ORDERED )
+      OMP_FOR_LOOP( OMP_STATIC )
       for( uint_t i = 0; i < 10; ++i ) {
          SN_LOG_WATCH_VARIABLES( "Itertion number", i );
       }

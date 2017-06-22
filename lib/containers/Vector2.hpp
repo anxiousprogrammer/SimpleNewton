@@ -1,8 +1,11 @@
 #ifndef SN_VECTOR2_HPP
 #define SN_VECTOR2_HPP
 
+#include <cmath>
+
 #include <logger/Logger.hpp>
 #include <types/DTInfo.hpp>
+
 #include "FArray.hpp"
 
 
@@ -46,58 +49,53 @@ template< typename T > Matrix2<T> operator*( const Vector2<T> &, const Vector2_t
 
 /** This class serves as a mathematical container which represents the 2-dimensional vector.
 *
-*   \tparam TYPE_T   The underlying data type of the Vector2.
+*   \tparam FP_TYPE_T   The underlying floating-point data type of the Vector2.
 */
 //==========================================================================================================================================
 
-template< typename TYPE_T >
-class Vector2 : public FArray< TYPE_T, 2 > {
+template< typename FP_TYPE_T >
+class Vector2 : public FArray< FP_TYPE_T, 2 > {
 
 private:
    
    /* Unveil the underlaying body of FArray */
-   using FArray<TYPE_T, 2>::data_;
+   using FArray<FP_TYPE_T, 2>::data_;
    
 public:
    
    /** \name Constructors and destructor
    *   @{
    */
+   /** Default initialization constructor. */
+   Vector2() = default;
+   
+   /** Direct initialization constructor which fills the vector with a provided value.
+   *
+   *   \param _val   The value which is to be used to populate the vector.
+   */
+   explicit Vector2( const FP_TYPE_T & _val ) : FArray<FP_TYPE_T, 2>( _val ) {
+      SN_CT_REQUIRE_FP_TYPE< FP_TYPE_T >();
+   }
+   
    /** List initialization constructor which creates a Vector2 object by assigning a value to each element.
    *
    *   \param v1   The value of the first element.
    *   \param v2   The value of the second element.
    */
-   Vector2( const TYPE_T & v1, const TYPE_T & v2 ) : FArray<TYPE_T, 2>() {
+   Vector2( const FP_TYPE_T & v1, const FP_TYPE_T & v2 ) : FArray<FP_TYPE_T, 2>() {
 
       data_[0] = v1;
       data_[1] = v2;
       
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 DIC)" );
+      SN_CT_REQUIRE_FP_TYPE< FP_TYPE_T >();
    }
    
-   /** Near-default copy constructor.
-   *
-   *   \param _ref   The reference Vector2 object whose values are to be used for initialization.
-   */
-   Vector2( const Vector2<TYPE_T> & _ref ) : FArray<TYPE_T, 2>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 CC)" );
-   }
-   
-   /** Near-default move constructor.
-   *
-   *   \param _ref   The Vector2 object whose values are to be used for initialization.
-   */
-   Vector2( Vector2<TYPE_T> && _ref ) : FArray<TYPE_T, 2>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 MC)" );
-   }
-   
-   /** Near-default destructor. */
-   ~Vector2() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2 Destr.)" );
-   }
+   /** Default destructor. */
+   ~Vector2() = default;
    
    /** @} */
+   
+   
    
    /** \name Access
    *   @{
@@ -107,22 +105,61 @@ public:
    *   \param index   The container index corresponding to the element which is to be accessed.
    *   \return        A non-const reference to the element.
    */
-   inline TYPE_T & operator()( small_t index )             { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
+   inline FP_TYPE_T & operator[]( small_t index )             { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
    
    /** Operator (const): direct element-wise access.
    *
    *   \param index   The container index corresponding to the element which is to be accessed.
    *   \return        A const qualified reference to the element.
    */
-   inline const TYPE_T & operator()( small_t index ) const { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
+   inline const FP_TYPE_T & operator[]( small_t index ) const { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
+   
+   /** A function (non-const) to access the elements of the vector.
+   *
+   *   \param index   The container index corresponding to the element which is to be accessed.
+   *   \return        A const qualified reference to the element.
+   */
+   inline FP_TYPE_T & at( small_t index )                     { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
+   
+   /** A function (const) to access the elements of the vector.
+   *
+   *   \param index   The container index corresponding to the element which is to be accessed.
+   *   \return        A const qualified reference to the element.
+   */
+   inline const FP_TYPE_T & at( small_t index ) const         { SN_ASSERT_INDEX_WITHIN_SIZE( index, 2 ); return data_[index]; }
    
    /** A function which returns a transposed form of the 2-dimensional vector.
    *
    *   \return   A Vector2_t object which is the transpose of the vector.
    */
-   inline Vector2_t<TYPE_T> t() const                      { return Vector2_t<TYPE_T>( data_[0], data_[1] ); }
+   inline Vector2_t<FP_TYPE_T> t() const                      { return Vector2_t<FP_TYPE_T>( data_[0], data_[1] ); }
    
    /** @} */
+   
+   
+   
+   /** \name Metric
+   *   @{
+   */
+   /** A function to calculate the L2 norm of the vector.
+   *
+   *   \return   The L2 norm of the vector.
+   */
+   inline FP_TYPE_T L2Norm() const {
+      return std::sqrt( data_[0] * data_[0] + data_[1] * data_[1] );
+   }
+   
+   /** A function to calculate the infinity norm of the vector.
+   *
+   *   \return   The infinity norm of the vector.
+   */
+   inline FP_TYPE_T infinityNorm() const {
+      return ( data_[0] >= data_[1] ? data_[0] : data_[1] );
+   }
+   
+   /** @} */
+   
+   
    
    /** \name Arithmetic
    *   @{
@@ -132,8 +169,8 @@ public:
    *   \param operand   A 2D vector with which the vector has to be added.
    *   \return          A Vector2 object which is the result of the addition.
    */
-   inline Vector2<TYPE_T> operator+( const Vector2<TYPE_T> & operand ) const {
-      return Vector2<TYPE_T>( data_[0] + operand.data_[0], data_[1] + operand.data_[1] );
+   inline Vector2<FP_TYPE_T> operator+( const Vector2<FP_TYPE_T> & operand ) const {
+      return Vector2<FP_TYPE_T>( data_[0] + operand.data_[0], data_[1] + operand.data_[1] );
    }
    
    /** Addition operator: operand is a scalar.
@@ -141,8 +178,8 @@ public:
    *   \param operand   A scalar with which the vector has to be added.
    *   \return          A Vector2 object which is the result of the addition.
    */
-   inline Vector2<TYPE_T> operator+( const TYPE_T & operand ) const {
-      return Vector2<TYPE_T>( data_[0] + operand, data_[1] + operand );
+   inline Vector2<FP_TYPE_T> operator+( const FP_TYPE_T & operand ) const {
+      return Vector2<FP_TYPE_T>( data_[0] + operand, data_[1] + operand );
    }
    
    /** Subtraction operator: operand is a 2D vector.
@@ -150,8 +187,8 @@ public:
    *   \param operand   A 2D vector which shall be subtracted from the vector.
    *   \return          A Vector2 object which is the result of the subtraction.
    */
-   inline Vector2<TYPE_T> operator-( const Vector2<TYPE_T> & operand ) const {
-      return Vector2<TYPE_T>( data_[0] - operand.data_[0], data_[1] - operand.data_[1] );
+   inline Vector2<FP_TYPE_T> operator-( const Vector2<FP_TYPE_T> & operand ) const {
+      return Vector2<FP_TYPE_T>( data_[0] - operand.data_[0], data_[1] - operand.data_[1] );
    }
    
    /** Subtraction operator: operand is a scalar.
@@ -159,8 +196,8 @@ public:
    *   \param operand   A scalar which shall be subtracted from the vector.
    *   \return          A Vector2 object which is the result of the subtraction.
    */
-   inline Vector2<TYPE_T> operator-( const TYPE_T & operand ) const {
-      return Vector2<TYPE_T>( data_[0] - operand, data_[1] - operand );
+   inline Vector2<FP_TYPE_T> operator-( const FP_TYPE_T & operand ) const {
+      return Vector2<FP_TYPE_T>( data_[0] - operand, data_[1] - operand );
    }
    
    /** Multiplication operator: operand is a scalar.
@@ -168,8 +205,8 @@ public:
    *   \param operand   A scalar with which the vector is to be multiplied.
    *   \return          A Vector2 object which is the result of the multiplication.
    */
-   inline Vector2<TYPE_T> operator*( const TYPE_T & operand ) const {
-      return Vector2<TYPE_T>( data_[0] * operand, data_[1] * operand );
+   inline Vector2<FP_TYPE_T> operator*( const FP_TYPE_T & operand ) const {
+      return Vector2<FP_TYPE_T>( data_[0] * operand, data_[1] * operand );
    }
    
    /** Multiplication operator: performs the outer product of 2-dimensional vectors. */
@@ -178,25 +215,83 @@ public:
    /** Multiplication operator: performs the inner product (dot-product) of 2-dimensional vectors. */
    template< typename T > friend T Vector2_t<T>::operator*( const Vector2<T> & ) const;
    
-   /** Division operator: operand is a scalar.
+   /** Division operator: operand is a scalar. Notes on exception safety: strong safety guaranteed. The function throws a MathError 
+   *   exception if division by zero is attempted.
    *
    *   \param operand   The scalar value by which every element of the vector shall be divided.
    *   \return          A Vector2 object which is the result of the division.
    */
-   inline Vector2<TYPE_T> operator/( const TYPE_T & operand ) const {
+   inline Vector2<FP_TYPE_T> operator/( const FP_TYPE_T & operand ) const {
    
       SN_ASSERT_NOT_ZERO( operand );
       
-      #ifdef NDEBUG
-      if( std::fabs(operand) <= globalConstants::ZERO )
-         SN_THROW_INVALID_ARGUMENT( "IA_Vector2_Div_Zero" );
-      #endif
-
-      TYPE_T inv = static_cast<TYPE_T>(1.0)/operand;
-      return Vector2<TYPE_T>( data_[0] * inv, data_[1] * inv );
+      FP_TYPE_T inv = FP_TYPE_T();
+      try {
+          inv = static_cast<FP_TYPE_T>(1.0)/operand;
+      }
+      catch( const std::exception & ) {
+         SN_THROW_MATH_ERROR("MATH_Vector2_Div_Zero");
+      }
+      
+      return Vector2<FP_TYPE_T>( data_[0] * inv, data_[1] * inv );
    }
    
    /** @} */
+   
+   
+   
+   /** \name Comparison
+   *   @{
+   */
+   /** Equal-to operator: operand is a scalar.
+   *
+   *   \param _ref   The scalar with which the vector is to be compared.
+   *   \return       True if the quantities are equal.
+   */
+   inline bool operator==( const FP_TYPE_T & _ref ) {
+      
+      return ( std::fabs( data_[0] - _ref ) <= globalConstants::ZERO && std::fabs( data_[1] - _ref ) <= globalConstants::ZERO );
+   }
+   
+   /** Less-than operator: operand is a scalar.
+   *
+   *   \param _ref   The scalar with which the vector is to be compared.
+   *   \return       True if the vector is less than the provided scalar value.
+   */
+   inline bool operator<( const FP_TYPE_T & _ref ) {
+      return ( data_[0] < _ref && data_[1] < _ref );
+   }
+   
+   /** Less-than-equal-to operator: operand is a scalar.
+   *
+   *   \param _ref   The scalar with which the vector is to be compared.
+   *   \return       True if the vector is less than or equal to the provided scalar value.
+   */
+   inline bool operator<=( const FP_TYPE_T & _ref ) {
+      return ( data_[0] <= _ref && data_[1] <= _ref );
+   }
+   
+   /** Greater-than operator: operand is a scalar.
+   *
+   *   \param _ref   The scalar with which the vector is to be compared.
+   *   \return       True if the vector is greater than the provided scalar value.
+   */
+   inline bool operator>( const FP_TYPE_T & _ref ) {
+      return ( data_[0] > _ref && data_[1] > _ref );
+   }
+   
+   /** Greater-than-equal-to operator: operand is a scalar.
+   *
+   *   \param _ref   The scalar with which the vector is to be compared.
+   *   \return       True if the vector is greater than or equal to the provided scalar value.
+   */
+   bool operator>=( const FP_TYPE_T & _ref ) {
+      return ( data_[0] >= _ref && data_[1] >= _ref );
+   }
+   
+   /** @} */
+   
+   
    
    /** \name Output
    *   @{
@@ -218,8 +313,8 @@ public:
 *   \param lg    An instance of Logger.
 *   \param vec   The Vector2 object to be output.
 */
-template< typename TYPE_T >
-Logger & operator<<( Logger & lg, const Vector2<TYPE_T> & vec ) {
+template< typename FP_TYPE_T >
+Logger & operator<<( Logger & lg, const Vector2<FP_TYPE_T> & vec ) {
 
    lg.fixFP();
    lg << '\n' << "Vector2 (t)   [" << vec[0] << "   " << vec[1] << "]   " << '\n';
@@ -233,52 +328,31 @@ Logger & operator<<( Logger & lg, const Vector2<TYPE_T> & vec ) {
 
 /** This class serves as a mathematical container which represents the transposed 2-dimensional vector.
 *
-*   \tparam TYPE_T   The underlying data type of the Vector2_t.
+*   \tparam FP_TYPE_T   The underlying data type of the Vector2_t.
 */
 //==========================================================================================================================================
 
-template< class TYPE_T >
-class Vector2_t : public FArray< TYPE_T, 2 > {
+template< class FP_TYPE_T >
+class Vector2_t : public FArray< FP_TYPE_T, 2 > {
 
 private:
 
    /* Unveil the underlaying body of FArray */
-   using FArray<TYPE_T, 2>::data_;
+   using FArray<FP_TYPE_T, 2>::data_;
    
 private:
-   /* LIC */ explicit Vector2_t( const TYPE_T & v1, const TYPE_T & v2 ) : FArray<TYPE_T, 2>() {
+   /* LIC */ explicit Vector2_t( const FP_TYPE_T & v1, const FP_TYPE_T & v2 ) : FArray<FP_TYPE_T, 2>() {
 
       data_[0] = v1;
       data_[1] = v2;
-      
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t TC)" );
    }
 public:
    
    /** \name Constructors and destructor
    *   @{
    */
-   /** Near-default copy constructor.
-   *
-   *   \param _ref   The reference Vector2_t object whose values are to be used for initialization.
-   */
-   Vector2_t( const Vector2_t<TYPE_T> & _ref ) : FArray<TYPE_T, 2>(_ref) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t CC)" );
-   }
-   
-   /** Near-default move constructor.
-   *
-   *   \param _ref   The reference Vector2_t object whose values are to be used for initialization.
-   */
-   Vector2_t( Vector2_t<TYPE_T> && _ref ) : FArray<TYPE_T, 2>( std::move(_ref) ) {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResAlloc, "data_, " << DTInfo< TYPE_T >::name << ", 2" << " (from Vector2_t MC)" );
-   }
-   
-   /** Near-default destructor */
-   ~Vector2_t() {
-      SN_LOG_REPORT_L1_EVENT( LogEventType::ResDealloc, "data_, " << DTInfo< TYPE_T >::name << ", 2"
-                                                        << " (from Vector2_t Destr.)" );
-   }
+   /** Default destructor */
+   ~Vector2_t() = default;
    
    /** @} */
    
@@ -289,7 +363,7 @@ public:
    *
    *   \return   A Vector2 object which is in non-transposed form.
    */
-   inline operator Vector2<TYPE_T>() const   { return Vector2<TYPE_T>( data_[0], data_[1] ); }
+   inline operator Vector2<FP_TYPE_T>() const   { return Vector2<FP_TYPE_T>( data_[0], data_[1] ); }
    
    /** @} */
    
@@ -301,7 +375,7 @@ public:
    *   \param op   The operand, which is a 2-dimensional vector.
    *   \return     The dot-product in underlying field type.
    */
-   inline TYPE_T operator*( const Vector2<TYPE_T> & op ) const {
+   inline FP_TYPE_T operator*( const Vector2<FP_TYPE_T> & op ) const {
       return ( data_[0] * op.data_[0] + data_[1] * op.data_[1] );
    }
    
@@ -311,7 +385,7 @@ public:
    /** @} */
    
    /** A function which returns a transposed form of a 2-dimensional vector. */
-   friend Vector2_t<TYPE_T> Vector2<TYPE_T>::t() const;
+   friend Vector2_t<FP_TYPE_T> Vector2<FP_TYPE_T>::t() const;
 };
 
 }   // namespace simpleNewton

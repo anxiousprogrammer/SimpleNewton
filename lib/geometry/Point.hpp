@@ -41,24 +41,13 @@ namespace simpleNewton {
 template< typename TYPE_T >
 class Point : public Object<TYPE_T> {
 
-private:
-
-   using Object<TYPE_T>::center_;
-   using Object<TYPE_T>::velocity_;
-   using Object<TYPE_T>::acceleration_;
-
 public:   
    
    /** \name Constructors and destructor
    *   @{
    */
-   /** Deleted trivial constructor. */
-   Point() = delete;
-
-   /** Direct initialization constructor in which the arguments are moved into the members. */
-   Point( Vector3<TYPE_T> && _center, 
-          Vector3<TYPE_T> && _vel = {},
-          Vector3<TYPE_T> && _acc = {} ) : Object<TYPE_T>( std::move(_center), std::move(_vel), std::move(_acc) ) {}
+   /** Default trivial constructor. */
+   Point() = default;
    
    /** Default move constructor. */
    Point( Point && ) = default;

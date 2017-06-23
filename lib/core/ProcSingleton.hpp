@@ -7,7 +7,6 @@
 #include <BasicBases.hpp>
 
 #include "ProcTimer.hpp"
-
 #include "World.hpp"
 
 #ifdef __SN_USE_MPI__
@@ -42,16 +41,16 @@ namespace simpleNewton {
 //=== CLASS ================================================================================================================================
 
 /** This is a singleton class responsible for managing the most important functions and requirements of a process. The instance 
-*   manages the MPI initialization and finalization, provides an unconventional exit strategy for the program and also a timer, among other 
-*   functions and services. The lifetime of the singleton spans the lifetime of the program. Any program using the simpleNewton framework
-*   must necessarily begin by calling the ProcSingleton's init member function.
+*   manages the simulation space, MPI initialization and finalization and also a timer, among other functions and services. The lifetime of 
+*   the singleton spans the lifetime of the program. Any program using the simpleNewton framework must necessarily begin by calling the 
+*   ProcSingleton's init member function.
 */
 //==========================================================================================================================================
 
 class ProcSingleton : private Singleton {
 
    /* A friend indeed! */
-   template< typename FP_T > friend class Simulator;
+   template< typename FP_TYPE_T, class KINEMATICS_BB > friend class Simulator;
    
 public:
    
@@ -61,17 +60,26 @@ public:
    /** \name Access
    *   @{
    */
-   /** A function to obtain the singleton instance */
+   /** A function to obtain the singleton instance. */
    static const ProcSingleton & getInstance();
    
-   /** A function which inspects the state of the process singleton: has it been initialised? */
-   static bool isInitialized();
+   /** A function which inspects the state of the process singleton: has it been initialised? Any program which makes use of the 
+   *   simpleNewton framework must initialize the ProcSingleton.
+   *
+   *   \return   True if the ProcSingleton has been initialized, false if not.
+   */
+   static inline bool isInitialized() {
+      return getPrivateInstance().is_initialized_;
+   }
    
-   /** A function which inspects the state of the process singleton: has it been initialised with thread support? */
-   static bool isInitializedWithMultithreading();
-   
-   /** A function which can be used to ascertain the name of the executable. */
-   static const std::string & getExecName();
+   /** A function which inspects the state of the process singleton: has it been initialised with thread support? Any program which makes 
+   *   use of the simpleNewton framework with multithreading/OpenMP must initialize the ProcSingleton accordingly.
+   *
+   *   \return   True if the ProcSingleton has been initialized with thread support, false if not.
+   */
+   static inline bool isInitializedWithMultithreading() {
+      return getPrivateInstance().is_initialized_with_multithreading_;
+   }
    
    /** A function which can be used to get the process rank.
    *
@@ -106,9 +114,6 @@ public:
    
    /** @} */
    
-   /** A function which decides the unconventional exit strategy for errors, exceptions and other reasons. */
-   static inline void ExitProgram() { std::quick_exit( EXIT_FAILURE ); }
-   
 private:
    
    /* Matters of god (!) */
@@ -133,8 +138,20 @@ private:
       return single;
    }
    
-   /** Name of the exec */
-   std::string exec_name_;
+   /** A function to obtain the simulation world. The world is created by lazy-initialization.
+   *
+   *   \return   A reference to the world.
+   */
+   template< typename FP_TYPE_T, class KINEMATICS_BB >
+   static inline World< FP_TYPE_T, KINEMATICS_BB > & getWorld() {
+      
+      static World< FP_TYPE_T, KINEMATICS_BB > singleWorld;
+      return singleWorld;
+   }
+   
+   /** @} */
+   
+   
    
    /** State flags */
    bool is_initialized_ = false;
@@ -148,9 +165,6 @@ private:
    
    /** Thread size */
    int omp_thread_size_ = 0;
-   
-   /** Simulation space -> the world */
-   World world_;
 };
 
 

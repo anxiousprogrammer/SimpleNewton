@@ -122,8 +122,9 @@ include_directories( "${simpleNewton_SOURCE_DIR}/lib" )
 
 add_subdirectory( lib )
 
-set( BASIC_LIBRARIES ASSERTS PROCMAN LOGGER CONCURRENCY MPI EXCEPTIONS TYPES ) # Opposite order makes sure dependencies are taken care of
-set( WORLD_LIBRARIES WORLD )
+# Opposite order takes care of dependencies
+set( BASIC_LIBRARIES ASSERTS PROCMAN LOGGER CONCURRENCY MPI EXCEPTIONS TYPECONSTRAINTS BASICTYPETRAITS TYPES GLOBAL )
+set( COMMON_LIBRARIES SIMULATOR WORLD CONTAINERS )
 
 if( SN_USE_MPI )
    set( BASIC_LIBRARIES ${BASIC_LIBRARIES} ${MPI_CXX_LIBRARIES} )
@@ -142,10 +143,10 @@ add_executable( TypelistTest ${simpleNewton_SOURCE_DIR}/prog/TypelistTest.cpp )
 add_executable( OMPTest ${simpleNewton_SOURCE_DIR}/prog/OMPTest.cpp )
 add_executable( FieldTest ${simpleNewton_SOURCE_DIR}/prog/FieldTest.cpp )
 # link the execs
+target_link_libraries( TypelistTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
 target_link_libraries( AssertTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
 target_link_libraries( LoggerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
 target_link_libraries( ContainerTest ${BASIC_LIBRARIES} TYPECONSTRAINTS CONTAINERS )
 target_link_libraries( MPITest ${BASIC_LIBRARIES} TYPECONSTRAINTS CONTAINERS )
-target_link_libraries( TypelistTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
-target_link_libraries( OMPTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
-target_link_libraries( FieldTest ${BASIC_LIBRARIES} TYPECONSTRAINTS )
+target_link_libraries( OMPTest ${BASIC_LIBRARIES} TYPECONSTRAINTS CONTAINERS )
+target_link_libraries( FieldTest ${BASIC_LIBRARIES} ${COMMON_LIBRARIES} )

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   Contains implementation of the classes in the header, World.
+///   Contains explicit instantiations of the classes in the header, World.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
@@ -24,5 +24,8 @@
 
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
+
+template class World< real_t, EulerExplicitWKBB< real_t > >;
+template class World< single_t, EulerExplicitWKBB< single_t > >;
 
 }   // namespace simpleNewton

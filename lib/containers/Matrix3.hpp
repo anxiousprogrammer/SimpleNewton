@@ -1,8 +1,11 @@
 #ifndef SN_MATRIX3_HPP
 #define SN_MATRIX3_HPP
 
+#include <Global.hpp>
+
 #include <logger/Logger.hpp>
 #include <types/DTInfo.hpp>
+
 #include "FArray.hpp"
 
 //==========================================================================================================================================
@@ -67,9 +70,7 @@ public:
    *
    *   \param _val   The value which is to be used to populate the matrix.
    */
-   explicit Matrix3( const FP_TYPE_T & _val ) : FArray<FP_TYPE_T, 9>( _val ) {
-      SN_CT_REQUIRE_FP_TYPE< FP_TYPE_T >();
-   }
+   explicit Matrix3( const FP_TYPE_T & _val ) : FArray<FP_TYPE_T, 9>( _val ) { SN_CT_REQUIRE_FP_TYPE< FP_TYPE_T >(); }
    
    /** List initialization constructor which takes every value of the matrix as argument.
    *
@@ -332,7 +333,7 @@ public:
    *   \param _ref   The scalar with which the matrix is to be compared.
    *   \return       True if the quantities are equal.
    */
-   inline bool operator==( const FP_TYPE_T & _ref ) {
+   inline bool operator==( const FP_TYPE_T & _ref ) const {
       
       return ( std::fabs( data_[0] - _ref ) <= globalConstants::ZERO && std::fabs( data_[1] - _ref ) <= globalConstants::ZERO && 
                std::fabs( data_[2] - _ref ) <= globalConstants::ZERO && std::fabs( data_[3] - _ref ) <= globalConstants::ZERO &&
@@ -346,7 +347,7 @@ public:
    *   \param _ref   The scalar with which the matrix is to be compared.
    *   \return       True if the matrix is less than the provided scalar value.
    */
-   inline bool operator<( const FP_TYPE_T & _ref ) {
+   inline bool operator<( const FP_TYPE_T & _ref ) const {
       
       return ( data_[0] < _ref && data_[1] < _ref && data_[2] < _ref && 
                data_[3] < _ref && data_[4] < _ref && data_[5] < _ref && 
@@ -358,7 +359,7 @@ public:
    *   \param _ref   The scalar with which the matrix is to be compared.
    *   \return       True if the matrix is less than or equal to the provided scalar value.
    */
-   inline bool operator<=( const FP_TYPE_T & _ref ) {
+   inline bool operator<=( const FP_TYPE_T & _ref ) const {
       
       return ( data_[0] <= _ref && data_[1] <= _ref && data_[2] <= _ref && 
                data_[3] <= _ref && data_[4] <= _ref && data_[5] <= _ref && 
@@ -370,7 +371,7 @@ public:
    *   \param _ref   The scalar with which the matrix is to be compared.
    *   \return       True if the matrix is greater than the provided scalar value.
    */
-   inline bool operator>( const FP_TYPE_T & _ref ) {
+   inline bool operator>( const FP_TYPE_T & _ref ) const {
       
       return ( data_[0] > _ref && data_[1] > _ref && data_[2] > _ref && 
                data_[3] > _ref && data_[4] > _ref && data_[5] > _ref && 
@@ -382,7 +383,7 @@ public:
    *   \param _ref   The scalar with which the matrix is to be compared.
    *   \return       True if the matrix is greater than or equal to the provided scalar value.
    */
-   bool operator>=( const FP_TYPE_T & _ref ) {
+   inline bool operator>=( const FP_TYPE_T & _ref ) const {
       
       return ( data_[0] >= _ref && data_[1] >= _ref && data_[2] >= _ref && 
                data_[3] >= _ref && data_[4] >= _ref && data_[5] >= _ref && 

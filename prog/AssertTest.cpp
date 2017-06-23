@@ -122,7 +122,7 @@ int main() {
    SN_ASSERT_GREQ( value, 10 );
    SN_ASSERT_ZERO( 1E-16 );
    
-   SN_ASSERT_MSG( value == 10, "Here" );
+   SN_ASSERT_MSG( "Here", value == 10 );
    
    SN_ASSERT_SIZE_STRICTLY_LESS_THAN( 1, 2 );
    SN_ASSERT_SIZE_LESS_THAN( 1, 2 );

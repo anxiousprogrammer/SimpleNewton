@@ -11,6 +11,7 @@ int main( int argc, char ** argv ) {
    SN_LOG_L1_EVENT_WATCH_REGION_LIMIT();
    int j = 0;
    float k = 0.f;
+   
    ProcSingleton::init( argc, argv );
 
    SN_LOG_L1_EVENT_WATCH_REGION_LIMIT();

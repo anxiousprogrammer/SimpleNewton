@@ -1,7 +1,5 @@
-#ifndef SN_EXIT_HPP
-#define SN_EXIT_HPP
 
-#include <cstdlib>
+#include <Global.hpp>
 
 //=========================================================================================================================================
 //
@@ -18,7 +16,7 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   This file provides a function for the unconventional exit strategy within the framework.
+///   This file provides the implementation of the header, Global.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
@@ -28,8 +26,29 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
-void ExitProgram();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//   Global variables (mostly internal - non-client info)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace globalVariables {
+
+/** The cardinality of the array of command line arguments. */
+int argc = 0;
+
+/** The array of command line arguments. */
+char ** argv = nullptr;
+
+}   // namespace globalVariables
+#endif   // DOXYSKIP
+
+
+
+void ExitProgram() {
+   
+   std::quick_exit( EXIT_FAILURE );
+   
+}
 
 }   // namespace simpleNewton
-
-#endif   // header guard

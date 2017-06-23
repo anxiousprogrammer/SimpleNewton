@@ -10,10 +10,10 @@
 #include <asserts/Asserts.hpp>
 #include <asserts/TypeConstraints.hpp>
 
-#include <core/Exceptions.hpp>
-
 #include <containers/Field.hpp>
 #include <containers/Vector3.hpp>
+
+#include <core/Exceptions.hpp>
 
 #include <geometry/Object.hpp>
 
@@ -52,6 +52,9 @@ class WorldKinematicsBB : private NonCopyable, private NonMovable {
    
 public:
 
+   /** This typedef identifies the floating point precision type being employed by the kinematics engine. */
+   using precType = FP_TYPE_T;
+   
    /** \name Constructors and destructor
    *   @{
    */

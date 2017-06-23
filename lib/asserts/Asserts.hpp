@@ -5,8 +5,7 @@
 #include <cmath>
 #include <sstream>
 
-#include <GlobalConstants.hpp>
-#include <Exit.hpp>
+#include <Global.hpp>
 
 #include <logger/Logger.hpp>
 
@@ -302,202 +301,202 @@ inline void assert_index_within_size( const U_INT & IND, const U_INT & SIZE, con
 //////////////////////
 
 /**   Run-time requirement failing which the program will exit with a suitable error message. The macro will direct its output at the 
-*     logger with information about the file, line and function.
-*
-*     \param EXPR bool expression which needs to be evaluated.
+*     logger with information about the file, line and function. The ellipsis captures the bool expression which formulates the requirement.
 */
-#define SN_REQUIRE( EXPR ) \
-do { asserts::internal::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE( ... ) \
+do { asserts::internal::assert( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement of equality failing which the program will exit with a suitable error message. The macro will direct its output 
-*     at the logger with information about the file, line and function.
+*     at the logger with information about the file, line and function. Note: the ellipsis captures the variable. This is to 
+*     accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for equality.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_EQUAL( VAL, REF ) \
-do { asserts::internal::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_EQUAL( REF, ... ) \
+do { asserts::internal::assert_equal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement of equality in floating point arithmetic failing which the program will exit with a suitable error message. The 
-*     macro will direct its output at the logger with information about the file, line and function.
+*     macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis captures the 
+*     variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for equality.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_FP_EQUAL( VAL, REF ) \
-do { asserts::internal::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_FP_EQUAL( REF, ... ) \
+do { asserts::internal::assert_fp_equal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 
 /**   Run-time requirement of inequality failing which the program will exit with a suitable error message. The macro will direct its 
-*     output at the logger with information about the file, line and function.
+*     output at the logger with information about the file, line and function. Note: the ellipsis captures the variable. This is to 
+*     accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for inequality.
+*     \param REF An instance which needs to be compared with another.
 */
-#define SN_REQUIRE_INEQUAL( VAL, REF ) \
-do { asserts::internal::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_INEQUAL( REF, ... ) \
+do { asserts::internal::assert_inequal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement of inequality in floating point arithmetic failing which the program will exit with a suitable error message. 
-*     The macro will direct its output at the logger with information about the file, line and function.
+*     The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis captures the 
+*     reference value. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for inequality.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_FP_INEQUAL( VAL, REF ) \
-do { asserts::internal::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_FP_INEQUAL( REF, ... ) \
+do { asserts::internal::assert_fp_inequal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that one value be less than another, failing which the program will exit with a suitable error message. The 
-*     macro will direct its output at the logger with information about the file, line and function.
+*     macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis captures the 
+*     variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_LESS_THAN( VAL, REF ) \
-do { asserts::internal::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_LESS_THAN( REF, ... ) \
+do { asserts::internal::assert_less_than( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that one value be less than or equal to another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_LEQ( VAL, REF ) \
-do { asserts::internal::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_LEQ( REF, ... ) \
+do { asserts::internal::assert_leq( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that one value be greater than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_GREATER_THAN( VAL, REF ) \
-do { asserts::internal::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_GREATER_THAN( REF, ... ) \
+do { asserts::internal::assert_greater_than( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that one value be greater than or equal to another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_REQUIRE_GREQ( VAL, REF ) \
-do { asserts::internal::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_GREQ( REF, ... ) \
+do { asserts::internal::assert_greq( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that a value be equal to zero in floating point arithmetic, failing which the program will exit with a suitable 
-*     error message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be zero valued.
+*     error message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_REQUIRE_ZERO( VAL ) \
-do { asserts::internal::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_ZERO( ... ) \
+do { asserts::internal::assert_zero( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that a value not be equal to zero in floating point arithmetic, failing which the program will exit with a 
-*     suitable error message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be non-zero valued.
+*     suitable error message. The macro will direct its output at the logger with information about the file, line and function. Note: the 
+*     ellipsis captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 */
-#define SN_REQUIRE_NOT_ZERO( VAL ) \
-do { asserts::internal::assert_not_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_NOT_ZERO( ... ) \
+do { asserts::internal::assert_not_zero( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that a value be positive, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be positive.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_REQUIRE_POSITIVE( VAL ) \
-do { asserts::internal::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_POSITIVE( ... ) \
+do { asserts::internal::assert_positive( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that a value be negative, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be negative.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_REQUIRE_NEGATIVE( VAL ) \
-do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_NEGATIVE( ... ) \
+do { asserts::internal::assert_negative( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement failing which the program will exit with a user-defined error message. The macro will direct its output at the 
-*     logger with information about the file, line and function.
+*     logger with information about the file, line and function. Note: the ellipsis captures the requirement. This is to accommodate for 
+*     template function and class names which may have multiple template parameters.
 *
-*     \param EXPR A bool expression.
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
-#define SN_REQUIRE_MSG( EXPR, MSG ) \
+#define SN_REQUIRE_MSG( MSG, ... ) \
 do { \
       std::stringstream oss; \
       oss << MSG; \
-      asserts::internal::assert_msg< EXPR >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
+      asserts::internal::assert_msg< __VA_ARGS__ >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /* Run-time constraints related to container sizes */
 
 /**   Run-time requirement that two sizes be the same, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_REQUIRE_SIZE_SAME( SIZE, REF ) \
-do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+#define SN_REQUIRE_SIZE_SAME( SIZE, ... ) \
+do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(__VA_ARGS__), \
                                       __FILE__, __LINE__, __func__ ); } while(false)
 
 
 /**   Run-time requirement that one size be less than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_REQUIRE_SIZE_LESS_THAN( SIZE, REF ) \
-do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+#define SN_REQUIRE_SIZE_LESS_THAN( SIZE, ... ) \
+do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(__VA_ARGS__), \
                                            __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   Run-time requirement that one size be strictly less than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_REQUIRE_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
-do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
-                                                    __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_REQUIRE_SIZE_STRICTLY_LESS_THAN( SIZE, ... ) \
+do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), \
+                                                        static_cast< const unsigned long >(__VA_ARGS__), \
+                                                        __FILE__, __LINE__, __func__ ); } while(false)
 
 
 /**   Run-time requirement that an index be less than its corresponding container's size, failing which the program will exit with a 
-*     suitable error message. The macro will direct its output at the logger with information about the file, line and function.
+*     suitable error message. The macro will direct its output at the logger with information about the file, line and function. Note: the 
+*     ellipsis captures the size variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 *
 *     \param IND  An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_REQUIRE_INDEX_WITHIN_SIZE( IND, REF ) \
-do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
+#define SN_REQUIRE_INDEX_WITHIN_SIZE( IND, ... ) \
+do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(__VA_ARGS__),\
                                               __FILE__, __LINE__, __func__ ); } while(false)
 
 
@@ -509,24 +508,24 @@ do { asserts::internal::assert_index_within_size( static_cast< const unsigned lo
 #ifdef NDEBUG
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#define SN_ASSERT( EXPR )
-#define SN_ASSERT_EQUAL( VAL, REF )
-#define SN_ASSERT_FP_EQUAL( VAL, REF )
-#define SN_ASSERT_INEQUAL( VAL, REF )
-#define SN_ASSERT_FP_INEQUAL( VAL, REF )
-#define SN_ASSERT_LESS_THAN( VAL, REF )
-#define SN_ASSERT_LEQ( VAL, REF )
-#define SN_ASSERT_GREATER_THAN( VAL, REF )
-#define SN_ASSERT_GREQ( VAL, REF )
-#define SN_ASSERT_ZERO( VAL )
-#define SN_ASSERT_NOT_ZERO( VAL )
-#define SN_ASSERT_POSITIVE( VAL )
-#define SN_ASSERT_NEGATIVE( VAL )
-#define SN_ASSERT_MSG( EXPR, MSG )
-#define SN_ASSERT_SIZE_SAME( SIZE, REF )
-#define SN_ASSERT_SIZE_LESS_THAN( SIZE, REF )
-#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, REF )
-#define SN_ASSERT_INDEX_WITHIN_SIZE( SIZE, REF )
+#define SN_ASSERT( ... )
+#define SN_ASSERT_EQUAL( REF, ... )
+#define SN_ASSERT_FP_EQUAL( REF, ... )
+#define SN_ASSERT_INEQUAL( REF, ... )
+#define SN_ASSERT_FP_INEQUAL( REF, ... )
+#define SN_ASSERT_LESS_THAN( REF, ... )
+#define SN_ASSERT_LEQ( REF, ... )
+#define SN_ASSERT_GREATER_THAN( REF, ... )
+#define SN_ASSERT_GREQ( REF, ... )
+#define SN_ASSERT_ZERO( ... )
+#define SN_ASSERT_NOT_ZERO( ... )
+#define SN_ASSERT_POSITIVE( ... )
+#define SN_ASSERT_NEGATIVE( ... )
+#define SN_ASSERT_MSG( MSG, ... )
+#define SN_ASSERT_SIZE_SAME( SIZE, ... )
+#define SN_ASSERT_SIZE_LESS_THAN( SIZE, ... )
+#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, ... )
+#define SN_ASSERT_INDEX_WITHIN_SIZE( SIZE, ... )
 
 #endif   // DOXYSKIP
 #else
@@ -534,201 +533,201 @@ do { asserts::internal::assert_index_within_size( static_cast< const unsigned lo
 
 
 /**   DEBUG mode run-time requirement failing which the program will exit with a suitable error message. The macro will direct its 
-*     output at the logger with information about the file, line and function.
-*
-*     \param EXPR bool expression which needs to be evaluated.
+*     output at the logger with information about the file, line and function. Note: the ellipsis captures the bool expression. This is to 
+*     accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_ASSERT( EXPR ) \
-do { asserts::internal::assert( EXPR, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT( ... ) \
+do { asserts::internal::assert( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement of equality failing which the program will exit with a suitable error message. The macro will 
-*     direct its output at the logger with information about the file, line and function.
+*     direct its output at the logger with information about the file, line and function. Note: the ellipsis captures the variable. This is 
+*     to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for equality.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_EQUAL( VAL, REF ) \
-do { asserts::internal::assert_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_EQUAL( REF, ... ) \
+do { asserts::internal::assert_equal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement of equality in floating point arithmetic failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for equality.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_FP_EQUAL( VAL, REF ) \
-do { asserts::internal::assert_fp_equal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_FP_EQUAL( REF, ... ) \
+do { asserts::internal::assert_fp_equal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement of inequality failing which the program will exit with a suitable error message. The macro will 
-*     direct its output at the logger with information about the file, line and function.
+*     direct its output at the logger with information about the file, line and function. Note: the ellipsis captures the variable. This is 
+*     to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for inequality.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_INEQUAL( VAL, REF ) \
-do { asserts::internal::assert_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_INEQUAL( REF, ... ) \
+do { asserts::internal::assert_inequal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement of inequality in floating point arithmetic failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for inequality.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_FP_INEQUAL( VAL, REF ) \
-do { asserts::internal::assert_fp_inequal( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_FP_INEQUAL( REF, ... ) \
+do { asserts::internal::assert_fp_inequal( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that one value be less than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_LESS_THAN( VAL, REF ) \
-do { asserts::internal::assert_less_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_LESS_THAN( REF, ... ) \
+do { asserts::internal::assert_less_than( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that one value be less than or equal to another, failing which the program will exit with a suitable 
-*     error message. The macro will direct its output at the logger with information about the file, line and function.
+*     error message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_LEQ( VAL, REF ) \
-do { asserts::internal::assert_leq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_LEQ( REF, ... ) \
+do { asserts::internal::assert_leq( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that one value be greater than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_GREATER_THAN( VAL, REF ) \
-do { asserts::internal::assert_greater_than( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_GREATER_THAN( REF, ... ) \
+do { asserts::internal::assert_greater_than( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that one value be greater than or equal to another, failing which the program will exit with a 
-*     suitable error message. The macro will direct its output at the logger with information about the file, line and function.
+*     suitable error message. The macro will direct its output at the logger with information about the file, line and function. Note: the 
+*     ellipsis captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 *
-*     \param VAL An instance which needs to be compared with another.
-*     \param REF An instance of the same type as VAL which serves as reference for comparison.
+*     \param REF The reference value provided.
 */
-#define SN_ASSERT_GREQ( VAL, REF ) \
-do { asserts::internal::assert_greq( VAL, REF, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_GREQ( REF, ... ) \
+do { asserts::internal::assert_greq( REF, __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that a value be equal to zero in floating point arithmetic, failing which the program will exit with 
-*     a suitable error message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be zero valued.
+*     a suitable error message. The macro will direct its output at the logger with information about the file, line and function. Note: 
+*     the ellipsis captures the variable. This is to accommodate for template function and class names which may have multiple template 
+*     parameters.
 */
-#define SN_ASSERT_ZERO( VAL ) \
-do { asserts::internal::assert_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_ZERO( ... ) \
+do { asserts::internal::assert_zero( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that a value not be equal to zero in floating point arithmetic, failing which the program will exit 
-*     with a suitable error message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be non-zero valued.
+*     with a suitable error message. The macro will direct its output at the logger with information about the file, line and function. 
+*     Note: the ellipsis captures the variable. This is to accommodate for template function and class names which may have multiple 
+*     template parameters.
 */
-#define SN_ASSERT_NOT_ZERO( VAL ) \
-do { asserts::internal::assert_not_zero( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_NOT_ZERO( ... ) \
+do { asserts::internal::assert_not_zero( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that a value be positive, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be positive.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_ASSERT_POSITIVE( VAL ) \
-do { asserts::internal::assert_positive( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_POSITIVE( ... ) \
+do { asserts::internal::assert_positive( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that a value be negative, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
-*
-*     \param VAL An instance which needs to be negative.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 */
-#define SN_ASSERT_NEGATIVE( VAL ) \
-do { asserts::internal::assert_negative( VAL, __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_NEGATIVE( ... ) \
+do { asserts::internal::assert_negative( __VA_ARGS__, __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement failing which the program will exit with a user-defined error message. The macro will direct its 
-*     output at the logger with information about the file, line and function.
+*     output at the logger with information about the file, line and function. Note: the ellipsis captures the variable. This is to 
+*     accommodate for template function and class names which may have multiple template parameters.
 *
-*     \param EXPR A bool expression.
 *     \param MSG  Error message which will be passed to the constructor of std::string.
 */
-#define SN_ASSERT_MSG( EXPR, MSG ) \
+#define SN_ASSERT_MSG( MSG, ... ) \
 do { \
       std::stringstream oss; \
       oss << MSG; \
-      asserts::internal::assert_msg< EXPR >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
+      asserts::internal::assert_msg< __VA_ARGS__ >( oss.str().c_str(), __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /* Run-time constraints related to container sizes */
 
 /**   DEBUG mode run-time requirement that two sizes be the same, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_ASSERT_SIZE_SAME( SIZE, REF ) \
-do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+#define SN_ASSERT_SIZE_SAME( SIZE, ... ) \
+do { asserts::internal::assert_size_same( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(__VA_ARGS__), \
                                       __FILE__, __LINE__, __func__ ); } while(false)
 
 
 /**   DEBUG mode run-time requirement that one size be less than another, failing which the program will exit with a suitable error 
-*     message. The macro will direct its output at the logger with information about the file, line and function.
+*     message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_ASSERT_SIZE_LESS_THAN( SIZE, REF ) \
-do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
+#define SN_ASSERT_SIZE_LESS_THAN( SIZE, ... ) \
+do { asserts::internal::assert_size_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(__VA_ARGS__), \
                                            __FILE__, __LINE__, __func__ ); } while(false)
 
 
 /**   DEBUG mode run-time requirement that one size be strictly less than another, failing which the program will exit with a suitable 
-*     error message. The macro will direct its output at the logger with information about the file, line and function.
+*     error message. The macro will direct its output at the logger with information about the file, line and function. Note: the ellipsis 
+*     captures the variable. This is to accommodate for template function and class names which may have multiple template parameters.
 *
 *     \param SIZE An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, REF ) \
-do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), static_cast< const unsigned long >(REF), \
-                                                    __FILE__, __LINE__, __func__ ); } while(false)
+#define SN_ASSERT_SIZE_STRICTLY_LESS_THAN( SIZE, ... ) \
+do { asserts::internal::assert_size_strictly_less_than( static_cast< const unsigned long >(SIZE), \
+                                                        static_cast< const unsigned long >(__VA_ARGS__), \
+                                                        __FILE__, __LINE__, __func__ ); } while(false)
 
 
 
 /**   DEBUG mode run-time requirement that an index be less than its corresponding container's size, failing which the program will exit 
-*     with a suitable error message. The macro will direct its output at the logger with information about the file, line and function.
+*     with a suitable error message. The macro will direct its output at the logger with information about the file, line and function. 
+*     Note: the ellipsis captures the size variable. This is to accommodate for template function and class names which may have multiple 
+*     template parameters.
 *
 *     \param IND  An integer-valued container size.
-*     \param REF  An integer-valued container size reference.
 */
-#define SN_ASSERT_INDEX_WITHIN_SIZE( IND, REF ) \
-do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(REF), \
+#define SN_ASSERT_INDEX_WITHIN_SIZE( IND, ... ) \
+do { asserts::internal::assert_index_within_size( static_cast< const unsigned long >(IND), static_cast< const unsigned long >(__VA_ARGS__),\
                                               __FILE__, __LINE__, __func__ ); } while(false)
 
 #endif

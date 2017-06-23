@@ -66,9 +66,6 @@ public:
    /** Default copy constructor. */
    FArray( const FArray<TYPE_T, SIZE> & ) = default;
    
-   /** Default move constructor. */
-   FArray( FArray<TYPE_T, SIZE> && ) = default;
-   
    /** Default destructor. */
    ~FArray() = default;
    

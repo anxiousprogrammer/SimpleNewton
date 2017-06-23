@@ -8,6 +8,8 @@
    #include <omp.h>
 #endif
 
+#include <Global.hpp>
+
 //==========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
@@ -72,8 +74,9 @@ void ProcSingleton::init( int argc, char ** argv, uint_t thread_count ) {
          }
       }
       
-      // Exec name
-      getPrivateInstance().exec_name_ = argv[0];
+      // Store the command line arguments
+      globalVariables::argc = argc;
+      globalVariables::argv = argv;
       
       // Console initialization
       SN_MPI_ROOTPROC_REGION() {
@@ -180,16 +183,6 @@ void ProcSingleton::init( int argc, char ** argv, uint_t thread_count ) {
 
 
 
-/** Multiple modules may require the executable's name for purposes of file writing, among others.
-*
-*   \return   A string with the name of the executable in it.
-*/
-const std::string & ProcSingleton::getExecName() {
-   return getPrivateInstance().exec_name_;
-}
-
-
-
 /** Performs cleanup and calls MPI_Finalize(). */
 ProcSingleton::~ProcSingleton() {
 
@@ -217,31 +210,9 @@ ProcSingleton::~ProcSingleton() {
                 << "========================================================================================================>" << std::endl;
    }
 
-   exec_name_ = "";
    is_initialized_ = false;
    comm_size_ = 0;
    comm_rank_ = 0;
 }
-
-
-
-/** Any program which makes use of the simpleNewton framework must initialize the ProcSingleton.
-*
-*   \return   true if the ProcSingleton has been initialized, false if not.
-*/
-bool ProcSingleton::isInitialized() {
-   return getPrivateInstance().is_initialized_;
-}
-
-
-
-/** Any program which makes use of the simpleNewton framework with multithreading/OpenMP must initialize the ProcSingleton accordingly.
-*
-*   \return   true if the ProcSingleton has been initialized with thread support, false if not.
-*/
-bool ProcSingleton::isInitializedWithMultithreading() {
-   return getPrivateInstance().is_initialized_with_multithreading_;
-}
-
 
 }   // namespace simpleNewton

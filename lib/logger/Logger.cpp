@@ -9,6 +9,8 @@
    #include <mutex>
 #endif
 
+#include <Global.hpp>
+
 #include <concurrency/OpenMP.hpp>
 
 //==========================================================================================================================================
@@ -46,6 +48,7 @@ bool consoleSwitch_ = true;                          // Here's another global!
 }   // namespace internal
 }   // namespace logger
 #endif   // DOXYSKIP
+
 
 
 /** The buffer must be flushed after streaming to ensure output.
@@ -107,7 +110,7 @@ void Logger::writeLog() {
    #endif
    
    try {
-      file.open( "_log_on_proc" + std::to_string( rank ), std::ios_base::app );
+      file.open( string_cast( globalVariables::argv[0] ) + "_log_on_proc" + std::to_string( rank ), std::ios_base::app );
    }
    catch( const std::ios_base::failure & ex ) {
       

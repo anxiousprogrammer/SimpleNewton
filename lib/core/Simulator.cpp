@@ -1,6 +1,7 @@
-#include <Exit.hpp>
 
-//=========================================================================================================================================
+#include "Simulator.hpp"
+
+//==========================================================================================================================================
 //
 //  This file is part of simpleNewton. simpleNewton is free software: you can 
 //  redistribute it and/or modify it under the terms of the GNU General Public
@@ -15,19 +16,17 @@
 //  You should have received a copy of the GNU General Public License along
 //  with simpleNewton (see LICENSE.txt). If not, see <http://www.gnu.org/licenses/>.
 //
-///   This file provides the implementation of the header, Exit.
+///   Contains the explicit instantiations of the class Simulator.
 ///   \file
 ///   \addtogroup core Core
 ///   \author Nitin Malapally (anxiousprogrammer) <nitin.malapally@gmail.com>
 //
-//=========================================================================================================================================
+//==========================================================================================================================================
 
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
-void ExitProgram() {
-   
-   std::quick_exit( EXIT_FAILURE );
-}
+template class Simulator< real_t, EulerExplicitWKBB< real_t > >;
+template class Simulator< single_t, EulerExplicitWKBB< single_t > >;
 
 }   // namespace simpleNewton

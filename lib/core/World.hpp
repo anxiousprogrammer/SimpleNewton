@@ -3,18 +3,17 @@
 
 #include <algorithm>
 
+#include <Global.hpp>
 #include <Types.hpp>
 #include <types/Functor.hpp>
 #include <BasicBases.hpp>
-#include <GlobalConstants.hpp>
 
 #include <asserts/Asserts.hpp>
 #include <asserts/TypeConstraints.hpp>
 
-#include <core/Exceptions.hpp>
-
 #include <containers/Vector3.hpp>
 
+#include <core/Exceptions.hpp>
 #include "kinematics/AllWKBBs.hpp"
 
 #include <geometry/Object.hpp>
@@ -44,23 +43,30 @@
 /** The space in which all global entities of the framework are accessible */
 namespace simpleNewton {
 
+template< typename FP_TYPE_T, class KINEMATICS_BB >
 class World : private NonCopyable, private NonMovable {
 
    /* A friend indeed! */
-   template< typename FP_T > friend class Simulator;
+   template< typename FP_T, class KIN_BB > friend class Simulator;
 
 public:
    
-   /** This typedef identifies the floating point precision being employed by the world. */
-   using precType = real_t;
+   /** This typedef identifies the type of the kinematic engine used by the world. */
+   using kinematicType = KINEMATICS_BB;
    
-   World() = default;
+   /** This typedef identifies the floating point precision being employed by the world. */
+   using precType = FP_TYPE_T;
+   
+   World() { SN_CT_REQUIRE_FP_TYPE< FP_TYPE_T >(); SN_CT_REQUIRE_DERIVED_FROM< KINEMATICS_BB, WorldKinematicsBB< precType > >(); }
+   
+   
    
 private:
 
    Vector3< precType > domain_ = {};
-   precType domain_offset_ = {};
-   small_t parallel_dimension_ = -1;
+   precType            domain_offset_ = {};
+   flag_t              domain_initialized_ = false;
+   small_t             parallel_dimension_ = -1;
 };
 
 }   // namespace simpleNewton

@@ -128,7 +128,7 @@ public:
 
 private:   // MEMBERS
    
-   std::stringstream buffer_ = std::stringstream( "" );   ///< The Buffer.
+   std::stringstream buffer_ = std::stringstream("");   ///< The Buffer.
 };
 
 
@@ -176,15 +176,18 @@ void report_warning( const std::string & , const std::string & , int , const std
 void markEventHorizon( const uint_t );
 
 void report_L1_event( LogEventType , const std::string & , int , const std::string & , const std::string & );
+
 void report_L2_event( const std::string & , int , const std::string & , const std::string & , const std::string & );
 
 void watch_impl( Logger & );
+
 template< class HEAD_PARAM, class... TAIL_PARAM >
 void watch_impl( Logger & lg, const HEAD_PARAM & head, const TAIL_PARAM &... tail ) {
 
    lg << head << "   ";
    watch_impl( lg, tail... );   
 }
+
 template< class... PARAM >
 void watch_variables( const std::string & msg, const std::string & file, int line, const std::string & func, PARAM... arg ) {
 
